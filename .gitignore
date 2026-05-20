@@ -1,0 +1,8 @@
+# Ignore common OS files
+.DS_Store
+Thumbs.db
+
+# Ignore editor files
+*.swp
+*.swo
+.vscode/
