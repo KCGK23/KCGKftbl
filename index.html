@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Football Profile</title>
+  <link rel="stylesheet" href="styles.css.css" />
+</head>
+<body>
+  <header class="goalkeeper">
+    <img class="team-logo" src="team-logo.png" alt="Renfrew Juniors logo" />
+    <h1>My Player Profile</h1>
+    
+  </header>
+
+  <section class="profile-card">
+    <img src="player-photo.jpg" alt="Profile photo of Kyle Connelly" />
+    <div class="info">
+      <div id="aboutSection" style="display: none;">
+        <h2>About Me</h2>
+        <p>My name is Kyle Connelly I am 15 and I am a football player. I have been playing since 2022. I play as a goalkeeper for Renfrew Juniors. </p>
+      </div>
+
+      <div id="statsSection" style="display: none;">
+        <h3>Stats</h3>
+        <ul>
+          <li>Team: Renfrew Juniors</li>
+          <li>Position: Goalkeeper</li>
+          <li>Kit No. : 23</li>
+          <li>Yellow Cards: 1</li>
+          <li>Red Cards: 0</li>
+          <li>Preferred Foot: Right</li>
+        </ul>
+      </div>
+
+      <h1>Kyle Connelly</h1>
+      <h2>Goalkeeper</h2>
+      <button id="statsButton" onclick="toggleStats()">Show Stats</button>
+      <button id="aboutButton" onclick="toggleAbout()">Show About Me</button>
+      <div class="social-row">
+        <a class="social-button" href="https://www.tiktok.com/@that_gk_kyle23" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok profile">
+          <img class="social-logo" src="tiktok-logo.png" alt="TikTok logo" />
+        </a>
+        <a class="social-button social-button--text" href="https://www.youtube.com/results?search_query=renfrew+fc+blue+2011" target="_blank" rel="noopener noreferrer" aria-label="Open team YouTube channel">
+          <span class="social-text">Team YouTube Channel (matches and highlights)</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="fixtures-card">
+    <div class="fixtures-header">
+      <h2>Upcoming Fixtures</h2>
+        <p>Only you can add fixtures. Fixtures are stored locally unless a working remote service is configured.</p>
+      </div>
+
+      <div class="fixture-controls">
+        <button id="manageSiteButton" type="button" class="secondary-button">Site Management</button>
+      </div>
+
+      <div id="managementPanel" class="management-panel hidden">
+        <div class="fixture-access">
+          <label for="fixturePassword">Owner access required to add fixtures:</label>
+          <div class="fixture-access-row">
+            <input id="fixturePassword" type="password" placeholder="Enter owner password" />
+          </div>
+          <div class="fixture-access-buttons">
+            <button id="unlockFixturesButton" type="button" class="primary-button">Unlock Fixtures</button>
+            <button id="lockFixturesButton" type="button" class="secondary-button hidden">Lock Fixtures</button>
+          </div>
+          <p id="fixtureAccessMessage" class="fixture-message">Only the owner can add fixtures here.</p>
+        </div>
+      </div>
+
+    <form id="fixtureForm" class="fixture-form locked">
+      <div class="fixture-row">
+        <label>
+          Date
+          <input type="date" id="fixtureDate" required />
+        </label>
+        <label>
+          Opponent
+          <input type="text" id="fixtureOpponent" placeholder="Opponent" required />
+        </label>
+      </div>
+      <div class="fixture-row">
+        <label>
+          Competition
+          <input type="text" id="fixtureComp" placeholder="Competition" />
+        </label>
+        <label>
+          Location
+          <input type="text" id="fixtureLocation" placeholder="Venue" />
+        </label>
+      </div>
+      <button type="submit" class="primary-button">Add Fixture</button>
+    </form>
+
+    <div class="fixture-list-card">
+      <h3>Fixture List</h3>
+      <div id="fixtureLoading" class="fixture-loading hidden">Loading fixtures…</div>
+      <ul id="fixtureList">
+        <li class="fixture-empty">No fixtures added yet.</li>
+      </ul>
+    </div>
+  </section>
+
+  <script>
+    const FIXTURE_PASSWORD = 'KCGK@110311';
+    const FIXTURE_API_BASE = '';
+    const LOCAL_FIXTURE_KEY = 'localFixtures';
+    const UNLOCK_KEY = 'fixturesUnlocked';
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const fixtureForm = document.getElementById('fixtureForm');
+      const unlockButton = document.getElementById('unlockFixturesButton');
+      const lockButton = document.getElementById('lockFixturesButton');
+      const passwordInput = document.getElementById('fixturePassword');
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+      const manageButton = document.getElementById('manageSiteButton');
+      const managementPanel = document.getElementById('managementPanel');
+
+      if (fixtureForm) fixtureForm.addEventListener('submit', addFixture);
+      if (unlockButton) unlockButton.addEventListener('click', unlockFixtures);
+      if (lockButton) lockButton.addEventListener('click', lockFixtures);
+
+      if (manageButton && managementPanel) {
+        manageButton.addEventListener('click', function() {
+          managementPanel.classList.toggle('hidden');
+        });
+      }
+
+      if (localStorage.getItem(UNLOCK_KEY) === 'true') {
+        unlockFixturesUI();
+        accessMessage.textContent = 'Fixture editor unlocked.';
+        accessMessage.classList.add('success');
+        accessMessage.classList.remove('error');
+      } else {
+        lockFixturesUI();
+      }
+
+      loadSharedFixtures();
+    });
+
+    function unlockFixtures() {
+      const passwordInput = document.getElementById('fixturePassword');
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+      const entered = passwordInput.value.trim();
+
+      if (entered === FIXTURE_PASSWORD) {
+        localStorage.setItem(UNLOCK_KEY, 'true');
+        passwordInput.value = '';
+        passwordInput.blur();
+        accessMessage.textContent = 'Fixture editor unlocked. You can now add fixtures.';
+        accessMessage.classList.add('success');
+        accessMessage.classList.remove('error');
+        unlockFixturesUI();
+      } else {
+        accessMessage.textContent = 'Wrong password. Only you can add fixtures.';
+        accessMessage.classList.add('error');
+        accessMessage.classList.remove('success');
+      }
+    }
+
+    function lockFixtures() {
+      localStorage.removeItem(UNLOCK_KEY);
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+      accessMessage.textContent = 'Fixture editor locked. Enter the owner password to unlock.';
+      accessMessage.classList.add('error');
+      accessMessage.classList.remove('success');
+      lockFixturesUI();
+    }
+
+    function unlockFixturesUI() {
+      const fixtureForm = document.getElementById('fixtureForm');
+      const lockButton = document.getElementById('lockFixturesButton');
+      fixtureForm.classList.remove('locked');
+      fixtureForm.style.display = 'flex';
+      lockButton.classList.remove('hidden');
+    }
+
+    function lockFixturesUI() {
+      const fixtureForm = document.getElementById('fixtureForm');
+      const lockButton = document.getElementById('lockFixturesButton');
+      fixtureForm.classList.add('locked');
+      fixtureForm.style.display = 'none';
+      lockButton.classList.add('hidden');
+    }
+
+    async function loadSharedFixtures() {
+      const list = document.getElementById('fixtureList');
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+      const loader = document.getElementById('fixtureLoading');
+      loader.classList.remove('hidden');
+
+      let fixtures = [];
+      let remoteFailed = false;
+
+      try {
+        if (FIXTURE_API_BASE) {
+          const response = await fetch(`${FIXTURE_API_BASE}?type=fixture&_sort=_createdOn`);
+          if (!response.ok) throw new Error('Could not load shared fixtures');
+          fixtures = await response.json();
+        }
+      } catch (error) {
+        remoteFailed = true;
+        console.warn('Remote load failed:', error);
+      }
+
+      if (!fixtures.length) {
+        fixtures = getLocalFixtures();
+      }
+
+      list.innerHTML = '';
+      if (!fixtures.length) {
+        list.innerHTML = '<li class="fixture-empty">No fixtures added yet.</li>';
+      } else {
+        fixtures.forEach(item => {
+          list.appendChild(createFixtureItem(item));
+        });
+      }
+
+      if (remoteFailed && fixtures.length) {
+        accessMessage.textContent = 'Remote storage unavailable. Loaded locally saved fixtures.';
+        accessMessage.classList.add('error');
+        accessMessage.classList.remove('success');
+      } else if (remoteFailed) {
+        accessMessage.textContent = 'Remote storage unavailable. You can still add fixtures locally.';
+        accessMessage.classList.add('error');
+        accessMessage.classList.remove('success');
+      } else {
+        accessMessage.textContent = 'Fixtures loaded.';
+        accessMessage.classList.add('success');
+        accessMessage.classList.remove('error');
+      }
+
+      loader.classList.add('hidden');
+    }
+
+    function getLocalFixtures() {
+      try {
+        const raw = localStorage.getItem(LOCAL_FIXTURE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveLocalFixtures(fixtures) {
+      localStorage.setItem(LOCAL_FIXTURE_KEY, JSON.stringify(fixtures));
+    }
+
+    function createFixtureItem(fixture) {
+      const item = document.createElement('li');
+      item.className = 'fixture-item';
+      item.innerHTML = `
+        <strong>${fixture.date}</strong>
+        <span>${fixture.opponent}</span>
+        <span>${fixture.competition || 'Friendly'}</span>
+        <span>${fixture.location || 'TBC'}</span>
+      `;
+      return item;
+    }
+
+    async function addFixture(event) {
+      event.preventDefault();
+      const date = document.getElementById('fixtureDate').value;
+      const opponent = document.getElementById('fixtureOpponent').value.trim();
+      const competition = document.getElementById('fixtureComp').value.trim();
+      const location = document.getElementById('fixtureLocation').value.trim();
+      const list = document.getElementById('fixtureList');
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+
+      if (!date || !opponent) return;
+      const payload = {
+        type: 'fixture',
+        date,
+        opponent,
+        competition: competition || 'Friendly',
+        location: location || 'TBC'
+      };
+
+      let saved = payload;
+      let remoteSaved = false;
+
+      try {
+        if (!FIXTURE_API_BASE) {
+          throw new Error('Remote storage not configured');
+        }
+
+        const response = await fetch(FIXTURE_API_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error('Unable to save fixture');
+        saved = await response.json();
+        remoteSaved = true;
+      } catch (error) {
+        console.warn('Saving fixture locally due to remote failure:', error);
+        const fixtures = getLocalFixtures();
+        fixtures.push(payload);
+        saveLocalFixtures(fixtures);
+        accessMessage.textContent = 'Saved locally because remote storage is unavailable.';
+        accessMessage.classList.add('error');
+        accessMessage.classList.remove('success');
+      }
+
+      const empty = list.querySelector('.fixture-empty');
+      if (empty) empty.remove();
+      list.appendChild(createFixtureItem(saved));
+      event.target.reset();
+
+      if (remoteSaved) {
+        accessMessage.textContent = 'Fixture saved successfully.';
+        accessMessage.classList.add('success');
+        accessMessage.classList.remove('error');
+      }
+    }
+
+    function toggleAbout() {
+      const about = document.getElementById('aboutSection');
+      const button = document.getElementById('aboutButton');
+
+      if (about.style.display === 'none' || about.style.display === '') {
+        about.style.display = 'block';
+        button.innerText = 'Hide About Me';
+      } else {
+        about.style.display = 'none';
+        button.innerText = 'Show About Me';
+      }
+    }
+
+    function toggleStats() {
+      const stats = document.getElementById('statsSection');
+      const button = document.getElementById('statsButton');
+
+      if (stats.style.display === 'none' || stats.style.display === '') {
+        stats.style.display = 'block';
+        button.innerText = 'Hide Stats';
+      } else {
+        stats.style.display = 'none';
+        button.innerText = 'Show Stats';
+      }
+    }
+  </script>
+</body>
+</html>
