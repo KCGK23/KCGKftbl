@@ -35,8 +35,8 @@
 
       <h1>Kyle Connelly</h1>
       <h2>Goalkeeper</h2>
-      <button id="statsButton" onclick="toggleStats()">Show Stats</button>
-      <button id="aboutButton" onclick="toggleAbout()">Show About Me</button>
+      <button id="statsButton">Show Stats</button>
+      <button id="aboutButton">Show About Me</button>
       <div class="social-row">
         <a class="social-button" href="https://www.tiktok.com/@that_gk_kyle23" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok profile">
           <img class="social-logo" src="tiktok-logo.png" alt="TikTok logo" />
@@ -175,6 +175,11 @@
       if (fixtureForm) fixtureForm.addEventListener('submit', addFixture);
       if (unlockButton) unlockButton.addEventListener('click', unlockFixtures);
       if (lockButton) lockButton.addEventListener('click', lockFixtures);
+
+      const statsButton = document.getElementById('statsButton');
+      const aboutButton = document.getElementById('aboutButton');
+      if (statsButton) statsButton.addEventListener('click', toggleStats);
+      if (aboutButton) aboutButton.addEventListener('click', toggleAbout);
 
       if (manageButton && managementPanel) {
         manageButton.addEventListener('click', function() {
