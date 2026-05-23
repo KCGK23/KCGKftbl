@@ -63,7 +63,9 @@
         <div class="fixture-access">
           <label for="fixturePassword">Owner access required to add fixtures:</label>
           <div class="fixture-access-row">
-            <input id="fixturePassword" type="password" placeholder="Enter owner password" />
+            <input id="fixtureEmail" type="email" placeholder="Enter admin email" />
+
+<input id="fixturePassword" type="password" placeholder="Enter admin password" />
           </div>
           <div class="fixture-access-buttons">
             <button id="unlockFixturesButton" type="button" class="primary-button">Unlock Fixtures</button>
@@ -139,6 +141,10 @@
       updateDoc,
       serverTimestamp
     } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+    import {
+  getAuth,
+  signInWithEmailAndPassword
+} from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBdO5oTbpn12nezqYLtcVtLo9XPQN_TIjU",
@@ -151,6 +157,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
     const fixturesCollection = collection(db, 'fixtures');
 
@@ -200,26 +207,36 @@
       loadSharedFixtures();
     });
 
-    function unlockFixtures() {
-      const passwordInput = document.getElementById('fixturePassword');
-      const accessMessage = document.getElementById('fixtureAccessMessage');
-      const entered = passwordInput.value.trim();
+ async function unlockFixtures() {
+  const emailInput = document.getElementById('fixtureEmail');
+  const passwordInput = document.getElementById('fixturePassword');
+  const accessMessage = document.getElementById('fixtureAccessMessage');
 
-      if (entered === FIXTURE_PASSWORD) {
-        localStorage.setItem(UNLOCK_KEY, 'true');
-        passwordInput.value = '';
-        passwordInput.blur();
-        accessMessage.textContent = 'Fixture editor unlocked. You can now add fixtures.';
-        accessMessage.classList.add('success');
-        accessMessage.classList.remove('error');
-        unlockFixturesUI();
-      } else {
-        accessMessage.textContent = 'Wrong password. Only you can add fixtures.';
-        accessMessage.classList.add('error');
-        accessMessage.classList.remove('success');
-      }
-    }
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
 
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+
+    localStorage.setItem(UNLOCK_KEY, 'true');
+
+    emailInput.value = '';
+    passwordInput.value = '';
+
+    accessMessage.textContent = 'Fixture editor unlocked.';
+    accessMessage.classList.add('success');
+    accessMessage.classList.remove('error');
+
+    unlockFixturesUI();
+
+  } catch (error) {
+    accessMessage.textContent = 'Incorrect email or password.';
+    accessMessage.classList.add('error');
+    accessMessage.classList.remove('success');
+
+    console.error(error);
+  }
+}
     function lockFixtures() {
       localStorage.removeItem(UNLOCK_KEY);
       const accessMessage = document.getElementById('fixtureAccessMessage');
