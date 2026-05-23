@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -513,4 +514,521 @@
     }
   </script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Football Profile</title>
+  <link rel="stylesheet" href="styles.css.css" />
+</head>
+<body>
+  <header class="goalkeeper">
+    <img class="team-logo" src="team-logo.png" alt="Renfrew Juniors logo" />
+    <h1>My Player Profile</h1>
+    
+  </header>
+
+  <section class="profile-card">
+    <img src="player-photo.jpg" alt="Profile photo of Kyle Connelly" />
+    <div class="info">
+      <div id="aboutSection" style="display: none;">
+        <h2>About Me</h2>
+        <p>My name is Kyle Connelly I am 15 and I am a football player. I have been playing since 2022. I play as a goalkeeper for Renfrew Juniors. </p>
+      </div>
+
+      <div id="statsSection" style="display: none;">
+        <h3>Stats</h3>
+        <ul>
+          <li>Team: Renfrew Juniors</li>
+          <li>Position: Goalkeeper</li>
+          <li>Kit No. : 23</li>
+          <li>Yellow Cards: 1</li>
+          <li>Red Cards: 0</li>
+          <li>Preferred Foot: Right</li>
+        </ul>
+      </div>
+
+      <h1>Kyle Connelly</h1>
+      <h2>Goalkeeper</h2>
+      <button id="statsButton">Show Stats</button>
+      <button id="aboutButton">Show About Me</button>
+      <div class="social-row">
+        <a class="social-button" href="https://www.tiktok.com/@that_gk_kyle23" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok profile">
+          <img class="social-logo" src="tiktok-logo.png" alt="TikTok logo" />
+        </a>
+        <a class="social-button social-button--text" href="https://www.youtube.com/results?search_query=renfrew+fc+blue+2011" target="_blank" rel="noopener noreferrer" aria-label="Open team YouTube channel">
+          <span class="social-text">Team YouTube Channel (matches and highlights)</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="fixtures-card">
+    <div class="fixtures-header">
+      <h2>Upcoming Fixtures</h2>
+        <p>Only the site owner can add fixtures. Fixtures are saved to Firebase and shared with everyone who visits this site.</p>
+      </div>
+
+      <div class="fixture-controls">
+        <button id="manageSiteButton" type="button" class="secondary-button">Site Management</button>
+      </div>
+
+      <div id="managementPanel" class="management-panel hidden">
+        <div class="fixture-access">
+          <label for="fixturePassword">Owner access required to add fixtures:</label>
+          <div class="fixture-access-row">
+            <input id="fixturePassword" type="password" placeholder="Enter owner password" />
+          </div>
+          <div class="fixture-access-buttons">
+            <button id="unlockFixturesButton" type="button" class="primary-button">Unlock Fixtures</button>
+            <button id="lockFixturesButton" type="button" class="secondary-button hidden">Lock Fixtures</button>
+          </div>
+          <p id="fixtureAccessMessage" class="fixture-message">Unlock to add fixtures and post scores.</p>
+        </div>
+
+        <div id="scoreEditor" class="fixture-score-editor hidden">
+          <h3>Post Fixture Score</h3>
+          <label for="scoreFixtureSelect">Select fixture</label>
+          <select id="scoreFixtureSelect">
+            <option value="">Select fixture</option>
+          </select>
+          <div class="fixture-row">
+            <label>
+              Our score
+              <input id="scoreHome" type="number" min="0" placeholder="0" />
+            </label>
+            <label>
+              Opponent score
+              <input id="scoreAway" type="number" min="0" placeholder="0" />
+            </label>
+          </div>
+          <button id="saveScoreButton" type="button" class="primary-button">Save Score</button>
+          <p id="scoreMessage" class="fixture-message"></p>
+        </div>
+      </div>
+
+    <form id="fixtureForm" class="fixture-form locked" style="display:none;">
+      <div class="fixture-row">
+        <label>
+          Date
+          <input type="date" id="fixtureDate" required />
+        </label>
+        <label>
+          Opponent
+          <input type="text" id="fixtureOpponent" placeholder="Opponent" required />
+        </label>
+      </div>
+      <div class="fixture-row">
+        <label>
+          Competition
+          <input type="text" id="fixtureComp" placeholder="Competition" />
+        </label>
+        <label>
+          Location
+          <input type="text" id="fixtureLocation" placeholder="Venue" />
+        </label>
+      </div>
+      <button type="submit" class="primary-button">Add Fixture</button>
+    </form>
+
+    <div class="fixture-list-card">
+      <h3>Fixture List</h3>
+      <div id="fixtureLoading" class="fixture-loading hidden">Loading fixtures…</div>
+      <ul id="fixtureList">
+        <li class="fixture-empty">No fixtures added yet.</li>
+      </ul>
+    </div>
+  </section>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      query,
+      orderBy,
+      addDoc,
+      doc,
+      updateDoc,
+      serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdO5oTbpn12nezqYLtcVtLo9XPQN_TIjU",
+      authDomain: "kcgkftbl.firebaseapp.com",
+      projectId: "kcgkftbl",
+      storageBucket: "kcgkftbl.firebasestorage.app",
+      messagingSenderId: "246624590251",
+      appId: "1:246624590251:web:7fc1c27dcc3dd0270e1aee",
+      measurementId: "G-46SLDG5R2H"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const fixturesCollection = collection(db, 'fixtures');
+
+    const FIXTURE_PASSWORD = 'KCGK@110311';
+    const LOCAL_FIXTURE_KEY = 'localFixtures';
+    const UNLOCK_KEY = 'fixturesUnlocked';
+    let currentFixtures = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const scoreFixtureSelect = document.getElementById('scoreFixtureSelect');
+      const saveScoreButton = document.getElementById('saveScoreButton');
+
+      if (scoreFixtureSelect) scoreFixtureSelect.addEventListener('change', onScoreFixtureSelected);
+      if (saveScoreButton) saveScoreButton.addEventListener('click', saveFixtureScore);
+      const fixtureForm = document.getElementById('fixtureForm');
+      const unlockButton = document.getElementById('unlockFixturesButton');
+      const lockButton = document.getElementById('lockFixturesButton');
+      const passwordInput = document.getElementById('fixturePassword');
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+      const manageButton = document.getElementById('manageSiteButton');
+      const managementPanel = document.getElementById('managementPanel');
+
+      if (fixtureForm) fixtureForm.addEventListener('submit', addFixture);
+      if (unlockButton) unlockButton.addEventListener('click', unlockFixtures);
+      if (lockButton) lockButton.addEventListener('click', lockFixtures);
+
+      const statsButton = document.getElementById('statsButton');
+      const aboutButton = document.getElementById('aboutButton');
+      if (statsButton) statsButton.addEventListener('click', toggleStats);
+      if (aboutButton) aboutButton.addEventListener('click', toggleAbout);
+
+      if (manageButton && managementPanel) {
+        manageButton.addEventListener('click', function() {
+          managementPanel.classList.toggle('hidden');
+        });
+      }
+
+      if (localStorage.getItem(UNLOCK_KEY) === 'true') {
+        unlockFixturesUI();
+        accessMessage.textContent = 'Fixture editor unlocked.';
+        accessMessage.classList.add('success');
+        accessMessage.classList.remove('error');
+      } else {
+        lockFixturesUI();
+      }
+
+      loadSharedFixtures();
+    });
+
+    function unlockFixtures() {
+      const passwordInput = document.getElementById('fixturePassword');
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+      const entered = passwordInput.value.trim();
+
+      if (entered === FIXTURE_PASSWORD) {
+        localStorage.setItem(UNLOCK_KEY, 'true');
+        passwordInput.value = '';
+        passwordInput.blur();
+        accessMessage.textContent = 'Fixture editor unlocked. You can now add fixtures.';
+        accessMessage.classList.add('success');
+        accessMessage.classList.remove('error');
+        unlockFixturesUI();
+      } else {
+        accessMessage.textContent = 'Wrong password. Only you can add fixtures.';
+        accessMessage.classList.add('error');
+        accessMessage.classList.remove('success');
+      }
+    }
+
+    function lockFixtures() {
+      localStorage.removeItem(UNLOCK_KEY);
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+      accessMessage.textContent = 'Fixture editor locked. Enter the owner password to unlock.';
+      accessMessage.classList.add('error');
+      accessMessage.classList.remove('success');
+      lockFixturesUI();
+    }
+
+    function unlockFixturesUI() {
+      const fixtureForm = document.getElementById('fixtureForm');
+      const lockButton = document.getElementById('lockFixturesButton');
+      const scoreEditor = document.getElementById('scoreEditor');
+      fixtureForm.classList.remove('locked');
+      fixtureForm.style.display = 'flex';
+      lockButton.classList.remove('hidden');
+      if (scoreEditor && localStorage.getItem(UNLOCK_KEY) === 'true') {
+        scoreEditor.classList.remove('hidden');
+      }
+    }
+
+    function lockFixturesUI() {
+      const fixtureForm = document.getElementById('fixtureForm');
+      const lockButton = document.getElementById('lockFixturesButton');
+      const scoreEditor = document.getElementById('scoreEditor');
+      fixtureForm.classList.add('locked');
+      fixtureForm.style.display = 'none';
+      lockButton.classList.add('hidden');
+      if (scoreEditor) {
+        scoreEditor.classList.add('hidden');
+      }
+    }
+
+    async function loadSharedFixtures() {
+      const list = document.getElementById('fixtureList');
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+      const loader = document.getElementById('fixtureLoading');
+      const scoreEditor = document.getElementById('scoreEditor');
+      loader.classList.remove('hidden');
+
+      let fixtures = [];
+      let remoteFailed = false;
+
+      try {
+        const fixturesQuery = query(fixturesCollection, orderBy('date'));
+        const snapshot = await getDocs(fixturesQuery);
+        fixtures = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } catch (error) {
+        remoteFailed = true;
+        console.warn('Remote load failed:', error);
+      }
+
+      if (!fixtures.length) {
+        fixtures = getLocalFixtures();
+      }
+
+      currentFixtures = fixtures;
+      list.innerHTML = '';
+      if (!fixtures.length) {
+        list.innerHTML = '<li class="fixture-empty">No fixtures added yet.</li>';
+      } else {
+        fixtures.forEach(item => {
+          list.appendChild(createFixtureItem(item));
+        });
+      }
+
+      populateScoreSelect(fixtures);
+      if (scoreEditor && !remoteFailed && localStorage.getItem(UNLOCK_KEY) === 'true') {
+        scoreEditor.classList.remove('hidden');
+      } else if (scoreEditor) {
+        scoreEditor.classList.add('hidden');
+      }
+
+      if (remoteFailed && fixtures.length) {
+        accessMessage.textContent = 'Remote storage unavailable. Loaded locally saved fixtures.';
+        accessMessage.classList.add('error');
+        accessMessage.classList.remove('success');
+      } else if (remoteFailed) {
+        accessMessage.textContent = 'Remote storage unavailable. You can still add fixtures locally.';
+        accessMessage.classList.add('error');
+        accessMessage.classList.remove('success');
+      } else {
+        accessMessage.textContent = 'Fixtures loaded from Firebase.';
+        accessMessage.classList.add('success');
+        accessMessage.classList.remove('error');
+      }
+
+      loader.classList.add('hidden');
+    }
+
+    function getLocalFixtures() {
+      try {
+        const raw = localStorage.getItem(LOCAL_FIXTURE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveLocalFixtures(fixtures) {
+      localStorage.setItem(LOCAL_FIXTURE_KEY, JSON.stringify(fixtures));
+    }
+
+   function createFixtureItem(fixture) {
+      const scoreText = typeof fixture.homeScore === 'number' && typeof fixture.awayScore === 'number'
+        ? ` • Score: ${fixture.homeScore}-${fixture.awayScore}`
+        : '';
+
+      const item = document.createElement('li');
+      item.className = 'fixture-item';
+      item.innerHTML = `
+        <strong>${fixture.date}</strong>
+        <span class="fixture-opponent">
+  ${fixture.opponent}
+  ${scoreText ? `<span class="score-badge">${fixture.homeScore}-${fixture.awayScore}</span>` : ''}
+</span>
+        <span>${fixture.competition || 'Friendly'}</span>
+        <span>${fixture.location || 'TBC'}</span>
+      `;
+      return item;
+    }
+
+    function populateScoreSelect(fixtures) {
+      const select = document.getElementById('scoreFixtureSelect');
+      const scoreHome = document.getElementById('scoreHome');
+      const scoreAway = document.getElementById('scoreAway');
+      const scoreMessage = document.getElementById('scoreMessage');
+
+      if (!select) return;
+      const currentValue = select.value;
+      select.innerHTML = '<option value="">Select fixture</option>';
+
+      fixtures.forEach(item => {
+        if (!item.id) return;
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = `${item.date} — ${item.opponent}`;
+        if (item.id === currentValue) {
+          option.selected = true;
+        }
+        select.appendChild(option);
+      });
+
+      if (scoreMessage) {
+        scoreMessage.textContent = '';
+        scoreMessage.classList.remove('success', 'error');
+      }
+
+      if (scoreHome) scoreHome.value = '';
+      if (scoreAway) scoreAway.value = '';
+    }
+
+    function onScoreFixtureSelected() {
+      const select = document.getElementById('scoreFixtureSelect');
+      const scoreHome = document.getElementById('scoreHome');
+      const scoreAway = document.getElementById('scoreAway');
+      const selectedId = select?.value;
+
+      if (!selectedId) {
+        if (scoreHome) scoreHome.value = '';
+        if (scoreAway) scoreAway.value = '';
+        return;
+      }
+
+      const fixture = currentFixtures.find(item => item.id === selectedId);
+      if (!fixture) return;
+
+      if (scoreHome) scoreHome.value = fixture.homeScore ?? '';
+      if (scoreAway) scoreAway.value = fixture.awayScore ?? '';
+    }
+
+    async function saveFixtureScore() {
+      const select = document.getElementById('scoreFixtureSelect');
+      const scoreHome = document.getElementById('scoreHome');
+      const scoreAway = document.getElementById('scoreAway');
+      const scoreMessage = document.getElementById('scoreMessage');
+      const selectedDocId = select?.value;
+
+      if (!selectedDocId || !scoreHome || !scoreAway || !scoreMessage) return;
+      const homeScoreValue = scoreHome.value.trim();
+      const awayScoreValue = scoreAway.value.trim();
+
+      if (homeScoreValue === '' || awayScoreValue === '') {
+        scoreMessage.textContent = 'Enter both scores before saving.';
+        scoreMessage.classList.add('error');
+        scoreMessage.classList.remove('success');
+        return;
+      }
+
+      const homeScore = Number(homeScoreValue);
+      const awayScore = Number(awayScoreValue);
+      if (Number.isNaN(homeScore) || Number.isNaN(awayScore)) {
+        scoreMessage.textContent = 'Scores must be numbers.';
+        scoreMessage.classList.add('error');
+        scoreMessage.classList.remove('success');
+        return;
+      }
+
+      try {
+        const fixtureDoc = doc(db, 'fixtures', selectedDocId);
+        await updateDoc(fixtureDoc, {
+          homeScore,
+          awayScore,
+          scorePostedAt: serverTimestamp()
+        });
+
+        scoreMessage.textContent = 'Score saved successfully.';
+        scoreMessage.classList.add('success');
+        scoreMessage.classList.remove('error');
+        await loadSharedFixtures();
+      } catch (error) {
+        console.warn('Error saving score:', error);
+        scoreMessage.textContent = 'Unable to save score. Check Firebase access.';
+        scoreMessage.classList.add('error');
+        scoreMessage.classList.remove('success');
+      }
+    }
+
+    async function addFixture(event) {
+      event.preventDefault();
+      const date = document.getElementById('fixtureDate').value;
+      const opponent = document.getElementById('fixtureOpponent').value.trim();
+      const competition = document.getElementById('fixtureComp').value.trim();
+      const location = document.getElementById('fixtureLocation').value.trim();
+      const list = document.getElementById('fixtureList');
+      const accessMessage = document.getElementById('fixtureAccessMessage');
+
+      if (!date || !opponent) return;
+      const payload = {
+        date,
+        opponent,
+        competition: competition || 'Friendly',
+        location: location || 'TBC',
+        createdAt: serverTimestamp()
+      };
+
+      let saved = payload;
+      let remoteSaved = false;
+
+      try {
+        const docRef = await addDoc(fixturesCollection, payload);
+        saved = { id: docRef.id, ...payload };
+        remoteSaved = true;
+      } catch (error) {
+        console.warn('Saving fixture locally due to remote failure:', error);
+        const fixtures = getLocalFixtures();
+        fixtures.push(payload);
+        saveLocalFixtures(fixtures);
+        accessMessage.textContent = 'Saved locally because remote storage is unavailable.';
+        accessMessage.classList.add('error');
+        accessMessage.classList.remove('success');
+      }
+
+      const empty = list.querySelector('.fixture-empty');
+      if (empty) empty.remove();
+      if (remoteSaved) {
+        accessMessage.textContent = 'Fixture saved to Firebase.';
+        accessMessage.classList.add('success');
+        accessMessage.classList.remove('error');
+        event.target.reset();
+        await loadSharedFixtures();
+      } else {
+        list.appendChild(createFixtureItem(saved));
+        event.target.reset();
+      }
+    }
+
+    function toggleAbout() {
+      const about = document.getElementById('aboutSection');
+      const button = document.getElementById('aboutButton');
+
+      if (about.style.display === 'none' || about.style.display === '') {
+        about.style.display = 'block';
+        button.innerText = 'Hide About Me';
+      } else {
+        about.style.display = 'none';
+        button.innerText = 'Show About Me';
+      }
+    }
+
+    function toggleStats() {
+      const stats = document.getElementById('statsSection');
+      const button = document.getElementById('statsButton');
+
+      if (stats.style.display === 'none' || stats.style.display === '') {
+        stats.style.display = 'block';
+        button.innerText = 'Hide Stats';
+      } else {
+        stats.style.display = 'none';
+        button.innerText = 'Show Stats';
+      }
+    }
+  </script>
+</body>
+>>>>>>> Stashed changes
 </html>
