@@ -488,9 +488,9 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
 }
 body{
   background: radial-gradient(circle at top, #2d6cdf 0%, #12223c 55%, #09101f 100%);
-  color:#2C7CFF;
+  color:#ffff;
 }
-..profile-card .info > button {
+.profile-card .info > button {
   background: linear-gradient(135deg, #4f9dff, #2c7cff);
   color: white;
   font-weight: 700;
