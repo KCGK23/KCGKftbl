@@ -383,26 +383,36 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
 }
 .fixture-item,
 .fixture-empty{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;
-  padding:14px 16px;
-  display:grid;
-  grid-template-columns: 120px 1fr 1fr 1fr;
-  gap:10px;
-  align-items:center;
-}
-.fixture-item strong{
-  display:block;
-  color:#d8e7ff;
-}
-.fixture-item span{
-  font-size:0.95rem;
-  color:rgba(248,235,235,0.9);
-}
-@media (max-width:760px){
-  .fixture-row{grid-template-columns:1fr}
-  .fixture-item,
-  .fixture-empty{grid-template-columns:1fr; text-align:left;}
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  border-radius: 18px;
+
+  padding: 18px 22px;
+
+  display: grid;
+  grid-template-columns: 140px 1.4fr 1fr 1fr;
+
+  gap: 20px;
+  align-items: center;
+
+  transition: all 0.25s ease;
 }
 
+.fixture-item:hover{
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.14);
+}
+
+.fixture-item strong{
+  display:block;
+  color:#ffffff;
+  font-size:1rem;
+  font-weight:700;
+}
+
+.fixture-item span{
+  font-size:0.96rem;
+  color:rgba(248,235,235,0.88);
+}

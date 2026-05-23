@@ -331,7 +331,10 @@
       item.className = 'fixture-item';
       item.innerHTML = `
         <strong>${fixture.date}</strong>
-        <span>${fixture.opponent}${scoreText}</span>
+        <span class="fixture-opponent">
+  ${fixture.opponent}
+  ${scoreText ? `<span class="score-badge">${fixture.homeScore}-${fixture.awayScore}</span>` : ''}
+</span>
         <span>${fixture.competition || 'Friendly'}</span>
         <span>${fixture.location || 'TBC'}</span>
       `;
