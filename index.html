@@ -196,7 +196,7 @@
         });
       }
 
-      if (localStorage.getItem(UNLOCK_KEY) === 'true') {
+      auth.currentUser
         unlockFixturesUI();
         accessMessage.textContent = 'Fixture editor unlocked.';
         accessMessage.classList.add('success');
@@ -305,7 +305,7 @@
       }
 
       populateScoreSelect(fixtures);
-      if (scoreEditor && !remoteFailed && localStorage.getItem(UNLOCK_KEY) === 'true') {
+      auth.currentUser
         scoreEditor.classList.remove('hidden');
       } else if (scoreEditor) {
         scoreEditor.classList.add('hidden');
