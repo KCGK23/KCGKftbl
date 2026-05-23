@@ -1,4 +1,4 @@
-<<<<<<< Updated upstream
+
 ﻿:root{
   --bg-1: #2d6cdf;
   --bg-2: #12223c;
@@ -416,423 +416,73 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
 .fixture-item span{
   font-size:0.96rem;
   color:rgba(248,235,235,0.88);
-=======
-﻿:root{
-  --bg-1: #2d6cdf;
-  --bg-2: #12223c;
-  --bg-3: #09101f;
-  --card-bg: rgba(255,255,255,0.06);
-  --muted: rgba(248,235,235,0.75);
-  --accent: #4f9dff;
-  --accent-strong: #2c7cff;
-  --radius: 18px;
-  --gap: 18px;
-  --max-width: 960px;
 }
 
-/* Page background and text */
-body{
-  margin:0;
-  min-height:100vh;
-  font-family: "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  background: radial-gradient(circle at top, var(--bg-1) 0%, var(--bg-2) 55%, var(--bg-3) 100%);
-  color: #f6f6f7;
-  line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-}
-
-/* Center page content */
-body > *{
-  max-width: var(--max-width);
-  margin:0 auto;
-  padding:20px;
-}
-
-/* Top header look */
-header.goalkeeper{
+.fixture-item{
   position:relative;
-  text-align:center;
-  padding:36px 20px;
-  border-radius: calc(var(--radius) + 6px);
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 18px 44px rgba(0,0,0,0.28);
-}
-
-header.goalkeeper .team-logo{
-  position:absolute;
-  top:12px;
-  right:12px;
-  width:86px;
-  height:auto;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.03);
-  padding:8px;
-  object-fit:contain;
-}
-
-/* Headings */
-header.goalkeeper h1:first-child{
-  margin-bottom:6px;
-  font-size:2.2rem;
-  letter-spacing:0.2px;
-}
-header.goalkeeper p{
-  margin:0;
-  opacity:0.95;
-  color:var(--muted);
-}
-
-/* Profile card styling */
-.profile-card{
-  display:grid;
-  grid-template-columns: minmax(180px, 260px) 1fr;
-  gap:24px;
-  align-items:start;
-  margin-top:28px;
-  padding:24px;
-  border-radius:var(--radius);
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-  border:1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 20px 50px rgba(3,10,20,0.45);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-.profile-card:hover{transform:translateY(-4px); box-shadow:0 30px 80px rgba(3,10,20,0.5)}
-
-/* Image styling */
-.profile-card img{
-  width:100%;
-  border-radius:14px;
-  object-fit:cover;
-  min-height:220px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-}
-
-/* Text block */
-.profile-card .info{
-  display:flex;
-  flex-direction:column;
-  gap:var(--gap);
-}
-
-.profile-card h1, .profile-card h2{margin:0}
-.profile-card h1{font-size:1.6rem}
-.profile-card h2{margin-top:6px; font-size:1.15rem; opacity:0.92; font-weight:500}
-
-/* Stats grid */
-.profile-card ul{
-  list-style:none;
-  padding:0;
-  margin:0;
-  display:grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap:10px;
-}
-.profile-card li{
-  background: var(--card-bg);
-  padding:10px 14px;
-  border-radius:12px;
-  margin:0;
-  font-weight:600;
-  color: #fbfbfc;
-}
-
-/* Button layout and styles */
-.profile-card .info > button{margin-right:12px}
-button{
-  display:inline-block;
-  border:none;
-  border-radius:999px;
-  padding:12px 22px;
-  background:var(--accent);
-  color:white;
-  cursor:pointer;
-  font-size:0.98rem;
-  transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
-  box-shadow: 0 8px 20px rgba(40,100,200,0.12);
-}
-button:hover{background:var(--accent-strong); transform:translateY(-3px); box-shadow:0 14px 32px rgba(40,100,200,0.16)}
-button:focus{outline:3px solid rgba(79,157,255,0.18); outline-offset:3px}
-
-/* Small screens */
-@media (max-width:720px){
-  .profile-card{grid-template-columns:1fr}
-  .profile-card ul{grid-template-columns:1fr}
-  header.goalkeeper .team-logo{width:64px}
-}
-
-/* Social button row */
-.social-row{
-  margin-top:8px;
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  align-items:center;
-}
-.social-button{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:52px;
-  height:52px;
-  border-radius:14px;
-  background: #000;
-  color:white;
-  text-decoration:none;
-  padding:0;
   overflow:hidden;
-  box-shadow:0 10px 26px rgba(0,0,0,0.35);
-  transition: transform 0.16s cubic-bezier(.2,.9,.2,1), box-shadow 0.16s ease, opacity 0.14s ease;
+  backdrop-filter:blur(12px);
+
+  background:linear-gradient(
+    135deg,
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.03)
+  );
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.04);
 }
-.social-button img.social-logo{
-  width:100%;
+
+.fixture-item::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:5px;
   height:100%;
-  display:block;
-  object-fit:contain;
-  background:transparent;
-  border:none;
-}
-.social-button--text{
-  width:auto;
-  min-width:180px;
-  padding:0 14px;
-  height:48px;
-  border-radius:999px;
-  background: linear-gradient(135deg, #ff0000 0%, #c80000 100%);
-}
-.social-button--text .social-text{
-  display:block;
-  color:#fff;
-  font-weight:700;
-  font-size:0.95rem;
-  letter-spacing:0.02em;
-}
-.social-button:hover{transform:translateY(-4px) scale(1.04); box-shadow:0 18px 40px rgba(0,0,0,0.4)}
-.social-button:focus{outline:3px solid rgba(79,157,255,0.18); outline-offset:3px}
 
-/* Tighter spacing for action buttons */
-.profile-card .info > button{margin-right:10px; margin-bottom:8px}
+  background:linear-gradient(
+    to bottom,
+    #4f9dff,
+    #2c7cff
+  );
+}
 
-.secondary-button{
-  border:none;
-  border-radius:999px;
-  padding:12px 22px;
-  background:rgba(255,255,255,0.14);
-  color:#fff;
-  cursor:pointer;
-  font-weight:700;
-  box-shadow:0 10px 20px rgba(0,0,0,0.18);
-}
-button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,255,255,0.2)}
-
-.fixtures-card{
-  margin-top:30px;
-  padding:24px;
-  border-radius:24px;
-  background: rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 20px 50px rgba(0,0,0,0.18);
-}
-.fixture-controls{
+.fixture-opponent{
   display:flex;
-  justify-content:flex-end;
-  margin-bottom:18px;
-}
-.management-panel{
-  margin-bottom:20px;
-  border-radius:18px;
-  border:1px solid rgba(255,255,255,0.1);
-  padding:18px;
-  background: rgba(255,255,255,0.04);
-}
-.hidden{display:none !important;}
-.fixture-access{
-  margin-bottom:0;
-}
-.fixture-access-row{
-  display:block;
-  margin-top:12px;
-}
-.fixture-access label{
-  color: rgba(248,235,235,0.92);
-  font-weight:700;
-}
-.fixture-access input{
-  width:100%;
-  border:1px solid rgba(255,255,255,0.18);
-  border-radius:14px;
-  padding:14px 16px;
-  background: rgba(255,255,255,0.08);
-  color:#fff;
-  min-height:50px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.18);
-}
-.fixture-access input:focus{
-  outline:2px solid rgba(79,157,255,0.35);
-  outline-offset:2px;
-}
-.fixture-score-editor{
-  margin-top:18px;
-}
-.fixture-score-editor label{
-  display:block;
-  margin-bottom:8px;
-  font-weight:700;
-  color: rgba(248,235,235,0.92);
-}
-.fixture-score-editor select,
-.fixture-score-editor input{
-  width:100%;
-  border:1px solid rgba(255,255,255,0.18);
-  border-radius:14px;
-  padding:14px 16px;
-  background: rgba(255,255,255,0.08);
-  color:#fff;
-  min-height:50px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.18);
-}
-.fixture-score-editor select:focus,
-.fixture-score-editor input:focus{
-  outline:2px solid rgba(79,157,255,0.35);
-  outline-offset:2px;
-}
-.fixture-access-buttons{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:12px;
-}
-.fixture-access-buttons button{
-  min-width:140px;
-  padding:10px 16px;
-  font-size:0.92rem;
-}
-.management-panel .primary-button,
-.management-panel .secondary-button {
-  border-radius:999px;
-  min-height:42px;
-}
-.fixture-message{
-  margin-top:10px;
-  font-size:0.95rem;
-  color:rgba(248,235,235,0.8);
-}
-.fixture-message.success{color:#aaf7c1;}
-.fixture-message.error{color:#ffb3b3;}
-.fixture-form.locked{
-  display:none;
-}
-.fixture-loading{
-  margin: 10px 0;
-  color: rgba(248,235,235,0.85);
-  font-size: 0.95rem;
-}
-.fixtures-header h2,
-.fixture-list-card h3{
-  margin:0 0 10px;
-}
-.fixtures-header p{
-  margin:0;
-  color:rgba(248,235,235,0.8);
-}
-.fixture-form{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  margin-bottom:22px;
-}
-.fixture-row{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-  gap:16px;
-  align-items:end;
-}
-.fixture-row > label{
-  margin:0;
-  width:100%;
-  min-width:0;
-}
-.fixture-form label{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  font-size:0.95rem;
-  min-width:0;
-}
-.fixture-form input{
-  width:100%;
-  box-sizing:border-box;
-  border:1px solid rgba(255,255,255,0.16);
-  border-radius:12px;
-  padding:14px 16px;
-  background: rgba(255,255,255,0.05);
-  color:#fff;
-  min-height:48px;
-}
-.fixture-form input:focus{
-  outline:2px solid rgba(79,157,255,0.3);
-  outline-offset:2px;
-}
-.primary-button{
-  align-self:flex-end;
-  border:none;
-  border-radius:999px;
-  padding:14px 28px;
-  background:linear-gradient(135deg,#4f9dff,#2c7cff);
-  color:#fff;
-  cursor:pointer;
-  font-weight:700;
-  box-shadow:0 12px 28px rgba(46,115,255,0.18);
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
-}
-.primary-button:hover{
-  transform:translateY(-2px);
-  box-shadow:0 16px 32px rgba(46,115,255,0.22);
-}
-.fixture-list-card{
-  padding:18px 0 0;
-}
-.fixture-list-card ul{
-  list-style:none;
-  padding:0;
-  margin:0;
-  display:grid;
+  align-items:center;
   gap:12px;
+  font-weight:700;
 }
-.fixture-item,
-.fixture-empty{
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.08);
 
-  border-radius: 18px;
+.score-badge{
+  padding:6px 12px;
+  border-radius:999px;
 
-  padding: 18px 22px;
+  background:linear-gradient(
+    135deg,
+    #4f9dff,
+    #2c7cff
+  );
 
-  display: grid;
-  grid-template-columns: 140px 1.4fr 1fr 1fr;
+  color:white;
+  font-size:0.82rem;
+  font-weight:800;
 
-  gap: 20px;
-  align-items: center;
-
-  transition: all 0.25s ease;
+  box-shadow:0 6px 18px rgba(44,124,255,0.35);
 }
 
 .fixture-item:hover{
-  transform: translateY(-3px);
-  background: rgba(255,255,255,0.09);
-  border-color: rgba(255,255,255,0.14);
-}
+  transform:translateY(-5px) scale(1.01);
 
-.fixture-item strong{
-  display:block;
-  color:#ffffff;
-  font-size:1rem;
-  font-weight:700;
-}
+  background:linear-gradient(
+    135deg,
+    rgba(255,255,255,0.12),
+    rgba(255,255,255,0.05)
+  );
 
-.fixture-item span{
-  font-size:0.96rem;
-  color:rgba(248,235,235,0.88);
->>>>>>> Stashed changes
+  box-shadow:
+    0 20px 45px rgba(0,0,0,0.28),
+    0 0 20px rgba(79,157,255,0.12);
 }
