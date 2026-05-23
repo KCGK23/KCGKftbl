@@ -470,7 +470,7 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
   font-size:0.82rem;
   font-weight:800;
 
-  box-shadow:0 6px 18px rgba(44,124,255,0.35);
+  box-shadow:0 6px 18px #2c7cff59;
 }
 
 .fixture-item:hover{
@@ -488,7 +488,7 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
 }
 body{
   background: radial-gradient(circle at top, #2d6cdf 0%, #12223c 55%, #09101f 100%);
-  color:#fff;
+  color:#2C7CFF;
 }
 ..profile-card .info > button {
   background: linear-gradient(135deg, #4f9dff, #2c7cff);
@@ -502,5 +502,5 @@ body{
 
 .profile-card .info > button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 32px rgba(46,115,255,0.22);
+  box-shadow: 0 16px 32px #2e73ff38;
 }
