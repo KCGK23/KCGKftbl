@@ -556,3 +556,9 @@ body{
   padding:18px;
   margin-bottom:18px;
 }
+.admin-subtitle{
+  margin-top:0;
+  margin-bottom:16px;
+  color:#d8e7ff;
+  font-size:1.1rem;
+}
