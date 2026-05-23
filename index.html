@@ -139,6 +139,7 @@
       addDoc,
       doc,
       updateDoc,
+      deleteDoc,
       serverTimestamp
     } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
     import {
@@ -341,9 +342,57 @@
     }
 
    function createFixtureItem(fixture) {
-      const scoreText = typeof fixture.homeScore === 'number' && typeof fixture.awayScore === 'number'
-        ? ` • Score: ${fixture.homeScore}-${fixture.awayScore}`
-        : '';
+  const scoreText =
+    typeof fixture.homeScore === 'number' &&
+    typeof fixture.awayScore === 'number'
+      ? ` • Score: ${fixture.homeScore}-${fixture.awayScore}`
+      : '';
+
+  const item = document.createElement('li');
+  item.className = 'fixture-item';
+
+  item.innerHTML = `
+    <strong>${fixture.date}</strong>
+
+    <span class="fixture-opponent">
+      ${fixture.opponent}
+      ${scoreText ? `<span class="score-badge">${fixture.homeScore}-${fixture.awayScore}</span>` : ''}
+    </span>
+
+    <span>${fixture.competition || 'Friendly'}</span>
+    <span>${fixture.location || 'TBC'}</span>
+
+    ${
+      localStorage.getItem(UNLOCK_KEY) === 'true' && fixture.id
+        ? `<button class="delete-fixture-button" data-id="${fixture.id}">Delete</button>`
+        : ''
+    }
+  `;
+
+  const deleteButton = item.querySelector('.delete-fixture-button');
+
+  if (deleteButton) {
+    deleteButton.addEventListener('click', function () {
+      deleteFixture(fixture.id);
+    });
+  }
+
+  return item;
+}
+async function deleteFixture(fixtureId) {
+  if (!confirm('Delete this fixture?')) return;
+
+  try {
+    await deleteDoc(doc(db, 'fixtures', fixtureId));
+
+    await loadSharedFixtures();
+
+  } catch (error) {
+    console.error('Error deleting fixture:', error);
+
+    alert('Unable to delete fixture.');
+  }
+}
 
       const item = document.createElement('li');
       item.className = 'fixture-item';
