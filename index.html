@@ -56,12 +56,13 @@
       </div>
 
       <div class="fixture-controls">
-        <button id="manageSiteButton" type="button" class="secondary-button">Site Management</button>
+        <button id="manageSiteButton" type="button" class="secondary-button">Admin Panel</button>
       </div>
 
       <div id="managementPanel" class="management-panel hidden">
+        <h3 class="admin-title">Admin Controls</h3>
         <div class="fixture-access">
-          <label for="fixturePassword">Owner access required to add fixtures:</label>
+          <label for="fixturePassword">Admin login:</label>
           <div class="fixture-access-row">
             <input id="fixtureEmail" type="email" placeholder="Enter admin email" />
 
@@ -71,7 +72,7 @@
             <button id="unlockFixturesButton" type="button" class="primary-button">Unlock Fixtures</button>
             <button id="lockFixturesButton" type="button" class="secondary-button hidden">Lock Fixtures</button>
           </div>
-          <p id="fixtureAccessMessage" class="fixture-message">Unlock to add fixtures and post scores.</p>
+          <p id="fixtureAccessMessage" class="fixture-message">Log in to manage fixtures, scores, and match reports.</p>
         </div>
 
         <div id="scoreEditor" class="fixture-score-editor hidden">
