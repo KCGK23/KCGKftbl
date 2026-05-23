@@ -361,6 +361,15 @@
 
     <span>${fixture.competition || 'Friendly'}</span>
     <span>${fixture.location || 'TBC'}</span>
+    ${
+  fixture.report
+    ? `<p class="match-report">${fixture.report}</p>`
+    : ''
+}
+    
+    <button class="report-button" data-id="${fixture.id}">
+  Match Report
+</button>
 
     ${
       auth.currentUser && fixture.id
@@ -370,6 +379,13 @@
   `;
 
   const deleteButton = item.querySelector('.delete-fixture-button');
+  const reportButton = item.querySelector('.report-button');
+
+if (reportButton) {
+  reportButton.addEventListener('click', function () {
+    openMatchReport(fixture);
+  });
+}
 
   if (deleteButton) {
     deleteButton.addEventListener('click', function () {
@@ -391,6 +407,31 @@ async function deleteFixture(fixtureId) {
     console.error('Error deleting fixture:', error);
 
     alert('Unable to delete fixture.');
+  }
+}
+async function openMatchReport(fixture) {
+  const existingReport = fixture.report || '';
+
+  const report = prompt(
+    'Enter match report:',
+    existingReport
+  );
+
+  if (report === null) return;
+
+  try {
+    await updateDoc(doc(db, 'fixtures', fixture.id), {
+      report
+    });
+
+    alert('Match report saved.');
+
+    await loadSharedFixtures();
+
+  } catch (error) {
+    console.error(error);
+
+    alert('Unable to save report.');
   }
 }
 
