@@ -510,3 +510,24 @@ header.goalkeeper {
 .fixtures-header p {
   color: white !important;
 }
+body > * {
+  max-width: 1100px !important;
+}
+
+.profile-card {
+  max-height: none;
+  gap: 20px;
+}
+
+.profile-card .info > button {
+  width: fit-content;
+  min-width: 160px;
+}
+
+.fixtures-card {
+  max-width: 1100px;
+}
+
+.fixture-item {
+  grid-template-columns: 120px 1.2fr 1.2fr 1.2fr;
+}
