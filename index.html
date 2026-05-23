@@ -367,9 +367,13 @@
     : ''
 }
     
-    <button class="report-button" data-id="${fixture.id}">
-  Match Report
-</button>
+    ${
+  auth.currentUser
+    ? `<button class="report-button" data-id="${fixture.id}">
+        Match Report
+      </button>`
+    : ''
+}
 
     ${
       auth.currentUser && fixture.id
@@ -409,6 +413,8 @@ async function deleteFixture(fixtureId) {
     alert('Unable to delete fixture.');
   }
 }
+if (!auth.currentUser) return;
+
 async function openMatchReport(fixture) {
   const existingReport = fixture.report || '';
 
