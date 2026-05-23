@@ -363,7 +363,7 @@
     <span>${fixture.location || 'TBC'}</span>
 
     ${
-      localStorage.getItem(UNLOCK_KEY) === 'true' && fixture.id
+      auth.currentUser && fixture.id
         ? `<button class="delete-fixture-button" data-id="${fixture.id}">Delete</button>`
         : ''
     }
