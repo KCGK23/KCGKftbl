@@ -394,19 +394,7 @@ async function deleteFixture(fixtureId) {
   }
 }
 
-      const item = document.createElement('li');
-      item.className = 'fixture-item';
-      item.innerHTML = `
-        <strong>${fixture.date}</strong>
-        <span class="fixture-opponent">
-  ${fixture.opponent}
-  ${scoreText ? `<span class="score-badge">${fixture.homeScore}-${fixture.awayScore}</span>` : ''}
-</span>
-        <span>${fixture.competition || 'Friendly'}</span>
-        <span>${fixture.location || 'TBC'}</span>
-      `;
-      return item;
-    }
+  
 
     function populateScoreSelect(fixtures) {
       const select = document.getElementById('scoreFixtureSelect');
