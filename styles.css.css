@@ -490,3 +490,13 @@ body{
   background: radial-gradient(circle at top, #2d6cdf 0%, #12223c 55%, #09101f 100%);
   color:#fff;
 }
+.profile-card .info > button {
+  background: #ffffff;
+  color: #12325f;
+  font-weight: 700;
+}
+
+.profile-card .info > button:hover {
+  background: #f2f6ff;
+  color: #0b2345;
+}
