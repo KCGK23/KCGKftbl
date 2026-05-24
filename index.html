@@ -132,6 +132,18 @@
         <p id="scoreMessage" class="fixture-message"></p>
       </div>
     </div>
+<div class="season-stats-card">
+  <h3>Season Stats</h3>
+
+  <div class="season-stats-grid">
+    <div><strong id="statPlayed">0</strong><span>Played</span></div>
+    <div><strong id="statWins">0</strong><span>Wins</span></div>
+    <div><strong id="statDraws">0</strong><span>Draws</span></div>
+    <div><strong id="statLosses">0</strong><span>Losses</span></div>
+    <div><strong id="statCleanSheets">0</strong><span>Clean Sheets</span></div>
+    <div><strong id="statConceded">0</strong><span>Goals Conceded</span></div>
+  </div>
+</div>
 
     <div class="fixture-list-card">
       <h3>Fixture List</h3>
@@ -331,6 +343,7 @@ async function logoutAdmin() {
       }
 
       currentFixtures = fixtures;
+      updateSeasonStats(fixtures);
       list.innerHTML = '';
       if (!fixtures.length) {
         list.innerHTML = '<li class="fixture-empty">No fixtures added yet.</li>';
@@ -362,6 +375,27 @@ async function logoutAdmin() {
       }
 
       loader.classList.add('hidden');
+
+      function updateSeasonStats(fixtures) {
+  const completed = fixtures.filter(fixture =>
+    typeof fixture.homeScore === 'number' &&
+    typeof fixture.awayScore === 'number'
+  );
+
+  const played = completed.length;
+  const wins = completed.filter(f => f.homeScore > f.awayScore).length;
+  const draws = completed.filter(f => f.homeScore === f.awayScore).length;
+  const losses = completed.filter(f => f.homeScore < f.awayScore).length;
+  const cleanSheets = completed.filter(f => f.awayScore === 0).length;
+  const conceded = completed.reduce((total, f) => total + f.awayScore, 0);
+
+  document.getElementById('statPlayed').textContent = played;
+  document.getElementById('statWins').textContent = wins;
+  document.getElementById('statDraws').textContent = draws;
+  document.getElementById('statLosses').textContent = losses;
+  document.getElementById('statCleanSheets').textContent = cleanSheets;
+  document.getElementById('statConceded').textContent = conceded;
+}
     }
 
     function getLocalFixtures() {

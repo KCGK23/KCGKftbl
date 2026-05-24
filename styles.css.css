@@ -610,3 +610,40 @@ body{
 .score-draw{
   background:linear-gradient(135deg,#9ca3af,#6b7280);
 }
+
+.season-stats-card{
+  margin-top:24px;
+  padding:22px;
+  border-radius:22px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.season-stats-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.season-stats-grid div{
+  padding:16px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.05);
+  text-align:center;
+}
+
+.season-stats-grid strong{
+  display:block;
+  font-size:1.8rem;
+}
+
+.season-stats-grid span{
+  color:rgba(255,255,255,0.7);
+  font-size:0.85rem;
+}
+
+@media(max-width:700px){
+  .season-stats-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
