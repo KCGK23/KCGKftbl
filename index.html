@@ -71,6 +71,7 @@
           <div class="fixture-access-buttons">
             <button id="unlockFixturesButton" type="button" class="primary-button">Unlock Fixtures</button>
             <button id="lockFixturesButton" type="button" class="secondary-button hidden">Lock Fixtures</button>
+            const logoutButton = document.getElementById('logoutButton');
           </div>
           <p id="fixtureAccessMessage" class="fixture-message">Log in to manage fixtures, scores, and match reports.</p>
         </div>
@@ -149,7 +150,8 @@
     } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
     import {
   getAuth,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  signOut
 } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
 
     const firebaseConfig = {
@@ -189,6 +191,7 @@
       if (fixtureForm) fixtureForm.addEventListener('submit', addFixture);
       if (unlockButton) unlockButton.addEventListener('click', unlockFixtures);
       if (lockButton) lockButton.addEventListener('click', lockFixtures);
+      if (logoutButton) logoutButton.addEventListener('click', logoutAdmin);
 
       const statsButton = document.getElementById('statsButton');
       const aboutButton = document.getElementById('aboutButton');
@@ -251,10 +254,38 @@
       accessMessage.classList.remove('success');
       lockFixturesUI();
     }
+function lockFixtures() {
+  localStorage.removeItem(UNLOCK_KEY);
+
+  const accessMessage = document.getElementById('fixtureAccessMessage');
+
+  accessMessage.textContent = 'Fixture editor locked.';
+  accessMessage.classList.add('error');
+  accessMessage.classList.remove('success');
+
+  lockFixturesUI();
+}
+
+async function logoutAdmin() {
+  await signOut(auth);
+
+  localStorage.removeItem(UNLOCK_KEY);
+
+  const accessMessage = document.getElementById('fixtureAccessMessage');
+
+  accessMessage.textContent = 'Admin logged out.';
+  accessMessage.classList.add('error');
+  accessMessage.classList.remove('success');
+
+  lockFixturesUI();
+
+  await loadSharedFixtures();
+}
 
     function unlockFixturesUI() {
       const fixtureForm = document.getElementById('fixtureForm');
       const lockButton = document.getElementById('lockFixturesButton');
+      const logoutButton = document.getElementById('logoutButton');
       const scoreEditor = document.getElementById('scoreEditor');
       fixtureForm.classList.remove('locked');
       fixtureForm.style.display = 'flex';
@@ -267,10 +298,13 @@
     function lockFixturesUI() {
       const fixtureForm = document.getElementById('fixtureForm');
       const lockButton = document.getElementById('lockFixturesButton');
+      const logoutButton = document.getElementById('logoutButton');
+      logoutButton.classList.remove('hidden');
       const scoreEditor = document.getElementById('scoreEditor');
       fixtureForm.classList.add('locked');
       fixtureForm.style.display = 'none';
       lockButton.classList.add('hidden');
+      logoutButton.classList.add('hidden');
       if (scoreEditor) {
         scoreEditor.classList.add('hidden');
       }
