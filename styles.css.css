@@ -600,3 +600,19 @@ body{
     grid-template-columns: 1fr;
   }
 }
+.fixture-access-row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.fixture-access input{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 760px){
+  .fixture-access-row{
+    grid-template-columns: 1fr;
+  }
+}
