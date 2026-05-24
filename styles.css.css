@@ -598,3 +598,15 @@ body{
     grid-template-columns:1fr;
   }
 }
+
+.score-win{
+  background:linear-gradient(135deg,#3b82f6,#2563eb);
+}
+
+.score-loss{
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+}
+
+.score-draw{
+  background:linear-gradient(135deg,#9ca3af,#6b7280);
+}

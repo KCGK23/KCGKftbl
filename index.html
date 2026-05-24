@@ -381,6 +381,17 @@ async function logoutAdmin() {
   const scoreText =
     typeof fixture.homeScore === 'number' &&
     typeof fixture.awayScore === 'number';
+let scoreClass = '';
+
+if (scoreText) {
+  if (fixture.homeScore > fixture.awayScore) {
+    scoreClass = 'score-win';
+  } else if (fixture.homeScore < fixture.awayScore) {
+    scoreClass = 'score-loss';
+  } else {
+    scoreClass = 'score-draw';
+  }
+}
 
   const item = document.createElement('li');
   item.className = 'fixture-item';
@@ -394,7 +405,7 @@ async function logoutAdmin() {
 
       ${
         scoreText
-          ? `<span class="score-badge">${fixture.homeScore}-${fixture.awayScore}</span>`
+         ? `<span class="score-badge ${scoreClass}">${fixture.homeScore}-${fixture.awayScore}</span>`
           : `<span class="fixture-status">Upcoming</span>`
       }
     </div>
