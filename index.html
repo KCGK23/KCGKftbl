@@ -377,74 +377,61 @@ async function logoutAdmin() {
       localStorage.setItem(LOCAL_FIXTURE_KEY, JSON.stringify(fixtures));
     }
 
-   function createFixtureItem(fixture) {
+  function createFixtureItem(fixture) {
   const scoreText =
     typeof fixture.homeScore === 'number' &&
-    typeof fixture.awayScore === 'number'
-      ? ` • Score: ${fixture.homeScore}-${fixture.awayScore}`
-      : '';
+    typeof fixture.awayScore === 'number';
 
   const item = document.createElement('li');
   item.className = 'fixture-item';
 
   item.innerHTML = `
+    <div class="fixture-main">
+      <div>
+        <span class="fixture-label">Opponent</span>
+        <h4>${fixture.opponent}</h4>
+      </div>
+
+      ${
+        scoreText
+          ? `<span class="score-badge">${fixture.homeScore}-${fixture.awayScore}</span>`
+          : `<span class="fixture-status">Upcoming</span>`
+      }
+    </div>
+
+    <div class="fixture-meta">
       <div class="fixture-detail">
-    <span class="fixture-label">📅 Date</span>
-    <strong>${fixture.date}</strong>
-  </div>
+        <span class="fixture-label">Date</span>
+        <strong>${fixture.date}</strong>
+      </div>
 
-  <div class="fixture-detail">
-    <span class="fixture-label">⚽ Opponent</span>
-    <strong>${fixture.opponent}</strong>
+      <div class="fixture-detail">
+        <span class="fixture-label">Competition</span>
+        <span>${fixture.competition || 'Friendly'}</span>
+      </div>
 
-    ${
-      scoreText
-        ? `<span class="score-badge">${fixture.homeScore}-${fixture.awayScore}</span>`
-        : ''
-    }
-  </div>
+      <div class="fixture-detail">
+        <span class="fixture-label">Location</span>
+        <span>${fixture.location || 'TBC'}</span>
+      </div>
+    </div>
 
-  <div class="fixture-detail">
-    <span class="fixture-label">🏆 Competition</span>
-    <span>${fixture.competition || 'Friendly'}</span>
-  </div>
+    ${fixture.report ? `<p class="match-report">${fixture.report}</p>` : ''}
 
-  <div class="fixture-detail">
-    <span class="fixture-label">📍 Location</span>
-    <span>${fixture.location || 'TBC'}</span>
-  </div>
-
-  ${
-    fixture.report
-      ? `<p class="match-report">${fixture.report}</p>`
-      : ''
-  }
-
-  ${
-    auth.currentUser
-      ? `<button class="report-button" data-id="${fixture.id}">
-          Match Report
-        </button>`
-      : ''
-  }
-
-  ${
-    auth.currentUser && fixture.id
-      ? `<button class="delete-fixture-button" data-id="${fixture.id}">
-          Delete
-        </button>`
-      : ''
-  }
-
+    <div class="fixture-actions">
+      ${auth.currentUser ? `<button class="report-button" data-id="${fixture.id}">Match Report</button>` : ''}
+      ${auth.currentUser && fixture.id ? `<button class="delete-fixture-button" data-id="${fixture.id}">Delete</button>` : ''}
+    </div>
   `;
+
   const deleteButton = item.querySelector('.delete-fixture-button');
   const reportButton = item.querySelector('.report-button');
 
-if (reportButton) {
-  reportButton.addEventListener('click', function () {
-    openMatchReport(fixture);
-  });
-}
+  if (reportButton) {
+    reportButton.addEventListener('click', function () {
+      openMatchReport(fixture);
+    });
+  }
 
   if (deleteButton) {
     deleteButton.addEventListener('click', function () {
