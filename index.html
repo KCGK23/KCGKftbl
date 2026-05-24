@@ -52,80 +52,85 @@
   <section class="fixtures-card">
     <div class="fixtures-header">
       <h2>Upcoming Fixtures</h2>
-        <p>Only the site owner can add fixtures. Fixtures are saved to Firebase and shared with everyone who visits this site.</p>
-      </div>
+      <p>Only the site owner can add fixtures. Fixtures are saved to Firebase and shared with everyone who visits this site.</p>
+    </div>
 
-      <div class="fixture-controls">
-        <button id="manageSiteButton" type="button" class="secondary-button">Admin Panel</button>
-      </div>
+    <div class="fixture-controls">
+      <button id="manageSiteButton" type="button" class="secondary-button">Admin Panel</button>
+    </div>
 
-      <div id="managementPanel" class="management-panel hidden">
-        
-        <div class="fixture-access admin-section">
-          <label for="fixturePassword">Admin login:</label>
-          <div class="fixture-access-row">
-            <input id="fixtureEmail" type="email" placeholder="Enter admin email" />
-
-<input id="fixturePassword" type="password" placeholder="Enter admin password" />
-          </div>
-          <div class="fixture-access-buttons">
-            <button id="unlockFixturesButton" type="button" class="primary-button">Unlock Fixtures</button>
-            <button id="lockFixturesButton" type="button" class="secondary-button hidden">Lock Fixtures</button>
-            <button id="logoutButton" type="button" class="secondary-button hidden">
-  Logout
-</button>
-            
-          </div>
-          <p id="fixtureAccessMessage" class="fixture-message">Log in to manage fixtures, scores, and match reports.</p>
-        </div>
-
-        <div id="scoreEditor" class="fixture-score-editor admin-section hidden">
-          <h3>Post Fixture Score</h3>
-          <label for="scoreFixtureSelect">Select fixture</label>
-          <select id="scoreFixtureSelect">
-            <option value="">Select fixture</option>
-          </select>
-          <div class="fixture-row">
-            <label>
-              Our score
-              <input id="scoreHome" type="number" min="0" placeholder="0" />
-            </label>
-            <label>
-              Opponent score
-              <input id="scoreAway" type="number" min="0" placeholder="0" />
-            </label>
-          </div>
-          <button id="saveScoreButton" type="button" class="primary-button">Save Score</button>
-          <p id="scoreMessage" class="fixture-message"></p>
+    <div id="managementPanel" class="management-panel hidden">
+      <div class="admin-panel-header">
+        <div>
+          <h3>Fixture Admin</h3>
+          <p>Log in to add fixtures, update scores, and write match reports.</p>
         </div>
       </div>
 
-    <div class="admin-section">
- 
+      <div class="fixture-access admin-section">
+        <h4>Admin Login</h4>
+        <div class="fixture-access-row">
+          <label>
+            Email
+            <input id="fixtureEmail" type="email" placeholder="Enter admin email" autocomplete="username" />
+          </label>
+          <label>
+            Password
+            <input id="fixturePassword" type="password" placeholder="Enter admin password" autocomplete="current-password" />
+          </label>
+        </div>
+        <div class="fixture-access-buttons">
+          <button id="unlockFixturesButton" type="button" class="primary-button">Unlock</button>
+          <button id="lockFixturesButton" type="button" class="secondary-button hidden">Lock</button>
+          <button id="logoutButton" type="button" class="secondary-button hidden">Logout</button>
+        </div>
+        <p id="fixtureAccessMessage" class="fixture-message">Log in to manage fixtures, scores, and match reports.</p>
+      </div>
 
-  <form id="fixtureForm" class="fixture-form locked" style="display:none;">
-      <div class="fixture-row">
-        <label>
-          Date
-          <input type="date" id="fixtureDate" required />
-        </label>
-        <label>
-          Opponent
-          <input type="text" id="fixtureOpponent" placeholder="Opponent" required />
-        </label>
+      <form id="fixtureForm" class="fixture-form admin-section locked">
+        <h4>Add Fixture</h4>
+        <div class="fixture-row">
+          <label>
+            Date
+            <input type="date" id="fixtureDate" required />
+          </label>
+          <label>
+            Opponent
+            <input type="text" id="fixtureOpponent" placeholder="Opponent" required />
+          </label>
+        </div>
+        <div class="fixture-row">
+          <label>
+            Competition
+            <input type="text" id="fixtureComp" placeholder="Competition" />
+          </label>
+          <label>
+            Location
+            <input type="text" id="fixtureLocation" placeholder="Venue" />
+          </label>
+        </div>
+        <button type="submit" class="primary-button">Add Fixture</button>
+      </form>
+
+      <div id="scoreEditor" class="fixture-score-editor admin-section hidden">
+        <h4>Post Fixture Score</h4>
+        <label for="scoreFixtureSelect">Select fixture</label>
+        <select id="scoreFixtureSelect">
+          <option value="">Select fixture</option>
+        </select>
+        <div class="fixture-row">
+          <label>
+            Our score
+            <input id="scoreHome" type="number" min="0" placeholder="0" />
+          </label>
+          <label>
+            Opponent score
+            <input id="scoreAway" type="number" min="0" placeholder="0" />
+          </label>
+        </div>
+        <button id="saveScoreButton" type="button" class="primary-button">Save Score</button>
+        <p id="scoreMessage" class="fixture-message"></p>
       </div>
-      <div class="fixture-row">
-        <label>
-          Competition
-          <input type="text" id="fixtureComp" placeholder="Competition" />
-        </label>
-        <label>
-          Location
-          <input type="text" id="fixtureLocation" placeholder="Venue" />
-        </label>
-      </div>
-      <button type="submit" class="primary-button">Add Fixture</button>
-    </form>
     </div>
 
     <div class="fixture-list-card">
@@ -205,6 +210,7 @@
       if (manageButton && managementPanel) {
         manageButton.addEventListener('click', function() {
           managementPanel.classList.toggle('hidden');
+          manageButton.textContent = managementPanel.classList.contains('hidden') ? 'Admin Panel' : 'Close Admin';
         });
       }
 
@@ -259,17 +265,6 @@
       lockFixturesUI();
     }
 
-  localStorage.removeItem(UNLOCK_KEY);
-
-  const accessMessage = document.getElementById('fixtureAccessMessage');
-
-  accessMessage.textContent = 'Fixture editor locked.';
-  accessMessage.classList.add('error');
-  accessMessage.classList.remove('success');
-
-  lockFixturesUI();
-
-
 async function logoutAdmin() {
   await signOut(auth);
 
@@ -292,8 +287,8 @@ async function logoutAdmin() {
       const logoutButton = document.getElementById('logoutButton');
       const scoreEditor = document.getElementById('scoreEditor');
       fixtureForm.classList.remove('locked');
-      fixtureForm.style.display = 'flex';
       lockButton.classList.remove('hidden');
+      logoutButton.classList.remove('hidden');
       if (scoreEditor && auth.currentUser) {
         scoreEditor.classList.remove('hidden');
       }
@@ -303,10 +298,8 @@ async function logoutAdmin() {
       const fixtureForm = document.getElementById('fixtureForm');
       const lockButton = document.getElementById('lockFixturesButton');
       const logoutButton = document.getElementById('logoutButton');
-      logoutButton.classList.add('hidden');
       const scoreEditor = document.getElementById('scoreEditor');
       fixtureForm.classList.add('locked');
-      fixtureForm.style.display = 'none';
       lockButton.classList.add('hidden');
       logoutButton.classList.add('hidden');
       if (scoreEditor) {
