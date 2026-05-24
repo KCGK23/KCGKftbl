@@ -647,3 +647,21 @@ body{
     grid-template-columns:repeat(2,1fr);
   }
 }
+
+.form-card{
+  margin-top:18px;
+  padding:20px 22px;
+  border-radius:22px;
+  background:linear-gradient(135deg, rgba(79,157,255,0.18), rgba(255,255,255,0.04));
+  border:1px solid rgba(79,157,255,0.22);
+}
+
+.form-card h3{
+  margin:0 0 8px;
+}
+
+.form-card p{
+  margin:0;
+  font-size:1.1rem;
+  font-weight:700;
+}

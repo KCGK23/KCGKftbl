@@ -145,6 +145,11 @@
   </div>
 </div>
 
+<div class="form-card">
+  <h3>Current Form</h3>
+  <p id="formMessage">No league form yet.</p>
+  
+</div>
     <div class="fixture-list-card">
       <h3>Fixture List</h3>
       <div id="fixtureLoading" class="fixture-loading hidden">Loading fixtures…</div>
@@ -344,6 +349,7 @@ async function logoutAdmin() {
 
       currentFixtures = fixtures;
       updateSeasonStats(fixtures);
+      updateFormMessage(fixtures);
       list.innerHTML = '';
       if (!fixtures.length) {
         list.innerHTML = '<li class="fixture-empty">No fixtures added yet.</li>';
@@ -352,6 +358,51 @@ async function logoutAdmin() {
           list.appendChild(createFixtureItem(item));
         });
       }
+
+function updateFormMessage(fixtures) {
+  const leagueGames = fixtures
+    .filter(fixture =>
+      typeof fixture.homeScore === 'number' &&
+      typeof fixture.awayScore === 'number' &&
+      fixture.competition &&
+      fixture.competition.toLowerCase().includes('league')
+    )
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const formMessage = document.getElementById('formMessage');
+
+  if (!leagueGames.length) {
+    formMessage.textContent = 'No league form yet.';
+    return;
+  }
+
+  let unbeaten = 0;
+  let cleanSheets = 0;
+
+  for (const game of leagueGames) {
+    if (game.homeScore >= game.awayScore) unbeaten++;
+    else break;
+  }
+
+  for (const game of leagueGames) {
+    if (game.awayScore === 0) cleanSheets++;
+    else break;
+  }
+
+  const latest = leagueGames[0];
+
+  if (cleanSheets >= 2) {
+    formMessage.textContent = `🧤 ${cleanSheets} clean sheets in a row`;
+  } else if (unbeaten >= 2) {
+    formMessage.textContent = `🔥 Unbeaten in ${unbeaten} league games`;
+  } else if (latest.homeScore > latest.awayScore) {
+    formMessage.textContent = '✅ Won the latest league match';
+  } else if (latest.homeScore === latest.awayScore) {
+    formMessage.textContent = '➖ Drew the latest league match';
+  } else {
+    formMessage.textContent = '🔴 Looking to bounce back next game';
+  }
+}
 
       populateScoreSelect(fixtures);
       if (scoreEditor && !remoteFailed && localStorage.getItem(UNLOCK_KEY) === 'true') {
