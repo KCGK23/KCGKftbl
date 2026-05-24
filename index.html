@@ -378,9 +378,11 @@ async function logoutAdmin() {
 
       function updateSeasonStats(fixtures) {
   const completed = fixtures.filter(fixture =>
-    typeof fixture.homeScore === 'number' &&
-    typeof fixture.awayScore === 'number'
-  );
+  typeof fixture.homeScore === 'number' &&
+  typeof fixture.awayScore === 'number' &&
+  fixture.competition &&
+  fixture.competition.toLowerCase().includes('league')
+);
 
   const played = completed.length;
   const wins = completed.filter(f => f.homeScore > f.awayScore).length;
