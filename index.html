@@ -71,7 +71,10 @@
           <div class="fixture-access-buttons">
             <button id="unlockFixturesButton" type="button" class="primary-button">Unlock Fixtures</button>
             <button id="lockFixturesButton" type="button" class="secondary-button hidden">Lock Fixtures</button>
-            const logoutButton = document.getElementById('logoutButton');
+            <button id="logoutButton" type="button" class="secondary-button hidden">
+  Logout
+</button>
+            
           </div>
           <p id="fixtureAccessMessage" class="fixture-message">Log in to manage fixtures, scores, and match reports.</p>
         </div>
@@ -183,6 +186,7 @@
       const fixtureForm = document.getElementById('fixtureForm');
       const unlockButton = document.getElementById('unlockFixturesButton');
       const lockButton = document.getElementById('lockFixturesButton');
+      const logoutButton = document.getElementById('logoutButton');
       const passwordInput = document.getElementById('fixturePassword');
       const accessMessage = document.getElementById('fixtureAccessMessage');
       const manageButton = document.getElementById('manageSiteButton');
@@ -254,7 +258,7 @@
       accessMessage.classList.remove('success');
       lockFixturesUI();
     }
-function lockFixtures() {
+
   localStorage.removeItem(UNLOCK_KEY);
 
   const accessMessage = document.getElementById('fixtureAccessMessage');
@@ -299,7 +303,7 @@ async function logoutAdmin() {
       const fixtureForm = document.getElementById('fixtureForm');
       const lockButton = document.getElementById('lockFixturesButton');
       const logoutButton = document.getElementById('logoutButton');
-      logoutButton.classList.remove('hidden');
+      logoutButton.classList.add('hidden');
       const scoreEditor = document.getElementById('scoreEditor');
       fixtureForm.classList.add('locked');
       fixtureForm.style.display = 'none';
