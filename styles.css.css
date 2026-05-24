@@ -558,3 +558,43 @@ body{
   color:#f5f5f5;
   line-height:1.5;
 }
+
+.fixture-detail{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.fixture-label{
+  font-size:0.72rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:rgba(255,255,255,0.55);
+  font-weight:700;
+}
+
+.fixture-detail strong{
+  font-size:1rem;
+  color:#fff;
+}
+
+.fixture-item{
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:18px;
+  align-items:start;
+}
+
+.match-report{
+  grid-column:1/-1;
+}
+
+.report-button,
+.delete-fixture-button{
+  width:max-content;
+}
+
+@media (max-width:700px){
+  .fixture-item{
+    grid-template-columns:1fr;
+  }
+}
