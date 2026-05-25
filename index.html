@@ -254,7 +254,6 @@
       const unlockButton = document.getElementById('unlockFixturesButton');
       const lockButton = document.getElementById('lockFixturesButton');
       const logoutButton = document.getElementById('logoutButton');
-      const editStatsButton = document.getElementById('editStatsButton');
       const passwordInput = document.getElementById('fixturePassword');
       const accessMessage = document.getElementById('fixtureAccessMessage');
       const manageButton = document.getElementById('manageSiteButton');
@@ -370,7 +369,6 @@ async function logoutAdmin() {
       fixtureForm.classList.remove('locked');
       lockButton.classList.remove('hidden');
       logoutButton.classList.remove('hidden');
-      document.getElementById('editStatsButton').classList.remove('hidden');
       if (scoreEditor && auth.currentUser) {
         scoreEditor.classList.remove('hidden');
       }
@@ -384,7 +382,6 @@ async function logoutAdmin() {
       fixtureForm.classList.add('locked');
       lockButton.classList.add('hidden');
       logoutButton.classList.add('hidden');
-      document.getElementById('editStatsButton').classList.add('hidden');
       if (scoreEditor) {
         scoreEditor.classList.add('hidden');
       }
