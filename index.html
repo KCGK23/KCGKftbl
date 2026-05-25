@@ -152,6 +152,13 @@
 </div>
     <div class="fixture-list-card">
       <h3>Fixture List</h3>
+      <div class="fixture-tabs">
+  <button type="button" class="fixture-tab active" data-filter="all">All</button>
+  <button type="button" class="fixture-tab" data-filter="upcoming">Upcoming</button>
+  <button type="button" class="fixture-tab" data-filter="results">Results</button>
+  <button type="button" class="fixture-tab" data-filter="league">League</button>
+  <button type="button" class="fixture-tab" data-filter="other">Cup/Friendly</button>
+</div>
       <div id="fixtureLoading" class="fixture-loading hidden">Loading fixtures…</div>
       <ul id="fixtureList">
         <li class="fixture-empty">No fixtures added yet.</li>
@@ -198,6 +205,7 @@
     const LOCAL_FIXTURE_KEY = 'localFixtures';
     const UNLOCK_KEY = 'fixturesUnlocked';
     let currentFixtures = [];
+    let currentFilter = 'all';
 
     document.addEventListener('DOMContentLoaded', function() {
       const scoreFixtureSelect = document.getElementById('scoreFixtureSelect');
@@ -240,6 +248,21 @@
         lockFixturesUI();
       }
 
+const tabs = document.querySelectorAll('.fixture-tab');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', function () {
+
+    tabs.forEach(t => t.classList.remove('active'));
+
+    this.classList.add('active');
+
+    currentFilter = this.dataset.filter;
+
+    renderFixtures(currentFixtures);
+  });
+
+});
       loadSharedFixtures();
     });
 
@@ -350,14 +373,7 @@ async function logoutAdmin() {
       currentFixtures = fixtures;
       updateSeasonStats(fixtures);
       updateFormMessage(fixtures);
-      list.innerHTML = '';
-      if (!fixtures.length) {
-        list.innerHTML = '<li class="fixture-empty">No fixtures added yet.</li>';
-      } else {
-        fixtures.forEach(item => {
-          list.appendChild(createFixtureItem(item));
-        });
-      }
+      renderFixtures(fixtures);
 
 function updateFormMessage(fixtures) {
   const leagueGames = fixtures
@@ -554,6 +570,50 @@ async function deleteFixture(fixtureId) {
   }
 }
 
+function renderFixtures(fixtures) {
+  const list = document.getElementById('fixtureList');
+
+  list.innerHTML = '';
+
+  let filtered = [...fixtures];
+
+  if (currentFilter === 'upcoming') {
+    filtered = fixtures.filter(f =>
+      typeof f.homeScore !== 'number' ||
+      typeof f.awayScore !== 'number'
+    );
+  }
+
+  if (currentFilter === 'results') {
+    filtered = fixtures.filter(f =>
+      typeof f.homeScore === 'number' &&
+      typeof f.awayScore === 'number'
+    );
+  }
+
+  if (currentFilter === 'league') {
+    filtered = fixtures.filter(f =>
+      f.competition &&
+      f.competition.toLowerCase().includes('league')
+    );
+  }
+
+  if (currentFilter === 'other') {
+    filtered = fixtures.filter(f =>
+      !f.competition ||
+      !f.competition.toLowerCase().includes('league')
+    );
+  }
+
+  if (!filtered.length) {
+    list.innerHTML = '<li class="fixture-empty">No fixtures found.</li>';
+    return;
+  }
+
+  filtered.forEach(item => {
+    list.appendChild(createFixtureItem(item));
+  });
+}
 
 async function openMatchReport(fixture) {
 
