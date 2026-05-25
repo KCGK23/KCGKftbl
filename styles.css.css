@@ -717,6 +717,7 @@ body{
 }
 
 .injury-active{
-  color:#ff6b6b;
-  font-weight:700;
+  background:rgba(239,68,68,0.18) !important;
+  border:1px solid rgba(239,68,68,0.45) !important;
+  color:#ffb4b4 !important;
 }
