@@ -922,24 +922,20 @@ async function openMatchReport(fixture) {
 }
 
 
+ async function savePlayerStats() {
   if (!auth.currentUser) return;
 
   const kitNumber = document.getElementById('editKitNumber').value;
   const yellowCards = document.getElementById('editYellowCards').value;
   const redCards = document.getElementById('editRedCards').value;
   const injuries = document.getElementById('editInjuries').value || 'None';
+  const statsSaveMessage = document.getElementById('statsSaveMessage');
 
-  document.querySelector('#statsSection li:nth-child(3)').textContent =
-    `Kit No. : ${kitNumber}`;
-
-  document.querySelector('#statsSection li:nth-child(4)').textContent =
-    `Yellow Cards: ${yellowCards}`;
-
-  document.querySelector('#statsSection li:nth-child(5)').textContent =
-    `Red Cards: ${redCards}`;
+  document.querySelector('#statsSection li:nth-child(3)').textContent = `Kit No. : ${kitNumber}`;
+  document.querySelector('#statsSection li:nth-child(4)').textContent = `Yellow Cards: ${yellowCards}`;
+  document.querySelector('#statsSection li:nth-child(5)').textContent = `Red Cards: ${redCards}`;
 
   const injuryStat = document.getElementById('injuryStat');
-
   injuryStat.textContent = `Injuries: ${injuries}`;
 
   if (injuries.toLowerCase() !== 'none') {
@@ -949,25 +945,23 @@ async function openMatchReport(fixture) {
   }
 
   try {
+    await setDoc(statsDocRef, {
+      kitNumber,
+      yellowCards,
+      redCards,
+      injuries
+    });
 
-  await setDoc(statsDocRef, {
-    kitNumber,
-    yellowCards,
-    redCards,
-    injuries
-  });
+    statsSaveMessage.textContent = 'Stats saved to Firebase.';
+    statsSaveMessage.classList.add('success');
+    statsSaveMessage.classList.remove('error');
+  } catch (error) {
+    console.error(error);
 
-  statsSaveMessage.textContent = 'Stats saved to Firebase.';
-  statsSaveMessage.classList.add('success');
-  statsSaveMessage.classList.remove('error');
-
-} catch (error) {
-
-  console.error(error);
-
-  statsSaveMessage.textContent = 'Unable to save stats.';
-  statsSaveMessage.classList.add('error');
-  statsSaveMessage.classList.remove('success');
+    statsSaveMessage.textContent = 'Unable to save stats.';
+    statsSaveMessage.classList.add('error');
+    statsSaveMessage.classList.remove('success');
+  }
 }
 
 async function loadPlayerStats() {
