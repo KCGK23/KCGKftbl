@@ -530,7 +530,20 @@ if (scoreText) {
       </div>
     </div>
 
-    ${fixture.report ? `<p class="match-report">${fixture.report}</p>` : ''}
+    ${
+  fixture.report
+    ? `
+      <button class="view-report-button" type="button">
+        View Match Report
+      </button>
+
+      <div class="match-report hidden">
+        <h5>Match Report</h5>
+        <p>${fixture.report}</p>
+      </div>
+    `
+    : ''
+}
 
     <div class="fixture-actions">
       ${auth.currentUser ? `<button class="report-button" data-id="${fixture.id}">Match Report</button>` : ''}
@@ -540,12 +553,24 @@ if (scoreText) {
 
   const deleteButton = item.querySelector('.delete-fixture-button');
   const reportButton = item.querySelector('.report-button');
+const viewReportButton = item.querySelector('.view-report-button');
+const matchReport = item.querySelector('.match-report');
 
   if (reportButton) {
     reportButton.addEventListener('click', function () {
       openMatchReport(fixture);
     });
   }
+if (viewReportButton && matchReport) {
+  viewReportButton.addEventListener('click', function () {
+
+    matchReport.classList.toggle('hidden');
+
+    this.textContent = matchReport.classList.contains('hidden')
+      ? 'View Match Report'
+      : 'Hide Match Report';
+  });
+}
 
   if (deleteButton) {
     deleteButton.addEventListener('click', function () {

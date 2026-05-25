@@ -685,3 +685,33 @@ body{
 .fixture-tab.active{
   background:linear-gradient(135deg,#4f9dff,#2c7cff);
 }
+
+.view-report-button{
+  grid-column:1/-1;
+  width:max-content;
+  background:rgba(255,255,255,0.1);
+  color:white;
+  border:1px solid rgba(255,255,255,0.15);
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:700;
+}
+
+.match-report{
+  grid-column:1/-1;
+  padding:16px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.match-report h5{
+  margin:0 0 8px;
+  color:#d8e7ff;
+  font-size:1rem;
+}
+
+.match-report p{
+  margin:0;
+  line-height:1.6;
+}
