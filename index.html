@@ -204,17 +204,19 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
     import {
-      getFirestore,
-      collection,
-      getDocs,
-      query,
-      orderBy,
-      addDoc,
-      doc,
-      updateDoc,
-      deleteDoc,
-      serverTimestamp
-    } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+  getFirestore,
+  collection,
+  getDocs,
+  getDoc,
+  setDoc,
+  query,
+  orderBy,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp
+} from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
     import {
   getAuth,
   signInWithEmailAndPassword,
@@ -235,6 +237,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const fixturesCollection = collection(db, 'fixtures');
+    const statsDocRef = doc(db, 'siteData', 'playerStats');
 
     const FIXTURE_PASSWORD = 'KCGK@110311';
     const LOCAL_FIXTURE_KEY = 'localFixtures';
@@ -304,6 +307,7 @@ tabs.forEach(tab => {
 
 });
       loadSharedFixtures();
+      loadPlayerStats();
     });
 
  async function unlockFixtures() {
@@ -917,7 +921,7 @@ async function openMatchReport(fixture) {
   }
 }
 
-function savePlayerStats() {
+
   if (!auth.currentUser) return;
 
   const kitNumber = document.getElementById('editKitNumber').value;
@@ -944,11 +948,66 @@ function savePlayerStats() {
     injuryStat.classList.remove('injury-active');
   }
 
-  const statsSaveMessage = document.getElementById('statsSaveMessage');
+  try {
 
-  statsSaveMessage.textContent = 'Stats updated successfully.';
+  await setDoc(statsDocRef, {
+    kitNumber,
+    yellowCards,
+    redCards,
+    injuries
+  });
+
+  statsSaveMessage.textContent = 'Stats saved to Firebase.';
   statsSaveMessage.classList.add('success');
+  statsSaveMessage.classList.remove('error');
+
+} catch (error) {
+
+  console.error(error);
+
+  statsSaveMessage.textContent = 'Unable to save stats.';
+  statsSaveMessage.classList.add('error');
+  statsSaveMessage.classList.remove('success');
 }
+
+async function loadPlayerStats() {
+  try {
+    const snapshot = await getDoc(statsDocRef);
+
+    if (!snapshot.exists()) return;
+
+    const stats = snapshot.data();
+
+    document.querySelector('#statsSection li:nth-child(3)').textContent =
+      `Kit No. : ${stats.kitNumber || '23'}`;
+
+    document.querySelector('#statsSection li:nth-child(4)').textContent =
+      `Yellow Cards: ${stats.yellowCards || '0'}`;
+
+    document.querySelector('#statsSection li:nth-child(5)').textContent =
+      `Red Cards: ${stats.redCards || '0'}`;
+
+    const injuryStat = document.getElementById('injuryStat');
+    const injuries = stats.injuries || 'None';
+
+    injuryStat.textContent = `Injuries: ${injuries}`;
+
+    document.getElementById('editKitNumber').value = stats.kitNumber || '23';
+    document.getElementById('editYellowCards').value = stats.yellowCards || '0';
+    document.getElementById('editRedCards').value = stats.redCards || '0';
+    document.getElementById('editInjuries').value = injuries;
+
+    if (injuries.toLowerCase() !== 'none') {
+      injuryStat.classList.add('injury-active');
+    } else {
+      injuryStat.classList.remove('injury-active');
+    }
+
+  } catch (error) {
+    console.error('Unable to load player stats:', error);
+  }
+}
+
   </script>
 </body>
 </html>
