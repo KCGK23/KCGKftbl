@@ -715,3 +715,8 @@ body{
   margin:0;
   line-height:1.6;
 }
+
+.injury-active{
+  color:#ff6b6b;
+  font-weight:700;
+}

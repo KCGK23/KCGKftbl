@@ -30,6 +30,7 @@
           <li>Kit No. : 23</li>
           <li>Yellow Cards: 1</li>
           <li>Red Cards: 0</li>
+          <li id="injuryStat">Injuries: None</li>
           <li>Preferred Foot: Right</li>
         </ul>
       </div>
@@ -134,7 +135,38 @@
         <button id="saveScoreButton" type="button" class="primary-button">Save Score</button>
         <p id="scoreMessage" class="fixture-message"></p>
       </div>
+      <div id="statsEditor" class="admin-section hidden">
+  <h4>Edit Player Stats</h4>
+
+  <div class="fixture-row">
+    <label>
+      Kit Number
+      <input id="editKitNumber" type="text" value="23" />
+    </label>
+
+    <label>
+      Yellow Cards
+      <input id="editYellowCards" type="number" min="0" value="1" />
+    </label>
+  </div>
+
+  <div class="fixture-row">
+    <label>
+      Red Cards
+      <input id="editRedCards" type="number" min="0" value="0" />
+    </label>
+
+    <label>
+      Injuries
+      <input id="editInjuries" type="text" value="None" />
+    </label>
+  </div>
+
+  <button id="saveStatsButton" type="button" class="primary-button">Save Stats</button>
+  <p id="statsSaveMessage" class="fixture-message"></p>
+</div>
     </div>
+
 <div class="season-stats-card">
   <h3>Season Stats</h3>
 
@@ -213,9 +245,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       const scoreFixtureSelect = document.getElementById('scoreFixtureSelect');
       const saveScoreButton = document.getElementById('saveScoreButton');
+      const saveStatsButton = document.getElementById('saveStatsButton');
 
       if (scoreFixtureSelect) scoreFixtureSelect.addEventListener('change', onScoreFixtureSelected);
       if (saveScoreButton) saveScoreButton.addEventListener('click', saveFixtureScore);
+      if (saveStatsButton) saveStatsButton.addEventListener('click', savePlayerStats);
       const fixtureForm = document.getElementById('fixtureForm');
       const unlockButton = document.getElementById('unlockFixturesButton');
       const lockButton = document.getElementById('lockFixturesButton');
@@ -246,6 +280,7 @@
 
       if (localStorage.getItem(UNLOCK_KEY) === 'true') {
         unlockFixturesUI();
+        document.getElementById('statsEditor').classList.remove('hidden');
         accessMessage.textContent = 'Fixture editor unlocked.';
         accessMessage.classList.add('success');
         accessMessage.classList.remove('error');
@@ -303,6 +338,7 @@ tabs.forEach(tab => {
 }
     function lockFixtures() {
       localStorage.removeItem(UNLOCK_KEY);
+      document.getElementById('statsEditor').classList.add('hidden');
       const accessMessage = document.getElementById('fixtureAccessMessage');
       accessMessage.textContent = 'Fixture editor locked. Enter the owner password to unlock.';
       accessMessage.classList.add('error');
@@ -849,23 +885,69 @@ async function openMatchReport(fixture) {
       }
     }
 
-    function editStats() {
+ function editStats() {
   if (!auth.currentUser) return;
 
-  const newYellowCards = prompt('Enter yellow cards:');
-  const newRedCards = prompt('Enter red cards:');
-  const newKitNumber = prompt('Enter kit number:');
+  const kitItem = document.querySelector('#statsSection li:nth-child(3)');
+  const yellowItem = document.querySelector('#statsSection li:nth-child(4)');
+  const redItem = document.querySelector('#statsSection li:nth-child(5)');
+  const injuryItem = document.getElementById('injuryStat');
 
-  if (newYellowCards !== null) {
-    document.querySelector('#statsSection li:nth-child(3)').textContent =
-      `Kit No. : ${newKitNumber || '23'}`;
+  const kitNumber = prompt('Kit number:', kitItem.textContent.replace('Kit No. : ', ''));
+  if (kitNumber === null) return;
 
-    document.querySelector('#statsSection li:nth-child(4)').textContent =
-      `Yellow Cards: ${newYellowCards}`;
+  const yellowCards = prompt('Yellow cards:', yellowItem.textContent.replace('Yellow Cards: ', ''));
+  if (yellowCards === null) return;
 
-    document.querySelector('#statsSection li:nth-child(5)').textContent =
-      `Red Cards: ${newRedCards || '0'}`;
+  const redCards = prompt('Red cards:', redItem.textContent.replace('Red Cards: ', ''));
+  if (redCards === null) return;
+
+  const injuries = prompt('Injuries:', injuryItem.textContent.replace('Injuries: ', ''));
+  if (injuries === null) return;
+
+  kitItem.textContent = `Kit No. : ${kitNumber}`;
+  yellowItem.textContent = `Yellow Cards: ${yellowCards}`;
+  redItem.textContent = `Red Cards: ${redCards}`;
+  injuryItem.textContent = `Injuries: ${injuries || 'None'}`;
+
+  if ((injuries || 'None').toLowerCase() !== 'none') {
+    injuryItem.classList.add('injury-active');
+  } else {
+    injuryItem.classList.remove('injury-active');
   }
+}
+
+function savePlayerStats() {
+  if (!auth.currentUser) return;
+
+  const kitNumber = document.getElementById('editKitNumber').value;
+  const yellowCards = document.getElementById('editYellowCards').value;
+  const redCards = document.getElementById('editRedCards').value;
+  const injuries = document.getElementById('editInjuries').value || 'None';
+
+  document.querySelector('#statsSection li:nth-child(3)').textContent =
+    `Kit No. : ${kitNumber}`;
+
+  document.querySelector('#statsSection li:nth-child(4)').textContent =
+    `Yellow Cards: ${yellowCards}`;
+
+  document.querySelector('#statsSection li:nth-child(5)').textContent =
+    `Red Cards: ${redCards}`;
+
+  const injuryStat = document.getElementById('injuryStat');
+
+  injuryStat.textContent = `Injuries: ${injuries}`;
+
+  if (injuries.toLowerCase() !== 'none') {
+    injuryStat.classList.add('injury-active');
+  } else {
+    injuryStat.classList.remove('injury-active');
+  }
+
+  const statsSaveMessage = document.getElementById('statsSaveMessage');
+
+  statsSaveMessage.textContent = 'Stats updated successfully.';
+  statsSaveMessage.classList.add('success');
 }
   </script>
 </body>
