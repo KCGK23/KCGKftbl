@@ -38,6 +38,9 @@
       <h2>Goalkeeper</h2>
       <button id="statsButton">Show Stats</button>
       <button id="aboutButton">Show About Me</button>
+      <button id="editStatsButton" class="hidden">
+  Edit Stats
+</button>
       <div class="social-row">
         <a class="social-button" href="https://www.tiktok.com/@that_gk_kyle23" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok profile">
           <img class="social-logo" src="tiktok-logo.png" alt="TikTok logo" />
@@ -217,6 +220,7 @@
       const unlockButton = document.getElementById('unlockFixturesButton');
       const lockButton = document.getElementById('lockFixturesButton');
       const logoutButton = document.getElementById('logoutButton');
+      const editStatsButton = document.getElementById('editStatsButton');
       const passwordInput = document.getElementById('fixturePassword');
       const accessMessage = document.getElementById('fixtureAccessMessage');
       const manageButton = document.getElementById('manageSiteButton');
@@ -226,6 +230,7 @@
       if (unlockButton) unlockButton.addEventListener('click', unlockFixtures);
       if (lockButton) lockButton.addEventListener('click', lockFixtures);
       if (logoutButton) logoutButton.addEventListener('click', logoutAdmin);
+      if (editStatsButton) editStatsButton.addEventListener('click', editStats);
 
       const statsButton = document.getElementById('statsButton');
       const aboutButton = document.getElementById('aboutButton');
@@ -329,6 +334,7 @@ async function logoutAdmin() {
       fixtureForm.classList.remove('locked');
       lockButton.classList.remove('hidden');
       logoutButton.classList.remove('hidden');
+      document.getElementById('editStatsButton').classList.remove('hidden');
       if (scoreEditor && auth.currentUser) {
         scoreEditor.classList.remove('hidden');
       }
@@ -342,6 +348,7 @@ async function logoutAdmin() {
       fixtureForm.classList.add('locked');
       lockButton.classList.add('hidden');
       logoutButton.classList.add('hidden');
+      document.getElementById('editStatsButton').classList.add('hidden');
       if (scoreEditor) {
         scoreEditor.classList.add('hidden');
       }
@@ -841,6 +848,25 @@ async function openMatchReport(fixture) {
         button.innerText = 'Show Stats';
       }
     }
+
+    function editStats() {
+  if (!auth.currentUser) return;
+
+  const newYellowCards = prompt('Enter yellow cards:');
+  const newRedCards = prompt('Enter red cards:');
+  const newKitNumber = prompt('Enter kit number:');
+
+  if (newYellowCards !== null) {
+    document.querySelector('#statsSection li:nth-child(3)').textContent =
+      `Kit No. : ${newKitNumber || '23'}`;
+
+    document.querySelector('#statsSection li:nth-child(4)').textContent =
+      `Yellow Cards: ${newYellowCards}`;
+
+    document.querySelector('#statsSection li:nth-child(5)').textContent =
+      `Red Cards: ${newRedCards || '0'}`;
+  }
+}
   </script>
 </body>
 </html>
