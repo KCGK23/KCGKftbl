@@ -39,9 +39,6 @@
       <h2>Goalkeeper</h2>
       <button id="statsButton">Show Stats</button>
       <button id="aboutButton">Show About Me</button>
-      <button id="editStatsButton" class="hidden">
-  Edit Stats
-</button>
       <div class="social-row">
         <a class="social-button" href="https://www.tiktok.com/@that_gk_kyle23" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok profile">
           <img class="social-logo" src="tiktok-logo.png" alt="TikTok logo" />
@@ -267,8 +264,7 @@
       if (unlockButton) unlockButton.addEventListener('click', unlockFixtures);
       if (lockButton) lockButton.addEventListener('click', lockFixtures);
       if (logoutButton) logoutButton.addEventListener('click', logoutAdmin);
-      if (editStatsButton) editStatsButton.addEventListener('click', editStats);
-
+      
       const statsButton = document.getElementById('statsButton');
       const aboutButton = document.getElementById('aboutButton');
       if (statsButton) statsButton.addEventListener('click', toggleStats);
@@ -888,39 +884,6 @@ async function openMatchReport(fixture) {
         button.innerText = 'Show Stats';
       }
     }
-
- function editStats() {
-  if (!auth.currentUser) return;
-
-  const kitItem = document.querySelector('#statsSection li:nth-child(3)');
-  const yellowItem = document.querySelector('#statsSection li:nth-child(4)');
-  const redItem = document.querySelector('#statsSection li:nth-child(5)');
-  const injuryItem = document.getElementById('injuryStat');
-
-  const kitNumber = prompt('Kit number:', kitItem.textContent.replace('Kit No. : ', ''));
-  if (kitNumber === null) return;
-
-  const yellowCards = prompt('Yellow cards:', yellowItem.textContent.replace('Yellow Cards: ', ''));
-  if (yellowCards === null) return;
-
-  const redCards = prompt('Red cards:', redItem.textContent.replace('Red Cards: ', ''));
-  if (redCards === null) return;
-
-  const injuries = prompt('Injuries:', injuryItem.textContent.replace('Injuries: ', ''));
-  if (injuries === null) return;
-
-  kitItem.textContent = `Kit No. : ${kitNumber}`;
-  yellowItem.textContent = `Yellow Cards: ${yellowCards}`;
-  redItem.textContent = `Red Cards: ${redCards}`;
-  injuryItem.textContent = `Injuries: ${injuries || 'None'}`;
-
-  if ((injuries || 'None').toLowerCase() !== 'none') {
-    injuryItem.classList.add('injury-active');
-  } else {
-    injuryItem.classList.remove('injury-active');
-  }
-}
-
 
  async function savePlayerStats() {
   if (!auth.currentUser) return;
