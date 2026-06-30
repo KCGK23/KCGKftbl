@@ -24,16 +24,51 @@
 
       <div id="statsSection" style="display: none;">
         <h3>Stats</h3>
-        <ul>
-          <li>Team: Renfrew Juniors</li>
-          <li>Position: Goalkeeper</li>
-          <li>Kit No. : 23</li>
-          <li>Yellow Cards: 1</li>
-          <li>Red Cards: 0</li>
-          <li id="injuryStat">Injuries: None</li>
-          <li>Preferred Foot: Right</li>
-        </ul>
-      </div>
+       <div class="player-stats-grid">
+
+  <div class="player-stat-card">
+    <span class="stat-icon">🛡️</span>
+    <span class="stat-title">Team</span>
+    <strong>Renfrew Juniors</strong>
+  </div>
+
+  <div class="player-stat-card">
+    <span class="stat-icon">🧤</span>
+    <span class="stat-title">Position</span>
+    <strong>Goalkeeper</strong>
+  </div>
+
+  <div class="player-stat-card">
+    <span class="stat-icon">👕</span>
+    <span class="stat-title">Kit Number</span>
+    <strong id="kitNumberStat">23</strong>
+  </div>
+
+  <div class="player-stat-card">
+    <span class="stat-icon">🟨</span>
+    <span class="stat-title">Yellow Cards</span>
+    <strong id="yellowCardStat">1</strong>
+  </div>
+
+  <div class="player-stat-card">
+    <span class="stat-icon">🟥</span>
+    <span class="stat-title">Red Cards</span>
+    <strong id="redCardStat">0</strong>
+  </div>
+
+  <div class="player-stat-card" id="injuryStat">
+    <span class="stat-icon">🏥</span>
+    <span class="stat-title">Injuries</span>
+    <strong>None</strong>
+  </div>
+
+  <div class="player-stat-card">
+    <span class="stat-icon">⚽</span>
+    <span class="stat-title">Preferred Foot</span>
+    <strong>Right</strong>
+  </div>
+
+      
 
       <h1>Kyle Connelly</h1>
       <h2>Goalkeeper</h2>
@@ -891,12 +926,12 @@ async function openMatchReport(fixture) {
   const injuries = document.getElementById('editInjuries').value || 'None';
   const statsSaveMessage = document.getElementById('statsSaveMessage');
 
-  document.querySelector('#statsSection li:nth-child(3)').textContent = `Kit No. : ${kitNumber}`;
-  document.querySelector('#statsSection li:nth-child(4)').textContent = `Yellow Cards: ${yellowCards}`;
-  document.querySelector('#statsSection li:nth-child(5)').textContent = `Red Cards: ${redCards}`;
+document.getElementById('kitNumberStat').textContent = kitNumber;
+document.getElementById('yellowCardStat').textContent = yellowCards;
+document.getElementById('redCardStat').textContent = redCards;
 
   const injuryStat = document.getElementById('injuryStat');
-  injuryStat.textContent = `Injuries: ${injuries}`;
+  injuryStat.querySelector('strong').textContent = injuries;
 
   if (injuries.toLowerCase() !== 'none') {
     injuryStat.classList.add('injury-active');
@@ -932,19 +967,19 @@ async function loadPlayerStats() {
 
     const stats = snapshot.data();
 
-    document.querySelector('#statsSection li:nth-child(3)').textContent =
-      `Kit No. : ${stats.kitNumber || '23'}`;
+    document.getElementById('kitNumberStat').textContent =
+  stats.kitNumber || '23';
 
-    document.querySelector('#statsSection li:nth-child(4)').textContent =
-      `Yellow Cards: ${stats.yellowCards || '0'}`;
+document.getElementById('yellowCardStat').textContent =
+  stats.yellowCards || '0';
 
-    document.querySelector('#statsSection li:nth-child(5)').textContent =
-      `Red Cards: ${stats.redCards || '0'}`;
+document.getElementById('redCardStat').textContent =
+  stats.redCards || '0';
 
     const injuryStat = document.getElementById('injuryStat');
     const injuries = stats.injuries || 'None';
-
-    injuryStat.textContent = `Injuries: ${injuries}`;
+    
+injuryStat.querySelector('strong').textContent = injuries;
 
     document.getElementById('editKitNumber').value = stats.kitNumber || '23';
     document.getElementById('editYellowCards').value = stats.yellowCards || '0';

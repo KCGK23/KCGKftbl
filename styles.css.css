@@ -772,3 +772,51 @@ body{
     grid-template-columns:1fr;
   }
 }
+
+/* ===========================
+   PLAYER STATS DASHBOARD
+=========================== */
+
+.player-stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:16px;
+    margin-top:20px;
+}
+
+.player-stat-card{
+    background:linear-gradient(145deg,#34435f,#263247);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:18px;
+    text-align:center;
+    transition:.25s;
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+
+.player-stat-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 14px 30px rgba(0,0,0,.28);
+    border-color:#4f9dff;
+}
+
+.stat-icon{
+    font-size:30px;
+    display:block;
+    margin-bottom:10px;
+}
+
+.stat-title{
+    display:block;
+    color:#9eb6d8;
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:8px;
+}
+
+.player-stat-card strong{
+    font-size:1.45rem;
+    color:white;
+    display:block;
+}
