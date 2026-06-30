@@ -820,3 +820,36 @@ body{
     color:white;
     display:block;
 }
+
+.player-header{
+    margin-bottom:25px;
+}
+
+.player-name h1{
+    margin:0;
+    font-size:3rem;
+    font-weight:800;
+    color:white;
+}
+
+.player-name p{
+    margin-top:8px;
+    color:#7fb6ff;
+    font-size:1.3rem;
+    font-weight:600;
+}
+
+.player-badges{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:18px;
+}
+
+.player-badges span{
+    background:rgba(79,157,255,.15);
+    border:1px solid rgba(79,157,255,.35);
+    padding:10px 18px;
+    border-radius:999px;
+    font-weight:600;
+}
