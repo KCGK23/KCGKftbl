@@ -17,10 +17,6 @@
   <section class="profile-card">
     <img src="player-photo.jpg" alt="Profile photo of Kyle Connelly" />
     <div class="info">
-      <div id="aboutSection" style="display: none;">
-        <h2>About Me</h2>
-        <p>My name is Kyle Connelly I am 15 and I am a football player. I have been playing since 2022. I play as a goalkeeper for Renfrew Juniors. </p>
-      </div>
 
       <div id="statsSection" style="display: none;">
         <h3>Stats</h3>
@@ -87,7 +83,6 @@
 </div>
 
       <button id="statsButton">Show Stats</button>
-      <button id="aboutButton">Show About Me</button>
       <div class="social-row">
         <a class="social-button" href="https://www.tiktok.com/@that_gk_kyle23" target="_blank" rel="noopener noreferrer" aria-label="Open TikTok profile">
           <img class="social-logo" src="tiktok-logo.png" alt="TikTok logo" />
@@ -315,9 +310,7 @@
       if (logoutButton) logoutButton.addEventListener('click', logoutAdmin);
       
       const statsButton = document.getElementById('statsButton');
-      const aboutButton = document.getElementById('aboutButton');
       if (statsButton) statsButton.addEventListener('click', toggleStats);
-      if (aboutButton) aboutButton.addEventListener('click', toggleAbout);
 
       if (manageButton && managementPanel) {
         manageButton.addEventListener('click', function() {
