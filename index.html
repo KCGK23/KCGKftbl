@@ -68,7 +68,9 @@
     <strong>Right</strong>
   </div>
 
-      
+      </div> <!-- Close player-stats-grid -->
+
+</div> <!-- Close statsSection -->
 
       <h1>Kyle Connelly</h1>
       <h2>Goalkeeper</h2>
@@ -978,7 +980,7 @@ document.getElementById('redCardStat').textContent =
 
     const injuryStat = document.getElementById('injuryStat');
     const injuries = stats.injuries || 'None';
-    
+
 injuryStat.querySelector('strong').textContent = injuries;
 
     document.getElementById('editKitNumber').value = stats.kitNumber || '23';
