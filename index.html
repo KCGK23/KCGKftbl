@@ -169,6 +169,7 @@
         <button id="saveScoreButton" type="button" class="primary-button">Save Score</button>
         <p id="scoreMessage" class="fixture-message"></p>
       </div>
+
       <div id="statsEditor" class="admin-section hidden">
   <h4>Edit Player Stats</h4>
 
@@ -403,6 +404,7 @@ async function logoutAdmin() {
       const lockButton = document.getElementById('lockFixturesButton');
       const logoutButton = document.getElementById('logoutButton');
       const scoreEditor = document.getElementById('scoreEditor');
+      document.getElementById('statsEditor').classList.remove('hidden');
       fixtureForm.classList.remove('locked');
       lockButton.classList.remove('hidden');
       logoutButton.classList.remove('hidden');
@@ -416,6 +418,7 @@ async function logoutAdmin() {
       const lockButton = document.getElementById('lockFixturesButton');
       const logoutButton = document.getElementById('logoutButton');
       const scoreEditor = document.getElementById('scoreEditor');
+      document.getElementById('statsEditor').classList.add('hidden');
       fixtureForm.classList.add('locked');
       lockButton.classList.add('hidden');
       logoutButton.classList.add('hidden');
