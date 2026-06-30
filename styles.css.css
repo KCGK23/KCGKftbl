@@ -853,3 +853,49 @@ body{
     border-radius:999px;
     font-weight:600;
 }
+
+.player-header{
+    margin-bottom:30px;
+    padding-bottom:20px;
+    border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+.player-title h1{
+    margin:0;
+    font-size:3.2rem;
+    font-weight:800;
+    color:#fff;
+    line-height:1;
+}
+
+.player-title p{
+    margin:10px 0 0;
+    font-size:1.35rem;
+    color:#7fb6ff;
+    font-weight:600;
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.player-meta{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:20px;
+}
+
+.player-meta span{
+    padding:8px 16px;
+    border-radius:999px;
+    background:rgba(79,157,255,.15);
+    border:1px solid rgba(79,157,255,.3);
+    color:white;
+    font-size:.95rem;
+    font-weight:600;
+    transition:.25s;
+}
+
+.player-meta span:hover{
+    background:#4f9dff;
+    transform:translateY(-2px);
+}
