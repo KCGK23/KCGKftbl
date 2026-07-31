@@ -565,6 +565,9 @@ function updateFormMessage(fixtures) {
       localStorage.setItem(LOCAL_FIXTURE_KEY, JSON.stringify(fixtures));
     }
 
+  const HOME_TEAM_NAME = 'Renfrew Juniors';
+  const DEFAULT_OPPONENT_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='20' fill='%231a3964'/%3E%3Cpath d='M60 18 94 32v27c0 22-14 37-34 44C40 96 26 81 26 59V32z' fill='%234f9dff' opacity='.9'/%3E%3Cpath d='M60 33v51M41 50h38' stroke='white' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E";
+
   function createFixtureItem(fixture) {
   const scoreText =
     typeof fixture.homeScore === 'number' &&
@@ -584,35 +587,41 @@ if (scoreText) {
   const item = document.createElement('li');
   item.className = 'fixture-item';
 
+  // Logo URL fields are optional so existing Firestore fixtures continue to render.
+  const homeLogo = fixture.homeLogoUrl || fixture.homeLogo || 'team-logo.png';
+  const opponentLogo = fixture.opponentLogoUrl || fixture.opponentLogo || fixture.awayLogoUrl || fixture.awayLogo || DEFAULT_OPPONENT_LOGO;
+
   item.innerHTML = `
-    <div class="fixture-main">
-      <div>
-        <span class="fixture-label">Opponent</span>
-        <h4>${fixture.opponent}</h4>
+    <div class="fixture-card-header">
+      <span class="fixture-status">${scoreText ? 'FULL TIME' : 'UPCOMING FIXTURE'}</span>
+      <span class="fixture-competition">${fixture.competition || 'Friendly'}</span>
+    </div>
+
+    <div class="fixture-matchup">
+      <div class="fixture-team">
+        <div class="fixture-logo-shell">
+          <img class="fixture-team-logo" src="${homeLogo}" alt="${HOME_TEAM_NAME} logo" />
+        </div>
+        <h4>${HOME_TEAM_NAME}</h4>
       </div>
 
-      ${
-        scoreText
-         ? `<span class="score-badge ${scoreClass}">${fixture.homeScore}-${fixture.awayScore}</span>`
-          : `<span class="fixture-status">Upcoming</span>`
-      }
+      <div class="fixture-versus">
+        ${scoreText
+          ? `<span class="score-badge ${scoreClass}">${fixture.homeScore} - ${fixture.awayScore}</span>`
+          : '<span>VS</span>'}
+      </div>
+
+      <div class="fixture-team">
+        <div class="fixture-logo-shell">
+          <img class="fixture-team-logo" src="${opponentLogo}" alt="${fixture.opponent} logo" />
+        </div>
+        <h4>${fixture.opponent}</h4>
+      </div>
     </div>
 
     <div class="fixture-meta">
-      <div class="fixture-detail">
-        <span class="fixture-label">Date</span>
-        <strong>${fixture.date}</strong>
-      </div>
-
-      <div class="fixture-detail">
-        <span class="fixture-label">Competition</span>
-        <span>${fixture.competition || 'Friendly'}</span>
-      </div>
-
-      <div class="fixture-detail">
-        <span class="fixture-label">Location</span>
-        <span>${fixture.location || 'TBC'}</span>
-      </div>
+      <span>📍 ${fixture.location || 'Location TBC'}</span>
+      <span>🕐 ${fixture.date || 'Date / time TBC'}</span>
     </div>
 
     ${
@@ -640,6 +649,11 @@ if (scoreText) {
   const reportButton = item.querySelector('.report-button');
 const viewReportButton = item.querySelector('.view-report-button');
 const matchReport = item.querySelector('.match-report');
+  item.querySelectorAll('.fixture-team-logo').forEach(logo => {
+    logo.addEventListener('error', () => {
+      logo.src = DEFAULT_OPPONENT_LOGO;
+    }, { once: true });
+  });
 
   if (reportButton) {
     reportButton.addEventListener('click', function () {
