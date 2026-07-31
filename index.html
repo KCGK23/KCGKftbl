@@ -177,6 +177,37 @@
         <p id="scoreMessage" class="fixture-message"></p>
       </div>
 
+      <section id="tournamentEditor" class="admin-section tournament-editor locked">
+        <div class="tournament-editor-heading">
+          <div>
+            <h4>Tournament Editor</h4>
+            <p>Create tournaments and add or update their matches.</p>
+          </div>
+          <button id="createTournamentButton" type="button" class="secondary-button">+ Create Tournament</button>
+        </div>
+
+        <div id="tournamentEditPanel" class="tournament-edit-panel hidden">
+          <input id="editingTournamentId" type="hidden" />
+          <div class="fixture-row">
+            <label>Tournament Name<input id="tournamentName" type="text" placeholder="Summer Tournament" /></label>
+            <label>Tournament Date<input id="tournamentDate" type="date" /></label>
+          </div>
+          <label>Tournament Location<input id="tournamentLocation" type="text" placeholder="Newfield Park" /></label>
+          <div class="tournament-edit-actions">
+            <button id="addTournamentMatchButton" type="button" class="secondary-button">+ Add Match</button>
+            <button id="saveTournamentButton" type="button" class="primary-button">Save Changes</button>
+            <button id="cancelTournamentButton" type="button" class="secondary-button">Cancel</button>
+          </div>
+          <div id="tournamentMatchEditor" class="tournament-match-editor"></div>
+          <p id="tournamentEditorMessage" class="fixture-message"></p>
+        </div>
+
+        <div class="tournament-admin-list-wrap">
+          <h5>Existing Tournaments</h5>
+          <div id="tournamentAdminList" class="tournament-admin-list">Loading tournaments…</div>
+        </div>
+      </section>
+
       <div id="statsEditor" class="admin-section hidden">
   <h4>Edit Player Stats</h4>
 
@@ -241,7 +272,29 @@
         <li class="fixture-empty">No fixtures added yet.</li>
       </ul>
     </div>
+
+    <section class="tournament-list-card" aria-labelledby="tournamentListTitle">
+      <div class="tournament-list-heading">
+        <h3 id="tournamentListTitle">Tournaments</h3>
+        <span>Match days and cup competitions</span>
+      </div>
+      <div id="tournamentLoading" class="fixture-loading hidden">Loading tournaments…</div>
+      <div id="tournamentList" class="tournament-list">
+        <p class="tournament-empty">No tournaments available.</p>
+      </div>
+    </section>
   </section>
+
+  <div id="tournamentModal" class="tournament-modal hidden" role="dialog" aria-modal="true" aria-labelledby="tournamentModalTitle">
+    <div class="tournament-modal-backdrop" data-close-tournament-modal></div>
+    <section class="tournament-modal-content">
+      <button id="closeTournamentModal" class="tournament-modal-close" type="button" aria-label="Close tournament">×</button>
+      <p class="tournament-kicker">🏆 TOURNAMENT</p>
+      <h2 id="tournamentModalTitle">Tournament</h2>
+      <p id="tournamentModalMeta" class="tournament-modal-meta"></p>
+      <div id="tournamentModalMatches" class="tournament-modal-matches"></div>
+    </section>
+  </div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
@@ -257,6 +310,7 @@
   doc,
   updateDoc,
   deleteDoc,
+  writeBatch,
   serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
     import {
@@ -279,6 +333,7 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
     const fixturesCollection = collection(db, 'fixtures');
+    const tournamentsCollection = collection(db, 'tournaments');
     const statsDocRef = doc(db, 'siteData', 'playerStats');
 
     const FIXTURE_PASSWORD = 'KCGK@110311';
@@ -286,6 +341,7 @@
     const UNLOCK_KEY = 'fixturesUnlocked';
     let currentFixtures = [];
     let currentFilter = 'all';
+    let currentTournaments = [];
 
     document.addEventListener('DOMContentLoaded', function() {
       const scoreFixtureSelect = document.getElementById('scoreFixtureSelect');
@@ -303,11 +359,24 @@
       const accessMessage = document.getElementById('fixtureAccessMessage');
       const manageButton = document.getElementById('manageSiteButton');
       const managementPanel = document.getElementById('managementPanel');
+      const createTournamentButton = document.getElementById('createTournamentButton');
+      const addTournamentMatchButton = document.getElementById('addTournamentMatchButton');
+      const saveTournamentButton = document.getElementById('saveTournamentButton');
+      const cancelTournamentButton = document.getElementById('cancelTournamentButton');
+      const closeTournamentModal = document.getElementById('closeTournamentModal');
 
       if (fixtureForm) fixtureForm.addEventListener('submit', addFixture);
       if (unlockButton) unlockButton.addEventListener('click', unlockFixtures);
       if (lockButton) lockButton.addEventListener('click', lockFixtures);
       if (logoutButton) logoutButton.addEventListener('click', logoutAdmin);
+      if (createTournamentButton) createTournamentButton.addEventListener('click', startNewTournament);
+      if (addTournamentMatchButton) addTournamentMatchButton.addEventListener('click', () => addTournamentMatchRow());
+      if (saveTournamentButton) saveTournamentButton.addEventListener('click', saveTournament);
+      if (cancelTournamentButton) cancelTournamentButton.addEventListener('click', closeTournamentEditor);
+      if (closeTournamentModal) closeTournamentModal.addEventListener('click', closeTournamentModalView);
+      document.querySelectorAll('[data-close-tournament-modal]').forEach(element => {
+        element.addEventListener('click', closeTournamentModalView);
+      });
       
       const statsButton = document.getElementById('statsButton');
       if (statsButton) statsButton.addEventListener('click', toggleStats);
@@ -345,6 +414,7 @@ tabs.forEach(tab => {
 
 });
       loadSharedFixtures();
+      loadTournaments();
       loadPlayerStats();
     });
 
@@ -406,11 +476,13 @@ async function logoutAdmin() {
 
     function unlockFixturesUI() {
       const fixtureForm = document.getElementById('fixtureForm');
+      const tournamentEditor = document.getElementById('tournamentEditor');
       const lockButton = document.getElementById('lockFixturesButton');
       const logoutButton = document.getElementById('logoutButton');
       const scoreEditor = document.getElementById('scoreEditor');
       document.getElementById('statsEditor').classList.remove('hidden');
       fixtureForm.classList.remove('locked');
+      if (tournamentEditor) tournamentEditor.classList.remove('locked');
       lockButton.classList.remove('hidden');
       logoutButton.classList.remove('hidden');
       if (scoreEditor && auth.currentUser) {
@@ -420,11 +492,13 @@ async function logoutAdmin() {
 
     function lockFixturesUI() {
       const fixtureForm = document.getElementById('fixtureForm');
+      const tournamentEditor = document.getElementById('tournamentEditor');
       const lockButton = document.getElementById('lockFixturesButton');
       const logoutButton = document.getElementById('logoutButton');
       const scoreEditor = document.getElementById('scoreEditor');
       document.getElementById('statsEditor').classList.add('hidden');
       fixtureForm.classList.add('locked');
+      if (tournamentEditor) tournamentEditor.classList.add('locked');
       lockButton.classList.add('hidden');
       logoutButton.classList.add('hidden');
       if (scoreEditor) {
@@ -737,6 +811,299 @@ function renderFixtures(fixtures) {
   filtered.forEach(item => {
     list.appendChild(createFixtureItem(item));
   });
+}
+
+// Tournament data is intentionally kept separate from normal fixtures.
+async function loadTournaments() {
+  const list = document.getElementById('tournamentList');
+  const loader = document.getElementById('tournamentLoading');
+  loader.classList.remove('hidden');
+
+  try {
+    const snapshot = await getDocs(tournamentsCollection);
+    currentTournaments = snapshot.docs
+      .map(tournamentDoc => ({ id: tournamentDoc.id, ...tournamentDoc.data() }))
+      .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')));
+    renderTournaments();
+    renderTournamentAdminList();
+  } catch (error) {
+    console.warn('Unable to load tournaments:', error);
+    list.innerHTML = '<p class="tournament-empty">Tournaments are currently unavailable.</p>';
+    const adminList = document.getElementById('tournamentAdminList');
+    if (adminList) adminList.textContent = 'Unable to load tournaments.';
+  } finally {
+    loader.classList.add('hidden');
+  }
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[character]));
+}
+
+function renderTournaments() {
+  const list = document.getElementById('tournamentList');
+  list.innerHTML = '';
+
+  if (!currentTournaments.length) {
+    list.innerHTML = '<p class="tournament-empty">No tournaments available.</p>';
+    return;
+  }
+
+  currentTournaments.forEach(tournament => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'tournament-card';
+    const matchLabel = `${Number(tournament.matchCount) || 0} ${Number(tournament.matchCount) === 1 ? 'MATCH' : 'MATCHES'}`;
+    card.innerHTML = `
+      <span class="tournament-card-kicker">🏆 TOURNAMENT</span>
+      <strong>${escapeHtml(tournament.name || 'Untitled Tournament')}</strong>
+      <span class="tournament-card-meta">📅 ${escapeHtml(tournament.date || 'Date TBC')}</span>
+      <span class="tournament-card-meta">📍 ${escapeHtml(tournament.location || 'Location TBC')}</span>
+      <span class="tournament-card-link">${matchLabel} · VIEW TOURNAMENT</span>
+    `;
+    card.addEventListener('click', () => openTournamentModal(tournament));
+    list.appendChild(card);
+  });
+}
+
+async function openTournamentModal(tournament) {
+  const modal = document.getElementById('tournamentModal');
+  const title = document.getElementById('tournamentModalTitle');
+  const meta = document.getElementById('tournamentModalMeta');
+  const matchesContainer = document.getElementById('tournamentModalMatches');
+  title.textContent = tournament.name || 'Untitled Tournament';
+  meta.textContent = `📅 ${tournament.date || 'Date TBC'} · 📍 ${tournament.location || 'Location TBC'}`;
+  matchesContainer.innerHTML = '<p class="tournament-empty">Loading matches…</p>';
+  modal.classList.remove('hidden');
+
+  try {
+    const snapshot = await getDocs(collection(db, 'tournaments', tournament.id, 'matches'));
+    const matches = snapshot.docs
+      .map(matchDoc => ({ id: matchDoc.id, ...matchDoc.data() }))
+      .sort((a, b) => `${a.date || ''}${a.time || ''}`.localeCompare(`${b.date || ''}${b.time || ''}`));
+
+    if (!matches.length) {
+      matchesContainer.innerHTML = '<p class="tournament-empty">No matches have been added yet.</p>';
+      return;
+    }
+
+    matchesContainer.innerHTML = matches.map((match, index) => {
+      const hasScore = typeof match.homeScore === 'number' && typeof match.awayScore === 'number';
+      const score = hasScore ? `${match.homeScore} - ${match.awayScore}` : '? - ?';
+      return `
+        <article class="tournament-match-card">
+          <span class="tournament-match-number">MATCH ${index + 1} · ${escapeHtml(match.status || (hasScore ? 'Completed' : 'Upcoming'))}</span>
+          <div class="tournament-match-scoreline">
+            <strong>${escapeHtml(match.homeTeam || 'Home team TBC')}</strong>
+            <b>${score}</b>
+            <strong>${escapeHtml(match.awayTeam || 'Away team TBC')}</strong>
+          </div>
+          <p>🕐 ${escapeHtml(match.date || tournament.date || 'Date TBC')}${match.time ? ` · ${escapeHtml(match.time)}` : ''}</p>
+        </article>`;
+    }).join('');
+  } catch (error) {
+    console.warn('Unable to load tournament matches:', error);
+    matchesContainer.innerHTML = '<p class="tournament-empty">Tournament matches are currently unavailable.</p>';
+  }
+}
+
+function closeTournamentModalView() {
+  document.getElementById('tournamentModal').classList.add('hidden');
+}
+
+function renderTournamentAdminList() {
+  const list = document.getElementById('tournamentAdminList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  if (!currentTournaments.length) {
+    list.textContent = 'No tournaments created yet.';
+    return;
+  }
+
+  currentTournaments.forEach(tournament => {
+    const row = document.createElement('div');
+    row.className = 'tournament-admin-item';
+    row.innerHTML = `
+      <div><strong>${escapeHtml(tournament.name || 'Untitled Tournament')}</strong><span>${escapeHtml(tournament.date || 'Date TBC')} · ${escapeHtml(tournament.location || 'Location TBC')} · ${Number(tournament.matchCount) || 0} matches</span></div>
+      <div class="tournament-admin-actions"><button type="button" class="secondary-button">Edit</button><button type="button" class="delete-fixture-button">Delete</button></div>
+    `;
+    const buttons = row.querySelectorAll('button');
+    buttons[0].addEventListener('click', () => editTournament(tournament.id));
+    buttons[1].addEventListener('click', () => deleteTournament(tournament.id));
+    list.appendChild(row);
+  });
+}
+
+function startNewTournament() {
+  document.getElementById('editingTournamentId').value = '';
+  document.getElementById('tournamentName').value = '';
+  document.getElementById('tournamentDate').value = '';
+  document.getElementById('tournamentLocation').value = '';
+  document.getElementById('tournamentMatchEditor').innerHTML = '';
+  document.getElementById('tournamentEditorMessage').textContent = '';
+  document.getElementById('tournamentEditPanel').classList.remove('hidden');
+  addTournamentMatchRow();
+}
+
+async function editTournament(tournamentId) {
+  if (!auth.currentUser) return;
+  const editPanel = document.getElementById('tournamentEditPanel');
+  const matchEditor = document.getElementById('tournamentMatchEditor');
+  editPanel.classList.remove('hidden');
+  matchEditor.innerHTML = '<p class="fixture-message">Loading matches…</p>';
+
+  try {
+    const tournamentSnapshot = await getDoc(doc(db, 'tournaments', tournamentId));
+    if (!tournamentSnapshot.exists()) throw new Error('Tournament not found');
+    const tournament = tournamentSnapshot.data();
+    document.getElementById('editingTournamentId').value = tournamentId;
+    document.getElementById('tournamentName').value = tournament.name || '';
+    document.getElementById('tournamentDate').value = tournament.date || '';
+    document.getElementById('tournamentLocation').value = tournament.location || '';
+    document.getElementById('tournamentEditorMessage').textContent = '';
+
+    const matchesSnapshot = await getDocs(collection(db, 'tournaments', tournamentId, 'matches'));
+    matchEditor.innerHTML = '';
+    matchesSnapshot.docs.forEach(matchDoc => addTournamentMatchRow({ id: matchDoc.id, ...matchDoc.data() }));
+  } catch (error) {
+    console.warn('Unable to edit tournament:', error);
+    document.getElementById('tournamentEditorMessage').textContent = 'Unable to load this tournament.';
+  }
+}
+
+function addTournamentMatchRow(match = {}) {
+  const editor = document.getElementById('tournamentMatchEditor');
+  const row = document.createElement('article');
+  row.className = 'tournament-match-edit-row';
+  row.dataset.matchId = match.id || '';
+  const hasScore = typeof match.homeScore === 'number' && typeof match.awayScore === 'number';
+  row.innerHTML = `
+    <div class="tournament-match-edit-heading"><h5>Match</h5><div><button type="button" class="secondary-button tournament-edit-match-button">Edit</button><button type="button" class="delete-fixture-button">Delete</button></div></div>
+    <div class="fixture-row"><label>Home Team<input class="tournament-home-team" type="text" value="${escapeHtml(match.homeTeam || '')}" placeholder="Renfrew Juniors" /></label><label>Away Team<input class="tournament-away-team" type="text" value="${escapeHtml(match.awayTeam || '')}" placeholder="Opponent" /></label></div>
+    <div class="fixture-row"><label>Date<input class="tournament-match-date" type="date" value="${escapeHtml(match.date || document.getElementById('tournamentDate').value || '')}" /></label><label>Time<input class="tournament-match-time" type="time" value="${escapeHtml(match.time || '')}" /></label></div>
+    <div class="fixture-row"><label>Home Score<input class="tournament-home-score" type="number" min="0" value="${hasScore ? match.homeScore : ''}" /></label><label>Away Score<input class="tournament-away-score" type="number" min="0" value="${hasScore ? match.awayScore : ''}" /></label></div>
+    <label>Status<select class="tournament-match-status"><option value="upcoming">Upcoming</option><option value="completed">Completed</option><option value="postponed">Postponed</option></select></label>
+  `;
+  row.querySelector('.tournament-match-status').value = match.status || (hasScore ? 'completed' : 'upcoming');
+  row.querySelector('.tournament-edit-match-button').addEventListener('click', () => {
+    row.querySelector('.tournament-home-team').focus();
+  });
+  row.querySelector('.delete-fixture-button').addEventListener('click', () => deleteTournamentMatchRow(row));
+  editor.appendChild(row);
+}
+
+async function deleteTournamentMatchRow(row) {
+  const matchId = row.dataset.matchId;
+  const tournamentId = document.getElementById('editingTournamentId').value;
+  if (!matchId) {
+    row.remove();
+    return;
+  }
+  if (!confirm('Delete this tournament match?') || !auth.currentUser) return;
+  try {
+    await deleteDoc(doc(db, 'tournaments', tournamentId, 'matches', matchId));
+    row.remove();
+    await syncTournamentMatchCount(tournamentId);
+    await loadTournaments();
+  } catch (error) {
+    console.warn('Unable to delete tournament match:', error);
+    document.getElementById('tournamentEditorMessage').textContent = 'Unable to delete this match.';
+  }
+}
+
+function readOptionalScore(input) {
+  return input.value === '' ? undefined : Number(input.value);
+}
+
+async function saveTournament() {
+  if (!auth.currentUser) return;
+  const name = document.getElementById('tournamentName').value.trim();
+  const date = document.getElementById('tournamentDate').value;
+  const location = document.getElementById('tournamentLocation').value.trim();
+  const idInput = document.getElementById('editingTournamentId');
+  const message = document.getElementById('tournamentEditorMessage');
+  if (!name) {
+    message.textContent = 'Enter a tournament name before saving.';
+    return;
+  }
+
+  try {
+    const tournamentRef = idInput.value ? doc(db, 'tournaments', idInput.value) : doc(tournamentsCollection);
+    const rows = [...document.querySelectorAll('.tournament-match-edit-row')];
+    const incompleteMatch = rows.find(row => !row.querySelector('.tournament-home-team').value.trim() || !row.querySelector('.tournament-away-team').value.trim());
+    if (incompleteMatch) {
+      message.textContent = 'Enter a home and away team for every tournament match.';
+      incompleteMatch.querySelector('.tournament-home-team').focus();
+      return;
+    }
+    const tournamentData = {
+      name,
+      date: date || '',
+      location: location || '',
+      matchCount: rows.length
+    };
+    if (!idInput.value) tournamentData.createdAt = serverTimestamp();
+    await setDoc(tournamentRef, tournamentData, { merge: true });
+
+    await Promise.all(rows.map(row => {
+      const matchRef = row.dataset.matchId
+        ? doc(db, 'tournaments', tournamentRef.id, 'matches', row.dataset.matchId)
+        : doc(collection(db, 'tournaments', tournamentRef.id, 'matches'));
+      const homeScore = readOptionalScore(row.querySelector('.tournament-home-score'));
+      const awayScore = readOptionalScore(row.querySelector('.tournament-away-score'));
+      const matchData = {
+        homeTeam: row.querySelector('.tournament-home-team').value.trim(),
+        awayTeam: row.querySelector('.tournament-away-team').value.trim(),
+        date: row.querySelector('.tournament-match-date').value || date || '',
+        time: row.querySelector('.tournament-match-time').value || '',
+        status: row.querySelector('.tournament-match-status').value || 'upcoming'
+      };
+      if (homeScore !== undefined) matchData.homeScore = homeScore;
+      if (awayScore !== undefined) matchData.awayScore = awayScore;
+      return setDoc(matchRef, matchData).then(() => { row.dataset.matchId = matchRef.id; });
+    }));
+
+    idInput.value = tournamentRef.id;
+    message.textContent = 'Tournament saved to Firebase.';
+    message.className = 'fixture-message success';
+    await loadTournaments();
+  } catch (error) {
+    console.warn('Unable to save tournament:', error);
+    message.textContent = 'Unable to save tournament. Check Firebase access.';
+    message.className = 'fixture-message error';
+  }
+}
+
+async function syncTournamentMatchCount(tournamentId) {
+  const snapshot = await getDocs(collection(db, 'tournaments', tournamentId, 'matches'));
+  await updateDoc(doc(db, 'tournaments', tournamentId), { matchCount: snapshot.size });
+}
+
+async function deleteTournament(tournamentId) {
+  if (!auth.currentUser || !confirm('Delete this tournament and all of its matches?')) return;
+  try {
+    const matchesSnapshot = await getDocs(collection(db, 'tournaments', tournamentId, 'matches'));
+    const matchDocs = matchesSnapshot.docs;
+    for (let index = 0; index < matchDocs.length; index += 400) {
+      const batch = writeBatch(db);
+      matchDocs.slice(index, index + 400).forEach(matchDoc => batch.delete(matchDoc.ref));
+      await batch.commit();
+    }
+    await deleteDoc(doc(db, 'tournaments', tournamentId));
+    if (document.getElementById('editingTournamentId').value === tournamentId) closeTournamentEditor();
+    await loadTournaments();
+  } catch (error) {
+    console.warn('Unable to delete tournament:', error);
+    document.getElementById('tournamentEditorMessage').textContent = 'Unable to delete tournament.';
+  }
+}
+
+function closeTournamentEditor() {
+  document.getElementById('tournamentEditPanel').classList.add('hidden');
+  document.getElementById('tournamentEditorMessage').textContent = '';
 }
 
 async function openMatchReport(fixture) {
