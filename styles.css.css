@@ -392,85 +392,11 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
 .fixture-list-card{
   padding:18px 0 0;
 }
-.fixture-list-card ul{
-  list-style:none;
-  padding:0;
-  margin:0;
-  display:grid;
-  gap:12px;
-}
-.fixture-item,
 .fixture-empty{
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.08);
-
   border-radius: 18px;
-
   padding: 18px 22px;
-
-  display: grid;
-  grid-template-columns: 140px 1.4fr 1fr 1fr;
-
-  gap: 20px;
-  align-items: center;
-
-  transition: all 0.25s ease;
-}
-
-.fixture-item:hover{
-  transform: translateY(-3px);
-  background: rgba(255,255,255,0.09);
-  border-color: rgba(255,255,255,0.14);
-}
-
-.fixture-item strong{
-  display:block;
-  color:#ffffff;
-  font-size:1rem;
-  font-weight:700;
-}
-
-.fixture-item span{
-  font-size:0.96rem;
-  color:rgba(248,235,235,0.88);
-}
-
-.fixture-item{
-  position:relative;
-  overflow:hidden;
-  backdrop-filter:blur(12px);
-
-  background:linear-gradient(
-    135deg,
-    rgba(255,255,255,0.08),
-    rgba(255,255,255,0.03)
-  );
-
-  box-shadow:
-    0 10px 25px rgba(0,0,0,0.18),
-    inset 0 1px 0 rgba(255,255,255,0.04);
-}
-
-.fixture-item::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  width:5px;
-  height:100%;
-
-  background:linear-gradient(
-    to bottom,
-    #4f9dff,
-    #2c7cff
-  );
-}
-
-.fixture-opponent{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-weight:700;
 }
 
 .score-badge{
@@ -488,20 +414,6 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
   font-weight:800;
 
   box-shadow:0 6px 18px #2c7cff59;
-}
-
-.fixture-item:hover{
-  transform:translateY(-5px) scale(1.01);
-
-  background:linear-gradient(
-    135deg,
-    rgba(255,255,255,0.12),
-    rgba(255,255,255,0.05)
-  );
-
-  box-shadow:
-    0 20px 45px rgba(0,0,0,0.28),
-    0 0 20px rgba(79,157,255,0.12);
 }
 body{
   background: radial-gradient(circle at top, #2d6cdf 0%, #12223c 55%, #09101f 100%);
@@ -550,7 +462,6 @@ body{
 }
 
 .match-report{
-  grid-column:1/-1;
   margin-top:10px;
   padding:14px;
   border-radius:12px;
@@ -559,44 +470,9 @@ body{
   line-height:1.5;
 }
 
-.fixture-detail{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-
-.fixture-label{
-  font-size:0.72rem;
-  text-transform:uppercase;
-  letter-spacing:0.08em;
-  color:rgba(255,255,255,0.55);
-  font-weight:700;
-}
-
-.fixture-detail strong{
-  font-size:1rem;
-  color:#fff;
-}
-
-.fixture-item{
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap:18px;
-  align-items:start;
-}
-
-.match-report{
-  grid-column:1/-1;
-}
-
 .report-button,
 .delete-fixture-button{
   width:max-content;
-}
-
-@media (max-width:700px){
-  .fixture-item{
-    grid-template-columns:1fr;
-  }
 }
 
 .score-win{
@@ -613,23 +489,34 @@ body{
 
 /* Fixture match cards */
 .fixture-list-card ul{
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:grid;
   grid-template-columns:repeat(auto-fit, minmax(285px, 1fr));
   gap:18px;
 }
 
 .fixture-item{
+  position:relative;
   display:flex;
   flex-direction:column;
   min-height:355px;
   padding:20px;
   gap:18px;
+  overflow:hidden;
   border:1px solid rgba(144, 198, 255, 0.2);
   border-radius:22px;
   background:linear-gradient(145deg, rgba(31, 75, 130, 0.45), rgba(7, 19, 40, 0.52));
   box-shadow:0 14px 34px rgba(0, 0, 0, 0.2), inset 0 1px rgba(255, 255, 255, 0.09);
+  backdrop-filter:blur(12px);
+  transition:transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .fixture-item::before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
   width:100%;
   height:3px;
   background:linear-gradient(90deg, transparent, #66b0ff, transparent);
