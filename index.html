@@ -320,7 +320,8 @@
     import {
   getAuth,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
 
     const firebaseConfig = {
@@ -346,6 +347,10 @@
     let currentFixtures = [];
     let currentFilter = 'all';
     let currentTournaments = [];
+
+    onAuthStateChanged(auth, () => {
+      refreshTournamentModalAdminForAuthState();
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
       const scoreFixtureSelect = document.getElementById('scoreFixtureSelect');
@@ -885,7 +890,16 @@ async function openTournamentModal(tournament) {
 }
 
 function canManageTournamentMatches() {
-  return Boolean(auth.currentUser && localStorage.getItem(UNLOCK_KEY) === 'true');
+  return Boolean(auth.currentUser);
+}
+
+function refreshTournamentModalAdminForAuthState() {
+  const modal = document.getElementById('tournamentModal');
+  if (!modal || modal.classList.contains('hidden')) return;
+  const tournament = currentTournaments.find(item => item.id === modal.dataset.tournamentId);
+  if (!tournament) return;
+  configureTournamentModalAdmin(tournament);
+  loadTournamentModalMatches(tournament);
 }
 
 function configureTournamentModalAdmin(tournament) {
