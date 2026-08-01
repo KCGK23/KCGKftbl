@@ -293,6 +293,37 @@
     </section>
   </section>
 
+  <section class="league-table-card" aria-labelledby="leagueTableTitle">
+    <div class="league-table-heading">
+      <div>
+        <p class="league-table-kicker">🏆 LIVE LEAGUE TABLE</p>
+        <h2 id="leagueTableTitle">PJDYFL 2011s Division 3</h2>
+        <p id="leagueTableUpdated" class="league-table-updated"></p>
+      </div>
+      <a class="league-table-source" href="https://www.pjdyfl.co.uk/leaguetablefeed/1058" target="_blank" rel="noopener noreferrer">Source: PJDYFL</a>
+    </div>
+    <div id="leagueTableStatus" class="league-table-status" role="status">Loading league table...</div>
+    <div id="leagueTableWrap" class="league-table-wrap hidden">
+      <table class="league-table">
+        <thead>
+          <tr>
+            <th scope="col">Pos</th>
+            <th scope="col">Club</th>
+            <th scope="col">P</th>
+            <th scope="col">W</th>
+            <th scope="col">D</th>
+            <th scope="col">L</th>
+            <th scope="col">F</th>
+            <th scope="col">A</th>
+            <th scope="col">GD</th>
+            <th scope="col">Pts</th>
+          </tr>
+        </thead>
+        <tbody id="leagueTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+
   <div id="tournamentModal" class="tournament-modal hidden" role="dialog" aria-modal="true" aria-labelledby="tournamentModalTitle">
     <div class="tournament-modal-backdrop" data-close-tournament-modal></div>
     <section class="tournament-modal-content">
@@ -435,7 +466,55 @@ tabs.forEach(tab => {
       loadSharedFixtures();
       loadTournaments();
       loadPlayerStats();
+      loadLeagueTable();
     });
+
+    async function loadLeagueTable() {
+      const status = document.getElementById('leagueTableStatus');
+      const wrap = document.getElementById('leagueTableWrap');
+      const body = document.getElementById('leagueTableBody');
+      const updated = document.getElementById('leagueTableUpdated');
+
+      try {
+        const response = await fetch('league-table.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error('League table unavailable');
+
+        const leagueTable = await response.json();
+        const teams = Array.isArray(leagueTable.teams) ? leagueTable.teams : [];
+        updated.textContent = leagueTable.updatedAt
+          ? `Last updated: ${new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(leagueTable.updatedAt))}`
+          : '';
+
+        if (!teams.length) {
+          status.textContent = 'No league table data available.';
+          return;
+        }
+
+        const currentTeam = 'renfrew football club blue';
+        body.innerHTML = '';
+        teams.forEach(team => {
+          const row = document.createElement('tr');
+          if (String(team.club || '').trim().toLowerCase() === currentTeam) {
+            row.classList.add('current-team');
+          }
+
+          [
+            team.position, team.club, team.played, team.won, team.drawn,
+            team.lost, team.goalsFor, team.goalsAgainst, team.goalDifference, team.points
+          ].forEach(value => {
+            const cell = document.createElement('td');
+            cell.textContent = value ?? '';
+            row.appendChild(cell);
+          });
+          body.appendChild(row);
+        });
+
+        status.classList.add('hidden');
+        wrap.classList.remove('hidden');
+      } catch {
+        status.textContent = 'League table temporarily unavailable.';
+      }
+    }
 
  async function unlockFixtures() {
   const emailInput = document.getElementById('fixtureEmail');
