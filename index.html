@@ -301,6 +301,16 @@
         <p id="leagueTableName" class="league-table-kicker"></p>
       </div>
     </div>
+
+    <div class="league-table-status-block">
+      <div class="league-table-live">
+        <span class="league-table-live-dot" aria-hidden="true"></span>
+        <span>LIVE DATA</span>
+      </div>
+      <p id="leagueTableLiveUpdated" class="league-table-live-updated"></p>
+    </div>
+
+    <div id="leagueTableSummary" class="league-table-summary" aria-live="polite"></div>
     <div id="leagueTableStatus" class="league-table-status" role="status">Loading league table...</div>
     <div id="leagueTableWrap" class="league-table-wrap hidden">
       <table class="league-table">
@@ -316,6 +326,8 @@
             <th scope="col">A</th>
             <th scope="col">GD</th>
             <th scope="col">Pts</th>
+            <th scope="col">Form</th>
+            <th scope="col">Movement</th>
           </tr>
         </thead>
         <tbody id="leagueTableBody"></tbody>
@@ -478,6 +490,93 @@ tabs.forEach(tab => {
       const body = document.getElementById('leagueTableBody');
       const leagueName = document.getElementById('leagueTableName');
       const updated = document.getElementById('leagueTableUpdated');
+      const liveUpdated = document.getElementById('leagueTableLiveUpdated');
+      const summary = document.getElementById('leagueTableSummary');
+
+      const formatUpdatedText = (value) => {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return new Intl.DateTimeFormat('en-GB', {
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        }).format(date);
+      };
+
+      const getTeamValue = (team, keys) => {
+        for (const key of keys) {
+          const value = team?.[key];
+          if (value !== undefined && value !== null && value !== '') {
+            return value;
+          }
+        }
+        return null;
+      };
+
+      const formatFormValue = (value) => {
+        if (value === null || value === undefined || value === '') return '—';
+
+        if (Array.isArray(value)) {
+          const results = value.map(item => String(item ?? '').trim()).filter(Boolean);
+          if (results.length) {
+            return results;
+          }
+        }
+
+        if (typeof value === 'string') {
+          const trimmed = value.trim();
+          if (!trimmed) return '—';
+
+          const matches = trimmed.match(/[WDL]/gi);
+          if (matches && matches.length) {
+            return matches.map(item => item.toUpperCase());
+          }
+
+          const parts = trimmed.split(/[,|\s]+/).filter(Boolean);
+          const mapped = parts.map(part => {
+            const upper = part.toUpperCase();
+            if (upper.startsWith('W')) return 'W';
+            if (upper.startsWith('D')) return 'D';
+            if (upper.startsWith('L')) return 'L';
+            return upper;
+          }).filter(part => ['W', 'D', 'L'].includes(part));
+
+          if (mapped.length) {
+            return mapped;
+          }
+
+          return trimmed;
+        }
+
+        return '—';
+      };
+
+      const formatMovementValue = (value) => {
+        if (value === null || value === undefined || value === '') return '—';
+
+        if (typeof value === 'number') {
+          if (value > 0) return `▲ ${value}`;
+          if (value < 0) return `▼ ${Math.abs(value)}`;
+          return '—';
+        }
+
+        if (typeof value === 'string') {
+          const trimmed = value.trim();
+          if (!trimmed) return '—';
+
+          const numericMatch = trimmed.match(/^([+-]?)(\d+)$/);
+          if (numericMatch) {
+            const amount = Number(numericMatch[2]);
+            if (numericMatch[1] === '-') return `▼ ${amount}`;
+            if (numericMatch[1] === '+') return `▲ ${amount}`;
+            return amount > 0 ? `▲ ${amount}` : amount < 0 ? `▼ ${Math.abs(amount)}` : '—';
+          }
+
+          return trimmed;
+        }
+
+        return '—';
+      };
 
       try {
         const response = await fetch('league-table.json', { cache: 'no-store' });
@@ -485,32 +584,104 @@ tabs.forEach(tab => {
 
         const leagueTable = await response.json();
         const teams = Array.isArray(leagueTable.teams) ? leagueTable.teams : [];
+        const formattedUpdated = formatUpdatedText(leagueTable.updatedAt);
+        const currentTeam = String(leagueTable.myTeam || '').trim();
+
         leagueName.textContent = leagueTable.league || '';
-        updated.textContent = leagueTable.updatedAt
-          ? `Last updated: ${new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(leagueTable.updatedAt))}`
-          : '';
+        updated.textContent = formattedUpdated ? `Last updated: ${formattedUpdated}` : '';
+        liveUpdated.textContent = formattedUpdated ? `Updated: ${formattedUpdated}` : '';
 
         if (!teams.length) {
           status.textContent = 'No league table data available.';
+          summary.innerHTML = '';
+          wrap.classList.add('hidden');
+          status.classList.remove('hidden');
           return;
         }
 
-        const currentTeam = String(leagueTable.myTeam || '').trim();
+        const leader = teams.reduce((best, team) => {
+          if (!best) return team;
+          return Number(team.points ?? 0) > Number(best.points ?? 0) ? team : best;
+        }, null);
+
+        summary.innerHTML = `
+          <div class="league-table-summary-card">
+            <span class="league-table-summary-label">Teams</span>
+            <strong>${teams.length}</strong>
+          </div>
+          <div class="league-table-summary-card">
+            <span class="league-table-summary-label">Current leader</span>
+            <strong>${leader ? String(leader.club || '—') : '—'}</strong>
+          </div>
+          <div class="league-table-summary-card">
+            <span class="league-table-summary-label">Leader points</span>
+            <strong>${leader ? String(leader.points ?? '—') : '—'}</strong>
+          </div>
+        `;
+
         body.innerHTML = '';
         teams.forEach(team => {
           const row = document.createElement('tr');
-          if (currentTeam && String(team.club || '').trim() === currentTeam) {
+          const clubName = String(team.club || '').trim();
+          const isCurrentTeam = currentTeam && clubName === currentTeam;
+          const posClass = team.position === 1 ? 'pos-1' : team.position === 2 ? 'pos-2' : team.position === 3 ? 'pos-3' : '';
+
+          if (posClass) {
+            row.classList.add(posClass);
+          }
+          if (isCurrentTeam) {
             row.classList.add('current-team');
           }
 
-          [
-            team.position, team.club, team.played, team.won, team.drawn,
-            team.lost, team.goalsFor, team.goalsAgainst, team.goalDifference, team.points
-          ].forEach(value => {
+          const positionCell = document.createElement('td');
+          positionCell.textContent = team.position ?? '';
+          row.appendChild(positionCell);
+
+          const clubCell = document.createElement('td');
+          clubCell.className = 'league-table-club-cell';
+          const clubNameText = document.createElement('span');
+          clubNameText.className = 'league-table-club-name';
+          clubNameText.textContent = clubName;
+          clubCell.appendChild(clubNameText);
+          if (isCurrentTeam) {
+            const badge = document.createElement('span');
+            badge.className = 'league-table-team-badge';
+            badge.textContent = 'YOUR TEAM';
+            clubCell.appendChild(badge);
+          }
+          row.appendChild(clubCell);
+
+          [team.played, team.won, team.drawn, team.lost, team.goalsFor, team.goalsAgainst, team.goalDifference, team.points].forEach(value => {
             const cell = document.createElement('td');
             cell.textContent = value ?? '';
             row.appendChild(cell);
           });
+
+          const formCell = document.createElement('td');
+          formCell.className = 'league-table-form-cell';
+          const formValue = getTeamValue(team, ['form', 'recentForm', 'formGuide', 'formData']);
+          const formItems = formatFormValue(formValue);
+          if (Array.isArray(formItems)) {
+            const formWrap = document.createElement('div');
+            formWrap.className = 'league-table-form-badges';
+            formItems.slice(0, 8).forEach(item => {
+              const badge = document.createElement('span');
+              badge.className = 'league-table-form-badge';
+              badge.textContent = item;
+              formWrap.appendChild(badge);
+            });
+            formCell.appendChild(formWrap);
+          } else {
+            formCell.textContent = formItems;
+          }
+          row.appendChild(formCell);
+
+          const movementCell = document.createElement('td');
+          movementCell.className = 'league-table-movement-cell';
+          const movementValue = getTeamValue(team, ['movement', 'move', 'movementText']);
+          movementCell.textContent = formatMovementValue(movementValue);
+          row.appendChild(movementCell);
+
           body.appendChild(row);
         });
 
@@ -518,6 +689,9 @@ tabs.forEach(tab => {
         wrap.classList.remove('hidden');
       } catch {
         status.textContent = 'League table temporarily unavailable.';
+        summary.innerHTML = '';
+        wrap.classList.add('hidden');
+        status.classList.remove('hidden');
       }
     }
 
