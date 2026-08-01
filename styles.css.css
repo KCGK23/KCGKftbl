@@ -263,6 +263,22 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
   flex-direction:column;
   gap:12px;
 }
+.motm-editor{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding-top:12px;
+  border-top:1px solid rgba(255,255,255,0.12);
+}
+.motm-toggle{
+  flex-direction:row !important;
+  align-items:center;
+  gap:10px !important;
+}
+.motm-toggle input{
+  width:auto;
+  min-height:0;
+}
 .fixture-access-row{
   display:grid;
   grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -629,6 +645,18 @@ body{
   justify-content:center;
   flex-wrap:wrap;
   gap:8px;
+}
+.motm-badge{
+  align-self:center;
+  margin-top:12px;
+  padding:6px 10px;
+  border:1px solid rgba(255,211,92,0.55);
+  border-radius:999px;
+  background:rgba(255,198,56,0.12);
+  color:#ffe29a;
+  font-size:0.72rem;
+  font-weight:800;
+  letter-spacing:0.08em;
 }
 
 .fixture-item .view-report-button,

@@ -175,6 +175,14 @@
         </div>
         <button id="saveScoreButton" type="button" class="primary-button">Save Score</button>
         <p id="scoreMessage" class="fixture-message"></p>
+        <div class="motm-editor">
+          <label class="motm-toggle" for="manOfTheMatch">
+            <input id="manOfTheMatch" type="checkbox" />
+            Man of the Match
+          </label>
+          <button id="saveManOfTheMatchButton" type="button" class="secondary-button">Save Man of the Match</button>
+          <p id="manOfTheMatchMessage" class="fixture-message"></p>
+        </div>
       </div>
 
       <section id="tournamentEditor" class="admin-section tournament-editor locked">
@@ -355,10 +363,12 @@
     document.addEventListener('DOMContentLoaded', function() {
       const scoreFixtureSelect = document.getElementById('scoreFixtureSelect');
       const saveScoreButton = document.getElementById('saveScoreButton');
+      const saveManOfTheMatchButton = document.getElementById('saveManOfTheMatchButton');
       const saveStatsButton = document.getElementById('saveStatsButton');
 
       if (scoreFixtureSelect) scoreFixtureSelect.addEventListener('change', onScoreFixtureSelected);
       if (saveScoreButton) saveScoreButton.addEventListener('click', saveFixtureScore);
+      if (saveManOfTheMatchButton) saveManOfTheMatchButton.addEventListener('click', saveManOfTheMatch);
       if (saveStatsButton) saveStatsButton.addEventListener('click', savePlayerStats);
       const fixtureForm = document.getElementById('fixtureForm');
       const unlockButton = document.getElementById('unlockFixturesButton');
@@ -706,6 +716,8 @@ if (scoreText) {
       <span>📍 ${fixture.location || 'Location TBC'}</span>
       <span>🕐 ${fixture.date || 'Date / time TBC'}</span>
     </div>
+
+    ${fixture.manOfTheMatch === true ? '<span class="motm-badge">&#127942; MAN OF THE MATCH</span>' : ''}
 
     ${
   fixture.report
@@ -1300,11 +1312,13 @@ async function openMatchReport(fixture) {
       const select = document.getElementById('scoreFixtureSelect');
       const scoreHome = document.getElementById('scoreHome');
       const scoreAway = document.getElementById('scoreAway');
+      const manOfTheMatch = document.getElementById('manOfTheMatch');
       const selectedId = select?.value;
 
       if (!selectedId) {
         if (scoreHome) scoreHome.value = '';
         if (scoreAway) scoreAway.value = '';
+        if (manOfTheMatch) manOfTheMatch.checked = false;
         return;
       }
 
@@ -1313,6 +1327,35 @@ async function openMatchReport(fixture) {
 
       if (scoreHome) scoreHome.value = fixture.homeScore ?? '';
       if (scoreAway) scoreAway.value = fixture.awayScore ?? '';
+      if (manOfTheMatch) manOfTheMatch.checked = fixture.manOfTheMatch === true;
+    }
+
+    async function saveManOfTheMatch() {
+      const select = document.getElementById('scoreFixtureSelect');
+      const manOfTheMatch = document.getElementById('manOfTheMatch');
+      const message = document.getElementById('manOfTheMatchMessage');
+      const selectedDocId = select?.value;
+
+      if (!selectedDocId || !manOfTheMatch || !message) {
+        if (message) {
+          message.textContent = 'Select a fixture first.';
+          message.className = 'fixture-message error';
+        }
+        return;
+      }
+
+      try {
+        await updateDoc(doc(db, 'fixtures', selectedDocId), {
+          manOfTheMatch: manOfTheMatch.checked
+        });
+        message.textContent = 'Man of the Match saved.';
+        message.className = 'fixture-message success';
+        await loadSharedFixtures();
+      } catch (error) {
+        console.warn('Error saving Man of the Match:', error);
+        message.textContent = 'Unable to save Man of the Match. Check Firebase access.';
+        message.className = 'fixture-message error';
+      }
     }
 
     async function saveFixtureScore() {
@@ -1377,6 +1420,7 @@ async function openMatchReport(fixture) {
         opponent,
         competition: competition || 'Friendly',
         location: location || 'TBC',
+        manOfTheMatch: false,
         createdAt: serverTimestamp()
       };
 
