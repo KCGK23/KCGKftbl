@@ -19,13 +19,12 @@ jobs:
       - name: Install parser
         run: pip install beautifulsoup4
 
-      - name: Fetch and parse correct PJDYFL Division 3 table
+      - name: Fetch and parse current PJDYFL Division 3 table
         run: |
           python - <<'PY'
           import urllib.request
           import json
           import re
-          import html
           from datetime import datetime, timezone
           from bs4 import BeautifulSoup
 
@@ -42,53 +41,85 @@ jobs:
               }
           )
 
-          print("Fetching PJDYFL league table...")
+          print("Fetching PJDYFL...")
 
           with urllib.request.urlopen(request, timeout=30) as response:
+              status = response.status
               content = response.read().decode("utf-8", errors="ignore")
 
-          print(f"HTTP status: {response.status}")
+          print(f"HTTP status: {status}")
           print(f"Downloaded: {len(content):,} characters")
 
-          if response.status != 200:
-              raise Exception(f"Unexpected HTTP status: {response.status}")
+          if status != 200:
+              raise Exception(f"Unexpected HTTP status: {status}")
 
           soup = BeautifulSoup(content, "html.parser")
 
-          # EXACT section we want.
-          target_text = "PJDYFL 15s (2011s) Division 3 25/26"
+          # ------------------------------------------------------------
+          # FIND THE CURRENT 2011s DIVISION 3 SECTION
+          # ------------------------------------------------------------
+          #
+          # Do NOT hard-code "25/26".
+          #
+          # We look for a heading containing:
+          #
+          # PJDYFL
+          # 2011s
+          # Division 3
+          #
+          # This allows the season/year to change automatically.
+          # ------------------------------------------------------------
 
-          target = None
+          target_heading = None
 
           for element in soup.find_all(
-              ["h1", "h2", "h3", "h4", "h5", "h6", "div", "p", "b", "strong"]
+              ["h1", "h2", "h3", "h4", "h5", "h6",
+               "div", "p", "b", "strong", "span"]
           ):
               text = element.get_text(" ", strip=True)
 
-              if target_text.lower() in text.lower():
-                  target = element
-                  print("Found correct Division 3 heading:")
+              normalised = re.sub(r"\s+", " ", text).lower()
+
+              if (
+                  "pjdyfl" in normalised
+                  and "2011" in normalised
+                  and "division 3" in normalised
+              ):
+                  target_heading = element
+
+                  print("")
+                  print("FOUND TARGET SECTION:")
                   print(text)
+                  print("")
+
                   break
 
-          if target is None:
+          if target_heading is None:
               raise Exception(
-                  "Could not find the exact 2011s Division 3 section."
+                  "Could not find the current PJDYFL 2011s Division 3 section."
               )
 
-          # Find the first table following the correct heading.
+          # ------------------------------------------------------------
+          # FIND THE TABLE BELONGING TO THAT SECTION
+          # ------------------------------------------------------------
+
           selected_table = None
 
-          for element in target.find_all_next("table"):
-              selected_table = element
+          for table in target_heading.find_all_next("table"):
+              selected_table = table
               break
 
           if selected_table is None:
               raise Exception(
-                  "Found the Division 3 heading but could not find its table."
+                  "Found the 2011s Division 3 heading, "
+                  "but could not find its league table."
               )
 
-          print("Found table underneath the correct Division 3 heading.")
+          print("Found the league table.")
+
+          # ------------------------------------------------------------
+          # EXTRACT TABLE ROWS
+          # ------------------------------------------------------------
 
           rows = selected_table.find_all("tr")
 
@@ -107,19 +138,31 @@ jobs:
 
               print("ROW:", values)
 
-              # Header row.
-              if "Club" in values:
+              # Skip the header.
+              joined = " ".join(values).lower()
+
+              if (
+                  "club" in joined
+                  and ("pts" in joined or "points" in joined)
+              ):
                   continue
 
-              # Expected:
+              # Expected structure:
+              #
               # Position | Club | P | W | D | L | F | A | GD | Pts
+              #
+              # We deliberately do NOT require exactly 12 teams.
+
               if len(values) < 10:
                   continue
 
               position_text = values[0]
               club = values[1]
 
-              position_match = re.search(r"\d+", position_text)
+              position_match = re.search(
+                  r"\d+",
+                  position_text
+              )
 
               if not position_match:
                   continue
@@ -129,18 +172,35 @@ jobs:
               stats = []
 
               for value in values[2:10]:
-                  match = re.search(r"-?\d+", value)
+                  match = re.search(
+                      r"-?\d+",
+                      value
+                  )
 
                   if not match:
                       stats = []
                       break
 
-                  stats.append(int(match.group()))
+                  stats.append(
+                      int(match.group())
+                  )
 
               if len(stats) != 8:
                   continue
 
-              played, won, drawn, lost, goals_for, goals_against, gd, points = stats
+              (
+                  played,
+                  won,
+                  drawn,
+                  lost,
+                  goals_for,
+                  goals_against,
+                  goal_difference,
+                  points
+              ) = stats
+
+              if not club:
+                  continue
 
               teams.append({
                   "position": position,
@@ -151,59 +211,53 @@ jobs:
                   "lost": lost,
                   "goalsFor": goals_for,
                   "goalsAgainst": goals_against,
-                  "goalDifference": gd,
+                  "goalDifference": goal_difference,
                   "points": points
               })
 
-          if len(teams) != 12:
+          # ------------------------------------------------------------
+          # SAFETY CHECK
+          # ------------------------------------------------------------
+          #
+          # We don't care whether Division 3 has 10, 11, 12, 13, etc.
+          # teams.
+          #
+          # But we DO require at least one valid team.
+          # ------------------------------------------------------------
+
+          if not teams:
               raise Exception(
-                  f"Expected exactly 12 Division 3 teams, "
-                  f"but found {len(teams)}."
+                  "No valid teams were extracted from the "
+                  "2011s Division 3 table."
               )
 
-          teams.sort(key=lambda team: team["position"])
+          teams.sort(
+              key=lambda team: team["position"]
+          )
 
-          # Extra safety check using the exact teams from the official table.
-          expected_teams = [
-              "Park Sports Project (2011)",
-              "Linwood Rangers YC (2011)",
-              "Giffnock SC Black (2011)",
-              "Houston United FC (2011)",
-              "Vale of Leven FC (2011)",
-              "JSCC 2011",
-              "Ardencaple Football Club (2011)",
-              "Port Glasgow Juniors C S C (2011)",
-              "Erskine Youth F C (Utd) (2011)",
-              "West End BC 2011's",
-              "Renfrew Football Club Blue (2011)",
-              "Baljaffray FC (2011)"
-          ]
-
-          actual_teams = [team["club"] for team in teams]
-
-          if actual_teams != expected_teams:
-              print("Expected teams:")
-              for team in expected_teams:
-                  print(" -", team)
-
-              print("")
-              print("Actual teams:")
-              for team in actual_teams:
-                  print(" -", team)
-
-              raise Exception(
-                  "The extracted teams do not match the expected "
-                  "2011s Division 3 teams. Refusing to update the JSON."
-              )
+          # ------------------------------------------------------------
+          # CREATE JSON
+          # ------------------------------------------------------------
 
           data = {
               "source": URL,
-              "league": "PJDYFL 15s (2011s) Division 3 25/26",
-              "updatedAt": datetime.now(timezone.utc).isoformat(),
+              "league": "PJDYFL 2011s Division 3",
+              "section": target_heading.get_text(
+                  " ",
+                  strip=True
+              ),
+              "updatedAt": datetime.now(
+                  timezone.utc
+              ).isoformat(),
+              "highlightClub": "Renfrew Football Club Blue (2011)",
               "teams": teams
           }
 
-          with open(OUTPUT, "w", encoding="utf-8") as f:
+          with open(
+              OUTPUT,
+              "w",
+              encoding="utf-8"
+          ) as f:
               json.dump(
                   data,
                   f,
@@ -211,12 +265,18 @@ jobs:
                   ensure_ascii=False
               )
 
+          # ------------------------------------------------------------
+          # OUTPUT RESULTS
+          # ------------------------------------------------------------
+
           print("")
-          print("======================================")
+          print("========================================")
           print("SUCCESS")
-          print("Correct 2011s Division 3 table found")
-          print(f"Teams: {len(teams)}")
-          print("======================================")
+          print("========================================")
+          print(
+              f"Division 3 teams found: {len(teams)}"
+          )
+          print("")
 
           for team in teams:
               print(
@@ -231,6 +291,12 @@ jobs:
                   f"GD {team['goalDifference']} | "
                   f"Pts {team['points']}"
               )
+
+          print("")
+          print(
+              "KCGK highlight team:",
+              data["highlightClub"]
+          )
           PY
 
       - name: Commit updated league table
@@ -241,7 +307,7 @@ jobs:
           git add league-table.json
 
           if git diff --cached --quiet; then
-            echo "No changes."
+            echo "No changes to commit."
           else
             git commit -m "Update PJDYFL 2011s Division 3 table"
             git push
