@@ -1,64 +1,167 @@
-name: Test PJDYFL Feed
+name: Update PJDYFL League Table
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
 
 jobs:
-  test-pjdyfl:
+  update-league-table:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test PJDYFL league table
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and process PJDYFL table
         run: |
           python - <<'PY'
           import urllib.request
+          import html
+          import json
+          import re
+          from datetime import datetime, timezone
 
-          url = "https://www.pjdyfl.co.uk/leaguetablefeed/1058"
-
-          print(f"Testing: {url}")
+          URL = "https://www.pjdyfl.co.uk/leaguetablefeed/1058"
+          OUTPUT = "league-table.json"
 
           request = urllib.request.Request(
-              url,
+              URL,
               headers={
-                  "User-Agent": "Mozilla/5.0 (compatible; KCGK League Table Test)"
+                  "User-Agent": "Mozilla/5.0 (compatible; KCGK League Table Updater)"
               }
           )
 
-          try:
-              with urllib.request.urlopen(request, timeout=30) as response:
-                  status = response.status
-                  content = response.read().decode("utf-8", errors="ignore")
+          print(f"Fetching: {URL}")
 
-              print(f"HTTP status: {status}")
-              print(f"Downloaded: {len(content):,} characters")
+          with urllib.request.urlopen(request, timeout=30) as response:
+              status = response.status
+              content = response.read().decode("utf-8", errors="ignore")
 
-              if status != 200:
-                  raise Exception(f"Unexpected HTTP status: {status}")
+          print(f"HTTP status: {status}")
+          print(f"Downloaded: {len(content):,} characters")
 
-              keywords = [
-                  "2011",
-                  "Division 3",
-                  "Club",
-                  "Pts"
-              ]
+          if status != 200:
+              raise Exception(f"Unexpected HTTP status: {status}")
 
-              print("\nChecking for league-table content:")
+          if "Division 3" not in content:
+              raise Exception(
+                  "Division 3 was not found in the PJDYFL response."
+              )
 
-              for keyword in keywords:
-                  if keyword.lower() in content.lower():
-                      print(f"✅ Found: {keyword}")
-                  else:
-                      print(f"❌ Not found: {keyword}")
+          # Remove scripts/styles and decode HTML entities.
+          cleaned = re.sub(
+              r"<(script|style).*?</\1>",
+              " ",
+              content,
+              flags=re.I | re.S
+          )
 
-              if "Division 3" not in content:
-                  raise Exception(
-                      "The page was reachable, but the expected Division 3 "
-                      "league-table content was not found."
-                  )
+          cleaned = re.sub(r"<[^>]+>", " ", cleaned)
+          cleaned = html.unescape(cleaned)
 
-              print("\n✅ SUCCESS: GitHub Actions can retrieve the PJDYFL feed.")
+          # Normalise whitespace.
+          cleaned = re.sub(r"\s+", " ", cleaned).strip()
 
-          except Exception as error:
-              print(f"\n❌ TEST FAILED: {error}")
-              raise
+          # Save the raw page temporarily so the parsing stage can be
+          # adjusted easily if PJDYFL changes its HTML structure.
+          with open("pjdyfl-page.html", "w", encoding="utf-8") as f:
+              f.write(content)
+
+          # Extract table rows from HTML.
+          row_matches = re.findall(
+              r"<tr\b[^>]*>(.*?)</tr>",
+              content,
+              flags=re.I | re.S
+          )
+
+          teams = []
+
+          for row in row_matches:
+              cells = re.findall(
+                  r"<t[dh]\b[^>]*>(.*?)</t[dh]>",
+                  row,
+                  flags=re.I | re.S
+              )
+
+              values = []
+
+              for cell in cells:
+                  value = re.sub(r"<[^>]+>", " ", cell)
+                  value = html.unescape(value)
+                  value = re.sub(r"\s+", " ", value).strip()
+                  values.append(value)
+
+              # Expected table structure:
+              # Club | P | W | D | L | F | A | GD | Pts
+              if len(values) < 9:
+                  continue
+
+              if values[0].lower() in {
+                  "club",
+                  "team",
+                  "club name"
+              }:
+                  continue
+
+              try:
+                  numbers = [int(re.sub(r"[^\d-]", "", x)) for x in values[1:9]]
+
+                  teams.append({
+                      "position": len(teams) + 1,
+                      "club": values[0],
+                      "played": numbers[0],
+                      "won": numbers[1],
+                      "drawn": numbers[2],
+                      "lost": numbers[3],
+                      "goalsFor": numbers[4],
+                      "goalsAgainst": numbers[5],
+                      "goalDifference": numbers[6],
+                      "points": numbers[7]
+                  })
+
+              except (ValueError, IndexError):
+                  continue
+
+          if not teams:
+              raise Exception(
+                  "The page was reachable, but no league-table rows could be parsed."
+              )
+
+          data = {
+              "source": URL,
+              "league": "PJDYFL 2011s Division 3",
+              "updatedAt": datetime.now(timezone.utc).isoformat(),
+              "teams": teams
+          }
+
+          with open(OUTPUT, "w", encoding="utf-8") as f:
+              json.dump(data, f, indent=2, ensure_ascii=False)
+
+          print(f"Successfully extracted {len(teams)} teams.")
+
+          for team in teams:
+              print(
+                  f"{team['position']}. "
+                  f"{team['club']} - "
+                  f"{team['played']} played, "
+                  f"{team['points']} points"
+              )
           PY
+
+      - name: Commit updated league table
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add league-table.json
+
+          if git diff --cached --quiet; then
+            echo "No league table changes."
+          else
+            git commit -m "Update PJDYFL league table"
+            git push
+          fi
