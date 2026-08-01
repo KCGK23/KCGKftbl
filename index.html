@@ -297,11 +297,9 @@
   <section id="leagueTable" class="league-table-card" aria-labelledby="leagueTableTitle">
     <div class="league-table-heading">
       <div>
-        <h2 id="leagueTableTitle">🏆 2011s Division 3</h2>
-        <p class="league-table-kicker">PJDYFL League Table</p>
-        <p id="leagueTableUpdated" class="league-table-updated"></p>
+        <h2 id="leagueTableTitle">🏆 League Table</h2>
+        <p id="leagueTableName" class="league-table-kicker"></p>
       </div>
-      <a class="league-table-source" href="https://www.pjdyfl.co.uk/leaguetablefeed/1058" target="_blank" rel="noopener noreferrer">Source: PJDYFL</a>
     </div>
     <div id="leagueTableStatus" class="league-table-status" role="status">Loading league table...</div>
     <div id="leagueTableWrap" class="league-table-wrap hidden">
@@ -322,6 +320,10 @@
         </thead>
         <tbody id="leagueTableBody"></tbody>
       </table>
+    </div>
+    <div class="league-table-footer">
+      <p id="leagueTableUpdated" class="league-table-updated"></p>
+      <a class="league-table-source" href="https://www.pjdyfl.co.uk/leaguetablefeed/1058" target="_blank" rel="noopener noreferrer">Source: PJDYFL</a>
     </div>
   </section>
 
@@ -474,6 +476,7 @@ tabs.forEach(tab => {
       const status = document.getElementById('leagueTableStatus');
       const wrap = document.getElementById('leagueTableWrap');
       const body = document.getElementById('leagueTableBody');
+      const leagueName = document.getElementById('leagueTableName');
       const updated = document.getElementById('leagueTableUpdated');
 
       try {
@@ -482,6 +485,7 @@ tabs.forEach(tab => {
 
         const leagueTable = await response.json();
         const teams = Array.isArray(leagueTable.teams) ? leagueTable.teams : [];
+        leagueName.textContent = leagueTable.league || '';
         updated.textContent = leagueTable.updatedAt
           ? `Last updated: ${new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(leagueTable.updatedAt))}`
           : '';
@@ -491,11 +495,11 @@ tabs.forEach(tab => {
           return;
         }
 
-        const currentTeam = 'renfrew football club blue';
+        const currentTeam = String(leagueTable.myTeam || '').trim();
         body.innerHTML = '';
         teams.forEach(team => {
           const row = document.createElement('tr');
-          if (String(team.club || '').trim().toLowerCase() === currentTeam) {
+          if (currentTeam && String(team.club || '').trim() === currentTeam) {
             row.classList.add('current-team');
           }
 
