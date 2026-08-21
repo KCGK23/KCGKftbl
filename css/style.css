@@ -144,6 +144,11 @@ button:focus{outline:3px solid rgba(79,157,255,0.18); outline-offset:3px}
   header.goalkeeper .team-logo{width:64px}
 }
 
+@media (max-width:480px){
+  header.goalkeeper{padding-right:88px;}
+  header.goalkeeper h1{font-size:1.75rem;}
+}
+
 /* Social button row */
 .social-row{
   margin-top:8px;
@@ -738,7 +743,7 @@ body{
   padding:0;
   margin:0;
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(285px, 1fr));
+  grid-template-columns:repeat(auto-fit, minmax(min(285px, 100%), 1fr));
   gap:18px;
 }
 
@@ -895,10 +900,22 @@ body{
 }
 
 @media (max-width:400px){
+  .fixtures-card{padding:16px;}
   .fixture-item{padding:17px;}
   .fixture-logo-shell{width:76px; border-radius:15px;}
   .fixture-matchup{gap:8px;}
   .fixture-versus{min-width:34px;}
+  .fixture-card-header{flex-wrap:wrap;}
+  .fixture-competition{max-width:100%;}
+
+  .site-nav{gap:7px;padding:12px;}
+  .site-nav a{padding:8px 11px;}
+}
+
+@media (max-width:360px){
+  .fixture-logo-shell{width:66px;}
+  .fixture-matchup{gap:6px;}
+  .fixture-versus{min-width:30px;}
 }
 
 /* Tournament fixtures use a lightweight, text-only layout. */
@@ -1037,7 +1054,7 @@ body{
 
 .tournament-list{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns:repeat(auto-fit, minmax(min(260px, 100%), 1fr));
   gap:18px;
 }
 
@@ -1240,6 +1257,19 @@ body{
   .tournament-modal-content{
     max-height:90vh;
     padding:25px 18px 18px;
+  }
+  .league-table-wrap{
+    position:relative;
+    padding-top:25px;
+  }
+  .league-table-wrap::before{
+    content:'Swipe table horizontally to view all columns';
+    position:absolute;
+    top:4px;
+    left:0;
+    color:rgba(238,247,255,0.72);
+    font-size:0.75rem;
+    font-weight:700;
   }
 }
 
