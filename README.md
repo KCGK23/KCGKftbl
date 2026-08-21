@@ -21,6 +21,6 @@ Your published site will usually be available at:
 
 ## Notes
 
-- `index.html` is the homepage.
-- `styles.css.css` contains the styling.
-- Image files are included in the project folder.
+- `index.html` is the player homepage; feature pages are in `pages/`.
+- `css/style.css` contains shared styling and `js/` contains the Firebase modules.
+- Image files are in `assets/images/`; league data is in `data/league-table.json`.
