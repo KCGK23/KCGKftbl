@@ -1,11 +1,23 @@
 {
   "source": "https://www.pjdyfl.co.uk/leaguetablefeed/1058",
   "league": "2026/2027 - PJDYFL 2011 Division 3",
-  "updatedAt": "2026-08-21T20:52:27.969965+00:00",
+  "updatedAt": "2026-08-21T21:26:14.331487+00:00",
   "myTeam": "Renfrew Football Club Blue (2011)",
   "teams": [
     {
       "position": 1,
+      "club": "Greenock HSFP AFC Black(2011)",
+      "played": 1,
+      "won": 1,
+      "drawn": 0,
+      "lost": 0,
+      "goalsFor": 7,
+      "goalsAgainst": 0,
+      "goalDifference": 7,
+      "points": 3
+    },
+    {
+      "position": 2,
       "club": "St Mirren Youth FC White (2011)",
       "played": 0,
       "won": 0,
@@ -17,7 +29,7 @@
       "points": 0
     },
     {
-      "position": 2,
+      "position": 3,
       "club": "St Andrews BC Blues (2011)",
       "played": 0,
       "won": 0,
@@ -29,7 +41,7 @@
       "points": 0
     },
     {
-      "position": 3,
+      "position": 4,
       "club": "Renfrew Football Club Blue (2011)",
       "played": 0,
       "won": 0,
@@ -41,7 +53,7 @@
       "points": 0
     },
     {
-      "position": 4,
+      "position": 5,
       "club": "Lochnell FC (2011)",
       "played": 0,
       "won": 0,
@@ -53,7 +65,7 @@
       "points": 0
     },
     {
-      "position": 5,
+      "position": 6,
       "club": "Irvine Meadow (2011)",
       "played": 0,
       "won": 0,
@@ -65,31 +77,7 @@
       "points": 0
     },
     {
-      "position": 6,
-      "club": "Harmony Row YC Athletic (2011)",
-      "played": 0,
-      "won": 0,
-      "drawn": 0,
-      "lost": 0,
-      "goalsFor": 0,
-      "goalsAgainst": 0,
-      "goalDifference": 0,
-      "points": 0
-    },
-    {
       "position": 7,
-      "club": "Greenock HSFP AFC Black(2011)",
-      "played": 0,
-      "won": 0,
-      "drawn": 0,
-      "lost": 0,
-      "goalsFor": 0,
-      "goalsAgainst": 0,
-      "goalDifference": 0,
-      "points": 0
-    },
-    {
-      "position": 8,
       "club": "Erskine Youth F C (Utd) (2011)",
       "played": 0,
       "won": 0,
@@ -101,7 +89,7 @@
       "points": 0
     },
     {
-      "position": 9,
+      "position": 8,
       "club": "Erskine Youth F C (Thistle) (2011)",
       "played": 0,
       "won": 0,
@@ -113,7 +101,7 @@
       "points": 0
     },
     {
-      "position": 10,
+      "position": 9,
       "club": "Clydebank FC Red (2011)",
       "played": 0,
       "won": 0,
@@ -125,19 +113,7 @@
       "points": 0
     },
     {
-      "position": 11,
-      "club": "BSC Glasgow 2011 (Green)",
-      "played": 0,
-      "won": 0,
-      "drawn": 0,
-      "lost": 0,
-      "goalsFor": 0,
-      "goalsAgainst": 0,
-      "goalDifference": 0,
-      "points": 0
-    },
-    {
-      "position": 12,
+      "position": 10,
       "club": "Ardgowan Thistle FC (2011)",
       "played": 0,
       "won": 0,
@@ -149,7 +125,7 @@
       "points": 0
     },
     {
-      "position": 13,
+      "position": 11,
       "club": "Ardeer Thistle FC (2011)",
       "played": 0,
       "won": 0,
@@ -158,6 +134,18 @@
       "goalsFor": 0,
       "goalsAgainst": 0,
       "goalDifference": 0,
+      "points": 0
+    },
+    {
+      "position": 12,
+      "club": "Harmony Row YC Athletic (2011)",
+      "played": 1,
+      "won": 0,
+      "drawn": 0,
+      "lost": 1,
+      "goalsFor": 0,
+      "goalsAgainst": 7,
+      "goalDifference": -7,
       "points": 0
     }
   ]
