@@ -1,7 +1,7 @@
 {
   "source": "https://www.pjdyfl.co.uk/leaguetablefeed/1058",
   "league": "2026/2027 - PJDYFL 2011 Division 3",
-  "updatedAt": "2026-08-22T15:47:29.183437+00:00",
+  "updatedAt": "2026-08-22T16:26:15.301339+00:00",
   "myTeam": "Renfrew Football Club Blue (2011)",
   "teams": [
     {
@@ -18,6 +18,18 @@
     },
     {
       "position": 2,
+      "club": "Lochnell FC (2011)",
+      "played": 1,
+      "won": 1,
+      "drawn": 0,
+      "lost": 0,
+      "goalsFor": 2,
+      "goalsAgainst": 0,
+      "goalDifference": 2,
+      "points": 3
+    },
+    {
+      "position": 3,
       "club": "St Mirren Youth FC White (2011)",
       "played": 0,
       "won": 0,
@@ -29,7 +41,7 @@
       "points": 0
     },
     {
-      "position": 3,
+      "position": 4,
       "club": "St Andrews BC Blues (2011)",
       "played": 0,
       "won": 0,
@@ -41,20 +53,8 @@
       "points": 0
     },
     {
-      "position": 4,
-      "club": "Renfrew Football Club Blue (2011)",
-      "played": 0,
-      "won": 0,
-      "drawn": 0,
-      "lost": 0,
-      "goalsFor": 0,
-      "goalsAgainst": 0,
-      "goalDifference": 0,
-      "points": 0
-    },
-    {
       "position": 5,
-      "club": "Lochnell FC (2011)",
+      "club": "Renfrew Football Club Blue (2011)",
       "played": 0,
       "won": 0,
       "drawn": 0,
@@ -78,18 +78,6 @@
     },
     {
       "position": 7,
-      "club": "Erskine Youth F C (Utd) (2011)",
-      "played": 0,
-      "won": 0,
-      "drawn": 0,
-      "lost": 0,
-      "goalsFor": 0,
-      "goalsAgainst": 0,
-      "goalDifference": 0,
-      "points": 0
-    },
-    {
-      "position": 8,
       "club": "Erskine Youth F C (Thistle) (2011)",
       "played": 0,
       "won": 0,
@@ -101,7 +89,7 @@
       "points": 0
     },
     {
-      "position": 9,
+      "position": 8,
       "club": "Clydebank FC Red (2011)",
       "played": 0,
       "won": 0,
@@ -113,7 +101,7 @@
       "points": 0
     },
     {
-      "position": 10,
+      "position": 9,
       "club": "Ardgowan Thistle FC (2011)",
       "played": 0,
       "won": 0,
@@ -125,7 +113,7 @@
       "points": 0
     },
     {
-      "position": 11,
+      "position": 10,
       "club": "Ardeer Thistle FC (2011)",
       "played": 0,
       "won": 0,
@@ -134,6 +122,18 @@
       "goalsFor": 0,
       "goalsAgainst": 0,
       "goalDifference": 0,
+      "points": 0
+    },
+    {
+      "position": 11,
+      "club": "Erskine Youth F C (Utd) (2011)",
+      "played": 1,
+      "won": 0,
+      "drawn": 0,
+      "lost": 1,
+      "goalsFor": 0,
+      "goalsAgainst": 2,
+      "goalDifference": -2,
       "points": 0
     },
     {
