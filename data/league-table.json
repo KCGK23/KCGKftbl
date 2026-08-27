@@ -1,7 +1,7 @@
 {
   "source": "https://www.pjdyfl.co.uk/leaguetablefeed/1058",
   "league": "2026/2027 - PJDYFL 2011 Division 3",
-  "updatedAt": "2026-08-27T00:31:14.641857+00:00",
+  "updatedAt": "2026-08-27T10:58:07.559680+00:00",
   "myTeam": "Renfrew Football Club Blue (2011)",
   "teams": [
     {
@@ -19,29 +19,17 @@
     {
       "position": 2,
       "club": "Ardgowan Thistle FC (2011)",
-      "played": 1,
-      "won": 1,
+      "played": 2,
+      "won": 2,
       "drawn": 0,
       "lost": 0,
-      "goalsFor": 4,
-      "goalsAgainst": 1,
-      "goalDifference": 3,
-      "points": 3
+      "goalsFor": 7,
+      "goalsAgainst": 2,
+      "goalDifference": 5,
+      "points": 6
     },
     {
       "position": 3,
-      "club": "St Andrews BC Blues (2011)",
-      "played": 1,
-      "won": 1,
-      "drawn": 0,
-      "lost": 0,
-      "goalsFor": 3,
-      "goalsAgainst": 1,
-      "goalDifference": 2,
-      "points": 3
-    },
-    {
-      "position": 4,
       "club": "Lochnell FC (2011)",
       "played": 1,
       "won": 1,
@@ -53,7 +41,7 @@
       "points": 3
     },
     {
-      "position": 5,
+      "position": 4,
       "club": "Irvine Meadow (2011)",
       "played": 2,
       "won": 1,
@@ -61,6 +49,18 @@
       "lost": 1,
       "goalsFor": 5,
       "goalsAgainst": 5,
+      "goalDifference": 0,
+      "points": 3
+    },
+    {
+      "position": 5,
+      "club": "St Andrews BC Blues (2011)",
+      "played": 2,
+      "won": 1,
+      "drawn": 0,
+      "lost": 1,
+      "goalsFor": 4,
+      "goalsAgainst": 4,
       "goalDifference": 0,
       "points": 3
     },
