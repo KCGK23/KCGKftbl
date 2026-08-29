@@ -1,20 +1,20 @@
 {
   "source": "https://www.pjdyfl.co.uk/leaguetablefeed/1058",
   "league": "2026/2027 - PJDYFL 2011 Division 3",
-  "updatedAt": "2026-08-29T14:13:06.486507+00:00",
+  "updatedAt": "2026-08-29T17:47:20.125883+00:00",
   "myTeam": "Renfrew Football Club Blue (2011)",
   "teams": [
     {
       "position": 1,
       "club": "Greenock HSFP AFC Black(2011)",
-      "played": 2,
-      "won": 2,
+      "played": 3,
+      "won": 3,
       "drawn": 0,
       "lost": 0,
-      "goalsFor": 10,
-      "goalsAgainst": 2,
-      "goalDifference": 8,
-      "points": 6
+      "goalsFor": 12,
+      "goalsAgainst": 3,
+      "goalDifference": 9,
+      "points": 9
     },
     {
       "position": 2,
@@ -30,6 +30,18 @@
     },
     {
       "position": 3,
+      "club": "Erskine Youth F C (Utd) (2011)",
+      "played": 3,
+      "won": 2,
+      "drawn": 0,
+      "lost": 1,
+      "goalsFor": 5,
+      "goalsAgainst": 3,
+      "goalDifference": 2,
+      "points": 6
+    },
+    {
+      "position": 4,
       "club": "Irvine Meadow (2011)",
       "played": 3,
       "won": 1,
@@ -41,7 +53,7 @@
       "points": 4
     },
     {
-      "position": 4,
+      "position": 5,
       "club": "Harmony Row YC Athletic (2011)",
       "played": 3,
       "won": 1,
@@ -53,27 +65,15 @@
       "points": 4
     },
     {
-      "position": 5,
-      "club": "Lochnell FC (2011)",
-      "played": 1,
-      "won": 1,
-      "drawn": 0,
-      "lost": 0,
-      "goalsFor": 2,
-      "goalsAgainst": 0,
-      "goalDifference": 2,
-      "points": 3
-    },
-    {
       "position": 6,
-      "club": "St Andrews BC Blues (2011)",
+      "club": "Lochnell FC (2011)",
       "played": 2,
       "won": 1,
       "drawn": 0,
       "lost": 1,
-      "goalsFor": 4,
-      "goalsAgainst": 4,
-      "goalDifference": 0,
+      "goalsFor": 3,
+      "goalsAgainst": 2,
+      "goalDifference": 1,
       "points": 3
     },
     {
@@ -90,27 +90,27 @@
     },
     {
       "position": 8,
-      "club": "Erskine Youth F C (Utd) (2011)",
+      "club": "Clydebank FC Red (2011)",
       "played": 2,
       "won": 1,
       "drawn": 0,
       "lost": 1,
-      "goalsFor": 2,
-      "goalsAgainst": 2,
-      "goalDifference": 0,
+      "goalsFor": 3,
+      "goalsAgainst": 4,
+      "goalDifference": -1,
       "points": 3
     },
     {
       "position": 9,
-      "club": "Clydebank FC Red (2011)",
-      "played": 1,
-      "won": 0,
+      "club": "St Andrews BC Blues (2011)",
+      "played": 3,
+      "won": 1,
       "drawn": 0,
-      "lost": 1,
-      "goalsFor": 1,
-      "goalsAgainst": 3,
+      "lost": 2,
+      "goalsFor": 5,
+      "goalsAgainst": 7,
       "goalDifference": -2,
-      "points": 0
+      "points": 3
     },
     {
       "position": 10,
@@ -127,13 +127,13 @@
     {
       "position": 11,
       "club": "St Mirren Youth FC White (2011)",
-      "played": 1,
+      "played": 2,
       "won": 0,
       "drawn": 0,
-      "lost": 1,
-      "goalsFor": 1,
-      "goalsAgainst": 4,
-      "goalDifference": -3,
+      "lost": 2,
+      "goalsFor": 2,
+      "goalsAgainst": 6,
+      "goalDifference": -4,
       "points": 0
     },
     {
