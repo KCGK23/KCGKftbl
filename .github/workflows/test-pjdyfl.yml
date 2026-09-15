@@ -30,13 +30,12 @@ jobs:
 
           URL = "https://www.pjdyfl.co.uk/leaguetablefeed/1058"
           OUTPUT = "data/league-table.json"
+
           # ============================================================
           # YOUR TEAM
           # ============================================================
-          #
+
           # This is deliberately the FULL club name.
-          # Do not change this to just "Renfrew".
-          #
           TARGET_CLUB = "Renfrew Football Club Blue (2011)"
 
           def normalise(text):
@@ -78,7 +77,7 @@ jobs:
                   f"PJDYFL returned HTTP status {status}"
               )
 
-          # Save the downloaded page for debugging if ever needed.
+          # Save the downloaded page for debugging if needed.
           with open(
               "pjdyfl-page.html",
               "w",
@@ -125,16 +124,8 @@ jobs:
                       continue
 
                   # Look at the cells individually.
-                  #
-                  # This is important because we do NOT want:
-                  #
-                  # "Renfrew"
-                  #
-                  # or:
-                  #
-                  # "Renfrew 2011s"
-                  #
-                  # accidentally matching our team.
+                  # This prevents "Renfrew" or another similar
+                  # name from accidentally matching our team.
                   for value in values:
 
                       if normalise(value) == target_normalised:
@@ -194,10 +185,21 @@ jobs:
               previous_elements = []
 
               for element in selected_table.find_all_previous(
-                  ["h1", "h2", "h3", "h4", "h5", "h6",
-                   "p", "div", "strong", "b"],
+                  [
+                      "h1",
+                      "h2",
+                      "h3",
+                      "h4",
+                      "h5",
+                      "h6",
+                      "p",
+                      "div",
+                      "strong",
+                      "b"
+                  ],
                   limit=30
               ):
+
                   text = element.get_text(
                       " ",
                       strip=True
@@ -214,8 +216,8 @@ jobs:
 
                   lower = text.casefold()
 
-                  # Look for something that appears to describe a
-                  # league/division rather than a generic page element.
+                  # Look for something that appears to describe
+                  # a league/division rather than a generic page element.
                   if (
                       "division" in lower
                       or "league" in lower
@@ -226,8 +228,6 @@ jobs:
               if previous_elements:
                   league_name = previous_elements[0]
 
-        
-# ============================================================
           # ============================================================
           # EXTRACT THE SELECTED TABLE
           # ============================================================
@@ -236,10 +236,16 @@ jobs:
           teams = []
 
           for row in rows:
-              cells = row.find_all(["th", "td"])
+
+              cells = row.find_all(
+                  ["th", "td"]
+              )
 
               values = [
-                  cell.get_text(" ", strip=True)
+                  cell.get_text(
+                      " ",
+                      strip=True
+                  )
                   for cell in cells
               ]
 
@@ -260,9 +266,14 @@ jobs:
               ):
                   continue
 
-              # Current PJDYFL format:
+              # ========================================================
+              # CURRENT PJDYFL FORMAT
               #
               # Position | Club | P | W | D | L | Pts
+              #
+              # Example:
+              # 9 | Renfrew Football Club Blue (2011) | 4 | 1 | 1 | 2 | 4
+              # ========================================================
 
               if len(values) < 7:
                   continue
@@ -272,13 +283,16 @@ jobs:
               position_index = None
 
               for index, value in enumerate(values):
+
                   match = re.fullmatch(
                       r"\s*\d+\s*",
                       value
                   )
 
                   if match:
-                      position = int(value.strip())
+                      position = int(
+                          value.strip()
+                      )
                       position_index = index
                       break
 
@@ -301,6 +315,7 @@ jobs:
                   position_index + 2:
               ]
 
+              # We need:
               # P | W | D | L | Pts
               if len(stat_values) < 5:
                   continue
@@ -308,6 +323,7 @@ jobs:
               stats = []
 
               for value in stat_values[:5]:
+
                   match = re.search(
                       r"-?\d+",
                       value
@@ -334,6 +350,9 @@ jobs:
 
               # The current PJDYFL table does not provide
               # goals for / goals against / goal difference.
+              #
+              # Keep these fields in the JSON so the website
+              # does not break if it expects them.
 
               teams.append({
                   "position": position,
@@ -347,90 +366,7 @@ jobs:
                   "goalDifference": None,
                   "points": points
               })
-    position_index = None
 
-    for index, value in enumerate(values):
-        match = re.fullmatch(
-            r"\s*\d+\s*",
-            value
-        )
-
-        if match:
-            position = int(value.strip())
-            position_index = index
-            break
-
-    if position is None:
-        continue
-
-    # The club should normally be immediately after position.
-    if position_index + 1 >= len(values):
-        continue
-
-    club = values[
-        position_index + 1
-    ].strip()
-
-    if not club:
-        continue
-
-    # Statistics come after the club.
-    stat_values = values[
-        position_index + 2:
-    ]
-
-    # We need:
-    # P | W | D | L | Pts
-    if len(stat_values) < 5:
-        continue
-
-    stats = []
-
-    for value in stat_values[:5]:
-
-        match = re.search(
-            r"-?\d+",
-            value
-        )
-
-        if not match:
-            stats = []
-            break
-
-        stats.append(
-            int(match.group())
-        )
-
-    if len(stats) != 5:
-        continue
-
-    (
-        played,
-        won,
-        drawn,
-        lost,
-        points
-    ) = stats
-
-    # The current PJDYFL table no longer supplies
-    # goals for / goals against / goal difference.
-    #
-    # Keep these fields in the JSON so the website
-    # does not break if it expects them, but use null
-    # because the source does not provide those values.
-
-    teams.append({
-        "position": position,
-        "club": club,
-        "played": played,
-        "won": won,
-        "drawn": drawn,
-        "lost": lost,
-        "goalsFor": None,
-        "goalsAgainst": None,
-        "goalDifference": None,
-        "points": points
-    })
           # ============================================================
           # SAFETY CHECK
           # ============================================================
@@ -463,6 +399,7 @@ jobs:
                   f"'{TARGET_CLUB}'."
               )
 
+          # Sort by league position.
           teams.sort(
               key=lambda team: team["position"]
           )
@@ -486,6 +423,7 @@ jobs:
               "w",
               encoding="utf-8"
           ) as f:
+
               json.dump(
                   data,
                   f,
@@ -501,15 +439,19 @@ jobs:
           print("======================================")
           print("SUCCESS")
           print("======================================")
+
           print(
               f"League/table found: {league_name}"
           )
+
           print(
               f"Teams found: {len(teams)}"
           )
+
           print(
               f"My team: {TARGET_CLUB}"
           )
+
           print("")
 
           for team in teams:
@@ -540,6 +482,7 @@ jobs:
               "The updater will automatically follow "
               "this team if it moves to another division."
           )
+
           PY
 
       - name: Commit updated league table
