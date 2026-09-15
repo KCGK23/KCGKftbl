@@ -228,51 +228,125 @@ jobs:
 
         
 # ============================================================
-# EXTRACT THE SELECTED TABLE
-# ============================================================
+          # ============================================================
+          # EXTRACT THE SELECTED TABLE
+          # ============================================================
 
-rows = selected_table.find_all("tr")
-teams = []
+          rows = selected_table.find_all("tr")
+          teams = []
 
-for row in rows:
-    cells = row.find_all(["th", "td"])
+          for row in rows:
+              cells = row.find_all(["th", "td"])
 
-    values = [
-        cell.get_text(" ", strip=True)
-        for cell in cells
-    ]
+              values = [
+                  cell.get_text(" ", strip=True)
+                  for cell in cells
+              ]
 
-    if not values:
-        continue
+              if not values:
+                  continue
 
-    print("TABLE ROW:", values)
+              print("TABLE ROW:", values)
 
-    # Ignore headings/header rows.
-    joined = " ".join(values).casefold()
+              # Ignore headings/header rows.
+              joined = " ".join(values).casefold()
 
-    if (
-        "club" in joined
-        and (
-            "pts" in joined
-            or "points" in joined
-        )
-    ):
-        continue
+              if (
+                  "club" in joined
+                  and (
+                      "pts" in joined
+                      or "points" in joined
+                  )
+              ):
+                  continue
 
-    # --------------------------------------------------------
-    # CURRENT PJDYFL FORMAT:
-    #
-    # Position | Club | P | W | D | L | Pts
-    #
-    # Example:
-    # 9 | Renfrew Football Club Blue (2011) | 4 | 1 | 1 | 2 | 4
-    # --------------------------------------------------------
+              # Current PJDYFL format:
+              #
+              # Position | Club | P | W | D | L | Pts
 
-    if len(values) < 7:
-        continue
+              if len(values) < 7:
+                  continue
 
-    # Find the position.
-    position = None
+              # Find the position.
+              position = None
+              position_index = None
+
+              for index, value in enumerate(values):
+                  match = re.fullmatch(
+                      r"\s*\d+\s*",
+                      value
+                  )
+
+                  if match:
+                      position = int(value.strip())
+                      position_index = index
+                      break
+
+              if position is None:
+                  continue
+
+              # The club should normally be immediately after position.
+              if position_index + 1 >= len(values):
+                  continue
+
+              club = values[
+                  position_index + 1
+              ].strip()
+
+              if not club:
+                  continue
+
+              # Statistics come after the club.
+              stat_values = values[
+                  position_index + 2:
+              ]
+
+              # P | W | D | L | Pts
+              if len(stat_values) < 5:
+                  continue
+
+              stats = []
+
+              for value in stat_values[:5]:
+                  match = re.search(
+                      r"-?\d+",
+                      value
+                  )
+
+                  if not match:
+                      stats = []
+                      break
+
+                  stats.append(
+                      int(match.group())
+                  )
+
+              if len(stats) != 5:
+                  continue
+
+              (
+                  played,
+                  won,
+                  drawn,
+                  lost,
+                  points
+              ) = stats
+
+              # The current PJDYFL table does not provide
+              # goals for / goals against / goal difference.
+
+              teams.append({
+                  "position": position,
+                  "club": club,
+                  "played": played,
+                  "won": won,
+                  "drawn": drawn,
+                  "lost": lost,
+                  "goalsFor": None,
+                  "goalsAgainst": None,
+                  "goalDifference": None,
+                  "points": points
+              })
     position_index = None
 
     for index, value in enumerate(values):
