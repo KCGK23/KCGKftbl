@@ -226,142 +226,137 @@ jobs:
               if previous_elements:
                   league_name = previous_elements[0]
 
-          # ============================================================
-          # EXTRACT THE SELECTED TABLE
-          # ============================================================
+        
+# ============================================================
+# EXTRACT THE SELECTED TABLE
+# ============================================================
 
-          rows = selected_table.find_all("tr")
+rows = selected_table.find_all("tr")
+teams = []
 
-          teams = []
+for row in rows:
+    cells = row.find_all(["th", "td"])
 
-          for row in rows:
+    values = [
+        cell.get_text(" ", strip=True)
+        for cell in cells
+    ]
 
-              cells = row.find_all(
-                  ["th", "td"]
-              )
+    if not values:
+        continue
 
-              values = [
-                  cell.get_text(
-                      " ",
-                      strip=True
-                  )
-                  for cell in cells
-              ]
+    print("TABLE ROW:", values)
 
-              if not values:
-                  continue
+    # Ignore headings/header rows.
+    joined = " ".join(values).casefold()
 
-              print("TABLE ROW:", values)
+    if (
+        "club" in joined
+        and (
+            "pts" in joined
+            or "points" in joined
+        )
+    ):
+        continue
 
-              # Ignore headings/header rows.
-              joined = " ".join(
-                  values
-              ).casefold()
+    # --------------------------------------------------------
+    # CURRENT PJDYFL FORMAT:
+    #
+    # Position | Club | P | W | D | L | Pts
+    #
+    # Example:
+    # 9 | Renfrew Football Club Blue (2011) | 4 | 1 | 1 | 2 | 4
+    # --------------------------------------------------------
 
-              if (
-                  "club" in joined
-                  and (
-                      "pts" in joined
-                      or "points" in joined
-                  )
-              ):
-                  continue
+    if len(values) < 7:
+        continue
 
-              # Expected:
-              #
-              # Position | Club | P | W | D | L | F | A | GD | Pts
-              #
-              if len(values) < 9:
-                  continue
+    # Find the position.
+    position = None
+    position_index = None
 
-              # Find the position.
-              position = None
-              position_index = None
+    for index, value in enumerate(values):
+        match = re.fullmatch(
+            r"\s*\d+\s*",
+            value
+        )
 
-              for index, value in enumerate(values):
+        if match:
+            position = int(value.strip())
+            position_index = index
+            break
 
-                  match = re.fullmatch(
-                      r"\s*\d+\s*",
-                      value
-                  )
+    if position is None:
+        continue
 
-                  if match:
-                      position = int(
-                          value.strip()
-                      )
-                      position_index = index
-                      break
+    # The club should normally be immediately after position.
+    if position_index + 1 >= len(values):
+        continue
 
-              if position is None:
-                  continue
+    club = values[
+        position_index + 1
+    ].strip()
 
-              # The club should normally be immediately after position.
-              if position_index + 1 >= len(values):
-                  continue
+    if not club:
+        continue
 
-              club = values[
-                  position_index + 1
-              ].strip()
+    # Statistics come after the club.
+    stat_values = values[
+        position_index + 2:
+    ]
 
-              if not club:
-                  continue
+    # We need:
+    # P | W | D | L | Pts
+    if len(stat_values) < 5:
+        continue
 
-              # Statistics come after the club.
-              stat_values = values[
-                  position_index + 2:
-              ]
+    stats = []
 
-              if len(stat_values) < 8:
-                  continue
+    for value in stat_values[:5]:
 
-              stats = []
+        match = re.search(
+            r"-?\d+",
+            value
+        )
 
-              for value in stat_values[:8]:
+        if not match:
+            stats = []
+            break
 
-                  # Handle things such as:
-                  # +12
-                  # -5
-                  # 12
-                  match = re.search(
-                      r"-?\d+",
-                      value
-                  )
+        stats.append(
+            int(match.group())
+        )
 
-                  if not match:
-                      stats = []
-                      break
+    if len(stats) != 5:
+        continue
 
-                  stats.append(
-                      int(match.group())
-                  )
+    (
+        played,
+        won,
+        drawn,
+        lost,
+        points
+    ) = stats
 
-              if len(stats) != 8:
-                  continue
+    # The current PJDYFL table no longer supplies
+    # goals for / goals against / goal difference.
+    #
+    # Keep these fields in the JSON so the website
+    # does not break if it expects them, but use null
+    # because the source does not provide those values.
 
-              (
-                  played,
-                  won,
-                  drawn,
-                  lost,
-                  goals_for,
-                  goals_against,
-                  goal_difference,
-                  points
-              ) = stats
-
-              teams.append({
-                  "position": position,
-                  "club": club,
-                  "played": played,
-                  "won": won,
-                  "drawn": drawn,
-                  "lost": lost,
-                  "goalsFor": goals_for,
-                  "goalsAgainst": goals_against,
-                  "goalDifference": goal_difference,
-                  "points": points
-              })
-
+    teams.append({
+        "position": position,
+        "club": club,
+        "played": played,
+        "won": won,
+        "drawn": drawn,
+        "lost": lost,
+        "goalsFor": None,
+        "goalsAgainst": None,
+        "goalDifference": None,
+        "points": points
+    })
           # ============================================================
           # SAFETY CHECK
           # ============================================================
