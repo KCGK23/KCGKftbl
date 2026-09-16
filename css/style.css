@@ -1564,3 +1564,53 @@ body{
 
 .site-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;padding:14px 20px;background:rgba(7,19,40,.45);border-bottom:1px solid rgba(255,255,255,.1)}
 .site-nav a{padding:9px 15px;border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;font-weight:700;text-decoration:none}.site-nav a:hover,.site-nav a[aria-current="page"]{background:linear-gradient(135deg,#4f9dff,#2c7cff);border-color:transparent}
+
+/* =========================================================
+   KYLE CARD BADGES
+========================================================= */
+
+.player-card-counts {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 5px 10px;
+
+  border-radius: 999px;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12);
+
+  white-space: nowrap;
+}
+
+/* Yellow card */
+
+.player-card-counts:has(🟨) {
+  background: rgba(255, 215, 0, 0.12);
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+/* Red card */
+
+.player-card-counts:has(🟥) {
+  background: rgba(220, 50, 50, 0.12);
+  border-color: rgba(220, 50, 50, 0.4);
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .player-card-counts {
+    margin-top: 6px;
+    padding: 4px 9px;
+    font-size: 0.8rem;
+  }
+}
