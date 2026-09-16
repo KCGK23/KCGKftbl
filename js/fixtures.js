@@ -883,11 +883,8 @@ export async function updateMatch(fixtureId, values) {
 
     /* KYLE'S CARDS */
 
-    playerYellowCards:
-      Number(values.playerYellowCards || 0),
-
-    playerRedCards:
-      Number(values.playerRedCards || 0),
+  playerCard:
+  values.playerCard || 'none',
 
     /* OTHER MATCH INFORMATION */
 
