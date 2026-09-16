@@ -30,13 +30,15 @@ export function updateSeasonStats(fixtures) {
 function applyStats(stats = {}) { const values = { kitNumber: stats.kitNumber || '23', yellowCards: stats.yellowCards || '0', redCards: stats.redCards || '0', injuries: stats.injuries || 'None' }; const map = { kitNumber: 'kitNumberStat', yellowCards: 'yellowCardStat', redCards: 'redCardStat' }; Object.entries(map).forEach(([key, id]) => { const node = document.getElementById(id); if (node) node.textContent = values[key]; }); const injury = document.getElementById('injuryStat'); if (injury) { injury.querySelector('strong').textContent = values.injuries; injury.classList.toggle('injury-active', values.injuries.toLowerCase() !== 'none'); } return values; }
 export async function loadPlayerStats() {
   try {
+    const { fixtures } = await loadFixtures();
+
+    const cardTotals = calculateCardTotals(fixtures);
+
     const snapshot = await getDoc(statsDocRef);
+
     const stats = snapshot.exists()
       ? snapshot.data()
       : {};
-
-    const { fixtures } = await loadFixtures();
-    const cardTotals = calculateCardTotals(fixtures);
 
     return applyStats({
       ...stats,
