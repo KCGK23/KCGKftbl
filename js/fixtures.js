@@ -200,6 +200,20 @@ export function createFixtureItem(fixture) {
   const awayRed =
     Number(fixture.awayRedCards || 0);
 
+    const playerCard =
+  fixture.playerCard ||
+  (Number(fixture.playerRedCards || 0) > 0
+    ? 'red'
+    : Number(fixture.playerYellowCards || 0) > 0
+      ? 'yellow'
+      : 'none');
+
+const playerCardDisplay =
+  playerCard === 'yellow'
+    ? '<div class="player-card-counts">🟨 Kyle</div>'
+    : playerCard === 'red'
+      ? '<div class="player-card-counts">🟥 Kyle</div>'
+      : '';
 
   const homeCards =
     homeYellow > 0 || homeRed > 0
@@ -290,10 +304,12 @@ export function createFixtureItem(fixture) {
         </div>
 
         <h4>
-          ${HOME_TEAM_NAME}
-        </h4>
+  ${HOME_TEAM_NAME}
+</h4>
 
-        ${homeCards}
+${homeCards}
+
+${playerCardDisplay}
 
       </div>
 
