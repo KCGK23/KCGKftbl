@@ -1566,13 +1566,16 @@ body{
 .site-nav a{padding:9px 15px;border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;font-weight:700;text-decoration:none}.site-nav a:hover,.site-nav a[aria-current="page"]{background:linear-gradient(135deg,#4f9dff,#2c7cff);border-color:transparent}
 
 /* =========================================================
-   KYLE CARD BADGES
+   MATCH CARD BADGES — ALL CARD TYPES
 ========================================================= */
+
+/* Kyle's personal card */
 
 .player-card-counts {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+
   margin-top: 8px;
   padding: 5px 10px;
 
@@ -1585,32 +1588,91 @@ body{
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
 
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 
   white-space: nowrap;
 }
 
+
+/* Team card container */
+
+.team-card-counts {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  margin-top: 8px;
+}
+
+
 /* Yellow card */
 
-.player-card-counts:has(🟨) {
-  background: rgba(255, 215, 0, 0.12);
-  border-color: rgba(255, 215, 0, 0.4);
+.yellow-card-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 215, 0, 0.14);
+  border: 1px solid rgba(255, 215, 0, 0.45);
+
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+
+  white-space: nowrap;
 }
+
 
 /* Red card */
 
-.player-card-counts:has(🟥) {
-  background: rgba(220, 50, 50, 0.12);
-  border-color: rgba(220, 50, 50, 0.4);
+.red-card-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  padding: 5px 9px;
+
+  border-radius: 999px;
+
+  background: rgba(220, 50, 50, 0.14);
+  border: 1px solid rgba(220, 50, 50, 0.45);
+
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+
+  white-space: nowrap;
 }
+
 
 /* Mobile */
 
 @media (max-width: 600px) {
+
   .player-card-counts {
     margin-top: 6px;
-    padding: 4px 9px;
+    padding: 4px 8px;
     font-size: 0.8rem;
   }
+
+  .team-card-counts {
+    margin-top: 6px;
+    gap: 5px;
+  }
+
+  .yellow-card-count,
+  .red-card-count {
+    padding: 4px 7px;
+    font-size: 0.75rem;
+  }
+
 }
