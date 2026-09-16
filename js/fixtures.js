@@ -825,26 +825,6 @@ export async function editMatchReport(
 }
 
 
-    alert(
-      'Fixture updated successfully!'
-    );
-
-    return true;
-
-  } catch (error) {
-
-    console.error(
-      'Failed to update fixture:',
-      error
-    );
-
-    alert(
-      'Could not update fixture. Check the console for details.'
-    );
-
-    return false;
-
+```js
   }
-
 }
-```
