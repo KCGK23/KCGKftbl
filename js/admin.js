@@ -350,21 +350,22 @@ function loadSelectedMatch() {
       fixture.awayRedCards || 0
     );
 
+const playerCard =
+  fixture.playerCard ||
+  (Number(fixture.playerRedCards || 0) > 0
+    ? 'red'
+    : Number(fixture.playerYellowCards || 0) > 0
+      ? 'yellow'
+      : 'none');
 
-  document.getElementById(
-    'editPlayerYellow'
-  ).value =
-    Number(
-      fixture.playerYellowCards || 0
-    );
+document.getElementById('editPlayerNoCard').checked =
+  playerCard === 'none';
 
+document.getElementById('editPlayerYellow').checked =
+  playerCard === 'yellow';
 
-  document.getElementById(
-    'editPlayerRed'
-  ).value =
-    Number(
-      fixture.playerRedCards || 0
-    );
+document.getElementById('editPlayerRed').checked =
+  playerCard === 'red';
 
 
   document.getElementById(
