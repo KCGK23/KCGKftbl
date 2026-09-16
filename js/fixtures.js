@@ -175,7 +175,7 @@ export function createFixtureItem(fixture) {
   const homeLogo =
     fixture.homeLogoUrl ||
     fixture.homeLogo ||
-    'team-logo.png';
+    '../assets/images/team-logo.png';
 
 
   const opponentLogo =
