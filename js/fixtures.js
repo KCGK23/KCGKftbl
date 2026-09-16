@@ -1,4 +1,3 @@
-```js
 import {
   auth,
   fixturesCollection,
@@ -15,26 +14,20 @@ import {
 export const LOCAL_FIXTURE_KEY = 'localFixtures';
 export const HOME_TEAM_NAME = 'Renfrew Juniors';
 
-const teamLogo = new URL(
-  '../assets/images/team-logo.png',
-  import.meta.url
-).href;
-
-const fallbackLogo =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='20' fill='%231a3964'/%3E%3Cpath d='M60 18 94 32v27c0 22-14 37-34 44C40 96 26 81 26 59V32z' fill='%234f9dff'/%3E%3Cpath d='M60 33v51M41 50h38' stroke='white' stroke-width='8'/%3E%3C/svg%3E";
+const DEFAULT_OPPONENT_LOGO =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='20' fill='%231a3964'/%3E%3Cpath d='M60 18 94 32v27c0 22-14 37-34 44C40 96 26 81 26 59V32z' fill='%234f9dff' opacity='.9'/%3E%3Cpath d='M60 33v51M41 50h38' stroke='white' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E";
 
 let currentFixtures = [];
 
 
 /* =========================================================
-   LOCAL STORAGE
+   LOCAL FIXTURES
 ========================================================= */
 
 export function getLocalFixtures() {
   try {
-    return JSON.parse(
-      localStorage.getItem(LOCAL_FIXTURE_KEY) || '[]'
-    );
+    const raw = localStorage.getItem(LOCAL_FIXTURE_KEY);
+    return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
@@ -57,8 +50,8 @@ export function getFixtures() {
 ========================================================= */
 
 export async function loadFixtures() {
-  let remoteFailed = false;
   let fixtures = [];
+  let remoteFailed = false;
 
   try {
     const snapshot = await getDocs(
@@ -72,6 +65,7 @@ export async function loadFixtures() {
       id: item.id,
       ...item.data()
     }));
+
   } catch (error) {
     console.warn(
       'Remote fixture load failed:',
@@ -95,85 +89,42 @@ export async function loadFixtures() {
 
 
 /* =========================================================
-   STATUS / RESULT HELPERS
+   FILTERS
 ========================================================= */
 
-function isCompleted(fixture) {
-  return (
-    typeof fixture.homeScore === 'number' &&
-    typeof fixture.awayScore === 'number'
-  );
-}
-
-function getFixtureStatus(fixture) {
-  if (fixture.status) {
-    return fixture.status;
-  }
-
-  return isCompleted(fixture)
-    ? 'played'
-    : 'scheduled';
-}
-
-function getStatusLabel(status) {
-  switch (status) {
-    case 'played':
-      return 'FULL TIME';
-
-    case 'postponed':
-      return 'POSTPONED';
-
-    case 'abandoned':
-      return 'ABANDONED';
-
-    case 'cancelled':
-      return 'CANCELLED';
-
-    case 'scheduled':
-    default:
-      return 'UPCOMING FIXTURE';
-  }
-}
-
-
-/* =========================================================
-   FILTER FIXTURES
-========================================================= */
-
-export function filterFixtures(fixtures, filter) {
+export function filterFixtures(
+  fixtures,
+  filter
+) {
 
   if (filter === 'upcoming') {
-    return fixtures.filter(item => {
-      const status = getFixtureStatus(item);
-
-      return (
-        status === 'scheduled' &&
-        !isCompleted(item)
-      );
-    });
+    return fixtures.filter(fixture =>
+      typeof fixture.homeScore !== 'number' ||
+      typeof fixture.awayScore !== 'number'
+    );
   }
 
   if (filter === 'results') {
-    return fixtures.filter(item => {
-      return (
-        getFixtureStatus(item) === 'played' ||
-        isCompleted(item)
-      );
-    });
+    return fixtures.filter(fixture =>
+      typeof fixture.homeScore === 'number' &&
+      typeof fixture.awayScore === 'number'
+    );
   }
 
   if (filter === 'league') {
-    return fixtures.filter(item =>
-      item.competition
-        ?.toLowerCase()
+    return fixtures.filter(fixture =>
+      fixture.competition &&
+      fixture.competition
+        .toLowerCase()
         .includes('league')
     );
   }
 
   if (filter === 'other') {
-    return fixtures.filter(item =>
-      !item.competition
-        ?.toLowerCase()
+    return fixtures.filter(fixture =>
+      !fixture.competition ||
+      !fixture.competition
+        .toLowerCase()
         .includes('league')
     );
   }
@@ -186,61 +137,137 @@ export function filterFixtures(fixtures, filter) {
    CREATE FIXTURE CARD
 ========================================================= */
 
-export function createFixtureItem(
-  fixture,
-  { allowAdminActions = false } = {}
-) {
+export function createFixtureItem(fixture) {
 
-  const completed = isCompleted(fixture);
-  const status = getFixtureStatus(fixture);
+  const scoreText =
+    typeof fixture.homeScore === 'number' &&
+    typeof fixture.awayScore === 'number';
 
-  const outcome =
-    !completed
-      ? ''
-      : fixture.homeScore > fixture.awayScore
-        ? 'score-win'
-        : fixture.homeScore < fixture.awayScore
-          ? 'score-loss'
-          : 'score-draw';
+  let scoreClass = '';
+
+  if (scoreText) {
+
+    if (
+      fixture.homeScore >
+      fixture.awayScore
+    ) {
+      scoreClass = 'score-win';
+
+    } else if (
+      fixture.homeScore <
+      fixture.awayScore
+    ) {
+      scoreClass = 'score-loss';
+
+    } else {
+      scoreClass = 'score-draw';
+    }
+  }
+
+
+  const item =
+    document.createElement('li');
+
+  item.className =
+    'fixture-item';
+
 
   const homeLogo =
     fixture.homeLogoUrl ||
     fixture.homeLogo ||
-    teamLogo;
+    'team-logo.png';
+
 
   const opponentLogo =
     fixture.opponentLogoUrl ||
     fixture.opponentLogo ||
     fixture.awayLogoUrl ||
     fixture.awayLogo ||
-    fallbackLogo;
+    DEFAULT_OPPONENT_LOGO;
 
-  const homeYellowCards =
+
+  /* CARD COUNTS */
+
+  const homeYellow =
     Number(fixture.homeYellowCards || 0);
 
-  const homeRedCards =
+  const homeRed =
     Number(fixture.homeRedCards || 0);
 
-  const awayYellowCards =
+  const awayYellow =
     Number(fixture.awayYellowCards || 0);
 
-  const awayRedCards =
+  const awayRed =
     Number(fixture.awayRedCards || 0);
 
 
-  const item = document.createElement('li');
+  const homeCards =
+    homeYellow > 0 || homeRed > 0
+      ? `
+        <div class="team-card-counts">
 
-  item.className = 'fixture-item';
+          ${
+            homeYellow > 0
+              ? `<span class="yellow-card-count">
+                   🟨 ${homeYellow}
+                 </span>`
+              : ''
+          }
+
+          ${
+            homeRed > 0
+              ? `<span class="red-card-count">
+                   🟥 ${homeRed}
+                 </span>`
+              : ''
+          }
+
+        </div>
+      `
+      : '';
+
+
+  const awayCards =
+    awayYellow > 0 || awayRed > 0
+      ? `
+        <div class="team-card-counts">
+
+          ${
+            awayYellow > 0
+              ? `<span class="yellow-card-count">
+                   🟨 ${awayYellow}
+                 </span>`
+              : ''
+          }
+
+          ${
+            awayRed > 0
+              ? `<span class="red-card-count">
+                   🟥 ${awayRed}
+                 </span>`
+              : ''
+          }
+
+        </div>
+      `
+      : '';
+
 
   item.innerHTML = `
 
     <div class="fixture-card-header">
 
       <span class="fixture-status">
-        ${getStatusLabel(status)}
+        ${
+          scoreText
+            ? 'FULL TIME'
+            : 'UPCOMING FIXTURE'
+        }
       </span>
 
-      <span class="fixture-competition"></span>
+      <span class="fixture-competition">
+        ${fixture.competition || 'Friendly'}
+      </span>
 
     </div>
 
@@ -248,7 +275,7 @@ export function createFixtureItem(
     <div class="fixture-matchup">
 
 
-      <!-- HOME TEAM -->
+      <!-- RENFREW -->
 
       <div class="fixture-team">
 
@@ -258,56 +285,32 @@ export function createFixtureItem(
             class="fixture-team-logo"
             src="${homeLogo}"
             alt="${HOME_TEAM_NAME} logo"
-          >
+          />
 
         </div>
 
-        <h4>${HOME_TEAM_NAME}</h4>
+        <h4>
+          ${HOME_TEAM_NAME}
+        </h4>
 
-
-        ${
-          homeYellowCards > 0 ||
-          homeRedCards > 0
-            ? `
-              <div class="team-card-counts">
-
-                ${
-                  homeYellowCards > 0
-                    ? `
-                      <span class="yellow-card-count">
-                        🟨 ${homeYellowCards}
-                      </span>
-                    `
-                    : ''
-                }
-
-                ${
-                  homeRedCards > 0
-                    ? `
-                      <span class="red-card-count">
-                        🟥 ${homeRedCards}
-                      </span>
-                    `
-                    : ''
-                }
-
-              </div>
-            `
-            : ''
-        }
+        ${homeCards}
 
       </div>
 
 
-      <!-- SCORE / VS -->
+      <!-- SCORE -->
 
       <div class="fixture-versus">
 
         ${
-          completed
+          scoreText
             ? `
-              <span class="score-badge ${outcome}">
-                ${fixture.homeScore} - ${fixture.awayScore}
+              <span
+                class="score-badge ${scoreClass}"
+              >
+                ${fixture.homeScore}
+                -
+                ${fixture.awayScore}
               </span>
             `
             : `
@@ -327,86 +330,37 @@ export function createFixtureItem(
           <img
             class="fixture-team-logo"
             src="${opponentLogo}"
-            alt="Opponent logo"
-          >
+            alt="${fixture.opponent || 'Opponent'} logo"
+          />
 
         </div>
 
-        <h4 class="fixture-opponent"></h4>
+        <h4>
+          ${fixture.opponent || 'Opponent'}
+        </h4>
 
-
-        ${
-          awayYellowCards > 0 ||
-          awayRedCards > 0
-            ? `
-              <div class="team-card-counts">
-
-                ${
-                  awayYellowCards > 0
-                    ? `
-                      <span class="yellow-card-count">
-                        🟨 ${awayYellowCards}
-                      </span>
-                    `
-                    : ''
-                }
-
-                ${
-                  awayRedCards > 0
-                    ? `
-                      <span class="red-card-count">
-                        🟥 ${awayRedCards}
-                      </span>
-                    `
-                    : ''
-                }
-
-              </div>
-            `
-            : ''
-        }
+        ${awayCards}
 
       </div>
 
     </div>
 
 
-    <!-- FIXTURE INFORMATION -->
-
     <div class="fixture-meta">
 
-      <span>📍 </span>
+      <span>
+        📍 ${fixture.location || 'Location TBC'}
+      </span>
 
-      <span>🕐 </span>
+      <span>
+        🕐 ${fixture.date || 'Date / time TBC'}
+      </span>
 
     </div>
 
 
-    <!-- POSTPONED / ABANDONED / CANCELLED NOTICE -->
-
     ${
-      status === 'postponed' ||
-      status === 'abandoned' ||
-      status === 'cancelled'
-        ? `
-          <div class="fixture-status-notice">
-
-            ${
-              fixture.statusReason
-                ? fixture.statusReason
-                : `This fixture has been ${status}.`
-            }
-
-          </div>
-        `
-        : ''
-    }
-
-
-    <!-- MAN OF THE MATCH -->
-
-    ${
-      fixture.manOfTheMatch
+      fixture.manOfTheMatch === true
         ? `
           <span class="motm-badge">
             🏆 MAN OF THE MATCH
@@ -415,8 +369,6 @@ export function createFixtureItem(
         : ''
     }
 
-
-    <!-- MATCH REPORT -->
 
     ${
       fixture.report
@@ -440,54 +392,37 @@ export function createFixtureItem(
     }
 
 
-    <!-- ADMIN ACTIONS -->
+    <div class="fixture-actions">
 
-    <div class="fixture-actions"></div>
+      ${
+        auth.currentUser
+          ? `
+            <button
+              class="report-button"
+              data-id="${fixture.id}"
+            >
+              Match Report
+            </button>
+          `
+          : ''
+      }
+
+      ${
+        auth.currentUser && fixture.id
+          ? `
+            <button
+              class="delete-fixture-button"
+              data-id="${fixture.id}"
+            >
+              Delete
+            </button>
+          `
+          : ''
+      }
+
+    </div>
 
   `;
-
-
-  /* =======================================================
-     BASIC INFORMATION
-  ======================================================= */
-
-  item.querySelector(
-    '.fixture-competition'
-  ).textContent =
-    fixture.competition || 'Friendly';
-
-  item.querySelector(
-    '.fixture-opponent'
-  ).textContent =
-    fixture.opponent || 'Opponent TBC';
-
-
-  const meta =
-    item.querySelectorAll(
-      '.fixture-meta span'
-    );
-
-  meta[0].append(
-    fixture.location || 'Location TBC'
-  );
-
-  meta[1].append(
-    fixture.date || 'Date / time TBC'
-  );
-
-
-  /* =======================================================
-     MATCH REPORT
-  ======================================================= */
-
-  if (fixture.report) {
-
-    item.querySelector(
-      '.match-report p'
-    ).textContent =
-      fixture.report;
-
-  }
 
 
   /* =======================================================
@@ -495,15 +430,14 @@ export function createFixtureItem(
   ======================================================= */
 
   item
-    .querySelectorAll(
-      '.fixture-team-logo'
-    )
-    .forEach(image => {
+    .querySelectorAll('.fixture-team-logo')
+    .forEach(logo => {
 
-      image.addEventListener(
+      logo.addEventListener(
         'error',
         () => {
-          image.src = fallbackLogo;
+          logo.src =
+            DEFAULT_OPPONENT_LOGO;
         },
         { once: true }
       );
@@ -512,31 +446,69 @@ export function createFixtureItem(
 
 
   /* =======================================================
-     VIEW REPORT
+     MATCH REPORT
   ======================================================= */
 
-  const view =
+  const reportButton =
+    item.querySelector(
+      '.report-button'
+    );
+
+  const viewReportButton =
     item.querySelector(
       '.view-report-button'
     );
 
-  if (view) {
+  const matchReport =
+    item.querySelector(
+      '.match-report'
+    );
 
-    view.addEventListener(
+
+  if (reportButton) {
+
+    reportButton.addEventListener(
       'click',
       () => {
 
-        const report =
-          item.querySelector(
-            '.match-report'
+        if (
+          typeof window.openMatchReport ===
+          'function'
+        ) {
+          window.openMatchReport(
+            fixture
           );
+        }
 
-        report.classList.toggle(
+      }
+    );
+
+  }
+
+
+  if (
+    viewReportButton &&
+    matchReport
+  ) {
+
+    matchReport
+      .querySelector('p')
+      .textContent =
+      fixture.report || '';
+
+
+    viewReportButton.addEventListener(
+      'click',
+      function () {
+
+        matchReport.classList.toggle(
           'hidden'
         );
 
-        view.textContent =
-          report.classList.contains('hidden')
+        this.textContent =
+          matchReport.classList.contains(
+            'hidden'
+          )
             ? 'View Match Report'
             : 'Hide Match Report';
 
@@ -547,117 +519,34 @@ export function createFixtureItem(
 
 
   /* =======================================================
-     ADMIN ACTIONS
+     DELETE
   ======================================================= */
 
-  if (
-    allowAdminActions &&
-    auth.currentUser &&
-    fixture.id
-  ) {
+  const deleteButton =
+    item.querySelector(
+      '.delete-fixture-button'
+    );
 
-    const actions =
-      item.querySelector(
-        '.fixture-actions'
-      );
+  if (deleteButton) {
 
-
-    /* EDIT FIXTURE */
-
-    const edit =
-      document.createElement(
-        'button'
-      );
-
-    edit.type = 'button';
-
-    edit.className =
-      'edit-fixture-button';
-
-    edit.textContent =
-      'Edit Fixture';
-
-    edit.addEventListener(
+    deleteButton.addEventListener(
       'click',
-      async () => {
-
-        const updated =
-          await editFixture(fixture);
-
-        if (updated) {
-          window.location.reload();
-        }
-
+      () => {
+        deleteFixture(
+          fixture.id
+        );
       }
     );
-
-    actions.append(edit);
-
-
-    /* MATCH REPORT */
-
-    const report =
-      document.createElement(
-        'button'
-      );
-
-    report.type = 'button';
-
-    report.className =
-      'report-button';
-
-    report.textContent =
-      'Match Report';
-
-    report.addEventListener(
-      'click',
-      () => editMatchReport(fixture)
-    );
-
-    actions.append(report);
-
-
-    /* DELETE */
-
-    const remove =
-      document.createElement(
-        'button'
-      );
-
-    remove.type = 'button';
-
-    remove.className =
-      'delete-fixture-button';
-
-    remove.textContent =
-      'Delete';
-
-    remove.addEventListener(
-      'click',
-      async () => {
-
-        const deleted =
-          await deleteFixture(
-            fixture.id
-          );
-
-        if (deleted) {
-          window.location.reload();
-        }
-
-      }
-    );
-
-    actions.append(remove);
 
   }
+
 
   return item;
 }
 
 
 /* =========================================================
-   RENDER FIXTURES
+   RENDER
 ========================================================= */
 
 export function renderFixtures(
@@ -674,6 +563,7 @@ export function renderFixtures(
       options.filter || 'all'
     );
 
+
   if (!displayed.length) {
 
     list.innerHTML =
@@ -682,16 +572,17 @@ export function renderFixtures(
     return;
   }
 
-  displayed.forEach(item => {
 
-    list.append(
+  displayed.forEach(fixture => {
+
+    list.appendChild(
       createFixtureItem(
-        item,
-        options
+        fixture
       )
     );
 
   });
+
 }
 
 
@@ -718,24 +609,6 @@ export async function addFixture({
     location:
       location || 'TBC',
 
-    status:
-      'scheduled',
-
-    statusReason:
-      '',
-
-    homeYellowCards:
-      0,
-
-    homeRedCards:
-      0,
-
-    awayYellowCards:
-      0,
-
-    awayRedCards:
-      0,
-
     manOfTheMatch:
       false,
 
@@ -747,7 +620,7 @@ export async function addFixture({
 
   try {
 
-    const ref =
+    const docRef =
       await addDoc(
         fixturesCollection,
         payload
@@ -758,7 +631,7 @@ export async function addFixture({
       remoteSaved: true,
 
       fixture: {
-        id: ref.id,
+        id: docRef.id,
         ...payload
       }
 
@@ -766,12 +639,19 @@ export async function addFixture({
 
   } catch (error) {
 
-    const local =
+    console.warn(
+      'Saving fixture locally due to remote failure:',
+      error
+    );
+
+    const fixtures =
       getLocalFixtures();
 
-    local.push(payload);
+    fixtures.push(payload);
 
-    saveLocalFixtures(local);
+    saveLocalFixtures(
+      fixtures
+    );
 
     return {
 
@@ -789,10 +669,12 @@ export async function addFixture({
 
 
 /* =========================================================
-   DELETE FIXTURE
+   DELETE
 ========================================================= */
 
-export async function deleteFixture(id) {
+export async function deleteFixture(
+  fixtureId
+) {
 
   if (
     !confirm(
@@ -802,12 +684,13 @@ export async function deleteFixture(id) {
     return false;
   }
 
+
   try {
 
     await deleteDoc(
       doc(
         fixturesCollection,
-        id
+        fixtureId
       )
     );
 
@@ -816,12 +699,12 @@ export async function deleteFixture(id) {
   } catch (error) {
 
     console.error(
-      'Failed to delete fixture:',
+      'Error deleting fixture:',
       error
     );
 
     alert(
-      'Could not delete fixture.'
+      'Unable to delete fixture.'
     );
 
     return false;
@@ -853,9 +736,6 @@ export async function saveScore(
 
       awayScore:
         Number(awayScore),
-
-      status:
-        'played',
 
       scorePostedAt:
         serverTimestamp()
@@ -892,7 +772,7 @@ export async function saveManOfTheMatch(
 
 
 /* =========================================================
-   EDIT MATCH REPORT
+   SAVE MATCH REPORT
 ========================================================= */
 
 export async function editMatchReport(
@@ -905,9 +785,11 @@ export async function editMatchReport(
       fixture.report || ''
     );
 
+
   if (report === null) {
     return false;
   }
+
 
   try {
 
@@ -917,12 +799,10 @@ export async function editMatchReport(
         fixture.id
       ),
       {
-        report
-      }
-    );
 
-    alert(
-      'Match report updated!'
+        report
+
+      }
     );
 
     return true;
@@ -930,12 +810,12 @@ export async function editMatchReport(
   } catch (error) {
 
     console.error(
-      'Failed to update match report:',
+      'Failed to save match report:',
       error
     );
 
     alert(
-      'Could not update match report.'
+      'Unable to save match report.'
     );
 
     return false;
@@ -943,411 +823,6 @@ export async function editMatchReport(
   }
 
 }
-
-
-/* =========================================================
-   EDIT FULL FIXTURE
-========================================================= */
-
-export async function editFixture(
-  fixture
-) {
-
-  if (
-    !auth.currentUser ||
-    !fixture.id
-  ) {
-
-    alert(
-      'You must be logged in as the site administrator.'
-    );
-
-    return false;
-
-  }
-
-
-  /* -------------------------------------------------------
-     DATE / TIME
-  ------------------------------------------------------- */
-
-  const date =
-    prompt(
-      'Date / time:',
-      fixture.date || ''
-    );
-
-  if (date === null) {
-    return false;
-  }
-
-
-  /* -------------------------------------------------------
-     OPPONENT
-  ------------------------------------------------------- */
-
-  const opponent =
-    prompt(
-      'Opponent:',
-      fixture.opponent || ''
-    );
-
-  if (opponent === null) {
-    return false;
-  }
-
-
-  /* -------------------------------------------------------
-     COMPETITION
-  ------------------------------------------------------- */
-
-  const competition =
-    prompt(
-      'Competition:',
-      fixture.competition || 'Friendly'
-    );
-
-  if (competition === null) {
-    return false;
-  }
-
-
-  /* -------------------------------------------------------
-     LOCATION
-  ------------------------------------------------------- */
-
-  const location =
-    prompt(
-      'Location:',
-      fixture.location || 'TBC'
-    );
-
-  if (location === null) {
-    return false;
-  }
-
-
-  /* -------------------------------------------------------
-     STATUS
-  ------------------------------------------------------- */
-
-  const currentStatus =
-    getFixtureStatus(fixture);
-
-  const statusInput =
-    prompt(
-      `Status:
-
-scheduled
-played
-postponed
-abandoned
-cancelled
-
-Enter status:`,
-      currentStatus
-    );
-
-  if (statusInput === null) {
-    return false;
-  }
-
-  const status =
-    statusInput
-      .trim()
-      .toLowerCase();
-
-
-  const allowedStatuses = [
-    'scheduled',
-    'played',
-    'postponed',
-    'abandoned',
-    'cancelled'
-  ];
-
-  if (
-    !allowedStatuses.includes(
-      status
-    )
-  ) {
-
-    alert(
-      'Invalid status.'
-    );
-
-    return false;
-
-  }
-
-
-  /* -------------------------------------------------------
-     STATUS REASON
-  ------------------------------------------------------- */
-
-  let statusReason =
-    fixture.statusReason || '';
-
-  if (
-    status === 'postponed' ||
-    status === 'abandoned' ||
-    status === 'cancelled'
-  ) {
-
-    const reason =
-      prompt(
-        'Reason / notice:',
-        statusReason
-      );
-
-    if (reason === null) {
-      return false;
-    }
-
-    statusReason =
-      reason.trim();
-
-  } else {
-
-    statusReason = '';
-
-  }
-
-
-  /* -------------------------------------------------------
-     SCORE
-  ------------------------------------------------------- */
-
-  let homeScore =
-    fixture.homeScore;
-
-  let awayScore =
-    fixture.awayScore;
-
-
-  if (status === 'played') {
-
-    const homeScoreInput =
-      prompt(
-        'Renfrew Juniors score:',
-        typeof homeScore === 'number'
-          ? homeScore
-          : '0'
-      );
-
-    if (
-      homeScoreInput === null
-    ) {
-      return false;
-    }
-
-
-    const awayScoreInput =
-      prompt(
-        `${opponent} score:`,
-        typeof awayScore === 'number'
-          ? awayScore
-          : '0'
-      );
-
-    if (
-      awayScoreInput === null
-    ) {
-      return false;
-    }
-
-
-    homeScore =
-      Number(homeScoreInput);
-
-    awayScore =
-      Number(awayScoreInput);
-
-
-    if (
-      Number.isNaN(homeScore) ||
-      Number.isNaN(awayScore) ||
-      homeScore < 0 ||
-      awayScore < 0
-    ) {
-
-      alert(
-        'Scores must be zero or greater.'
-      );
-
-      return false;
-
-    }
-
-  } else {
-
-    homeScore = null;
-
-    awayScore = null;
-
-  }
-
-
-  /* -------------------------------------------------------
-     YELLOW CARDS
-  ------------------------------------------------------- */
-
-  const homeYellowCardsInput =
-    prompt(
-      'Renfrew Juniors yellow cards:',
-      Number(
-        fixture.homeYellowCards || 0
-      )
-    );
-
-  if (
-    homeYellowCardsInput === null
-  ) {
-    return false;
-  }
-
-
-  const awayYellowCardsInput =
-    prompt(
-      `${opponent} yellow cards:`,
-      Number(
-        fixture.awayYellowCards || 0
-      )
-    );
-
-  if (
-    awayYellowCardsInput === null
-  ) {
-    return false;
-  }
-
-
-  /* -------------------------------------------------------
-     RED CARDS
-  ------------------------------------------------------- */
-
-  const homeRedCardsInput =
-    prompt(
-      'Renfrew Juniors red cards:',
-      Number(
-        fixture.homeRedCards || 0
-      )
-    );
-
-  if (
-    homeRedCardsInput === null
-  ) {
-    return false;
-  }
-
-
-  const awayRedCardsInput =
-    prompt(
-      `${opponent} red cards:`,
-      Number(
-        fixture.awayRedCards || 0
-      )
-    );
-
-  if (
-    awayRedCardsInput === null
-  ) {
-    return false;
-  }
-
-
-  const homeYellowCards =
-    Number(
-      homeYellowCardsInput
-    );
-
-  const awayYellowCards =
-    Number(
-      awayYellowCardsInput
-    );
-
-  const homeRedCards =
-    Number(
-      homeRedCardsInput
-    );
-
-  const awayRedCards =
-    Number(
-      awayRedCardsInput
-    );
-
-
-  /* -------------------------------------------------------
-     VALIDATE CARDS
-  ------------------------------------------------------- */
-
-  if (
-    [
-      homeYellowCards,
-      awayYellowCards,
-      homeRedCards,
-      awayRedCards
-    ].some(value =>
-      Number.isNaN(value) ||
-      value < 0
-    )
-  ) {
-
-    alert(
-      'Card counts must be zero or greater.'
-    );
-
-    return false;
-
-  }
-
-
-  /* -------------------------------------------------------
-     SAVE EVERYTHING
-  ------------------------------------------------------- */
-
-  try {
-
-    await updateDoc(
-      doc(
-        fixturesCollection,
-        fixture.id
-      ),
-      {
-
-        date,
-
-        opponent,
-
-        competition:
-          competition || 'Friendly',
-
-        location:
-          location || 'TBC',
-
-        status,
-
-        statusReason,
-
-        homeScore,
-
-        awayScore,
-
-        homeYellowCards,
-
-        homeRedCards,
-
-        awayYellowCards,
-
-        awayRedCards,
-
-        scorePostedAt:
-          status === 'played'
-            ? serverTimestamp()
-            : null
-
-      }
-    );
 
 
     alert(
