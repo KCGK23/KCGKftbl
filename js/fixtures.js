@@ -825,4 +825,82 @@ export async function editMatchReport(
 }
 
 
+/* =========================================================
+   UPDATE COMPLETE MATCH
+========================================================= */
 
+export async function updateMatch(fixtureId, values) {
+
+  // Extra security check — editor must be logged in
+  if (!auth.currentUser) {
+    throw new Error('Admin login required.');
+  }
+
+  if (!fixtureId) {
+    throw new Error('No fixture selected.');
+  }
+
+  const fixtureRef = doc(
+    fixturesCollection,
+    fixtureId
+  );
+
+  await updateDoc(fixtureRef, {
+
+    date: values.date,
+
+    opponent: values.opponent,
+
+    competition:
+      values.competition || 'Friendly',
+
+    location:
+      values.location || 'TBC',
+
+    homeScore:
+      values.homeScore === ''
+        ? null
+        : Number(values.homeScore),
+
+    awayScore:
+      values.awayScore === ''
+        ? null
+        : Number(values.awayScore),
+
+    /* TEAM CARDS */
+
+    homeYellowCards:
+      Number(values.homeYellowCards || 0),
+
+    homeRedCards:
+      Number(values.homeRedCards || 0),
+
+    awayYellowCards:
+      Number(values.awayYellowCards || 0),
+
+    awayRedCards:
+      Number(values.awayRedCards || 0),
+
+    /* KYLE'S CARDS */
+
+    playerYellowCards:
+      Number(values.playerYellowCards || 0),
+
+    playerRedCards:
+      Number(values.playerRedCards || 0),
+
+    /* OTHER MATCH INFORMATION */
+
+    manOfTheMatch:
+      Boolean(values.manOfTheMatch),
+
+    report:
+      values.report || '',
+
+    updatedAt:
+      serverTimestamp()
+
+  });
+
+  return true;
+}
