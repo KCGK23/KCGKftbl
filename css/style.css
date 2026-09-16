@@ -1564,3 +1564,193 @@ body{
 
 .site-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;padding:14px 20px;background:rgba(7,19,40,.45);border-bottom:1px solid rgba(255,255,255,.1)}
 .site-nav a{padding:9px 15px;border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;font-weight:700;text-decoration:none}.site-nav a:hover,.site-nav a[aria-current="page"]{background:linear-gradient(135deg,#4f9dff,#2c7cff);border-color:transparent}
+
+```css
+/* =========================================================
+   TEAM CARD COUNTS
+========================================================= */
+
+.team-card-counts {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  min-height: 22px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.yellow-card-count,
+.red-card-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+}
+
+.yellow-card-count {
+  color: #b88600;
+}
+
+.red-card-count {
+  color: #c62828;
+}
+
+
+/* =========================================================
+   FIXTURE STATUS NOTICE
+========================================================= */
+
+.fixture-status-notice {
+  margin: 14px auto 0;
+  padding: 10px 14px;
+  max-width: 90%;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: rgba(255, 193, 7, 0.12);
+}
+
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+.fixture-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+
+/* =========================================================
+   FIXTURE ACTION BUTTONS
+========================================================= */
+
+.fixture-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.fixture-actions button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.fixture-actions button:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+.fixture-actions button:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   REPORT BUTTON
+========================================================= */
+
+.view-report-button {
+  display: block;
+  margin: 14px auto 0;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   MOTM BADGE
+========================================================= */
+
+.motm-badge {
+  display: block;
+  width: fit-content;
+  margin: 14px auto 0;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   MATCH REPORT
+========================================================= */
+
+.match-report {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.match-report h5 {
+  margin: 0 0 7px;
+}
+
+.match-report p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* =========================================================
+   MOBILE FIXTURE STYLING
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .fixture-matchup {
+    gap: 8px;
+  }
+
+  .fixture-team h4 {
+    font-size: 0.9rem;
+  }
+
+  .team-card-counts {
+    gap: 6px;
+    font-size: 0.78rem;
+    margin-top: 5px;
+  }
+
+  .fixture-status {
+    font-size: 0.65rem;
+    padding: 4px 8px;
+  }
+
+  .fixture-actions {
+    gap: 6px;
+  }
+
+  .fixture-actions button {
+    padding: 7px 9px;
+    font-size: 0.75rem;
+  }
+
+}
+```
