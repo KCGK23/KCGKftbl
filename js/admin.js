@@ -542,15 +542,10 @@ async function saveCompleteMatch() {
         'editAwayRed'
       ).value,
 
-    playerYellowCards:
-      document.getElementById(
-        'editPlayerYellow'
-      ).value,
-
-    playerRedCards:
-      document.getElementById(
-        'editPlayerRed'
-      ).value,
+    playerCard:
+  document.querySelector(
+    'input[name="kyleCard"]:checked'
+  )?.value || 'none',
 
     manOfTheMatch:
       document.getElementById(
