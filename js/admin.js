@@ -351,12 +351,7 @@ function loadSelectedMatch() {
     );
 
 const playerCard =
-  fixture.playerCard ||
-  (Number(fixture.playerRedCards || 0) > 0
-    ? 'red'
-    : Number(fixture.playerYellowCards || 0) > 0
-      ? 'yellow'
-      : 'none');
+  fixture.playerCard || 'none';
 
 document.getElementById('editPlayerNoCard').checked =
   playerCard === 'none';

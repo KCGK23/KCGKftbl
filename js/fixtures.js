@@ -201,12 +201,7 @@ export function createFixtureItem(fixture) {
     Number(fixture.awayRedCards || 0);
 
     const playerCard =
-  fixture.playerCard ||
-  (Number(fixture.playerRedCards || 0) > 0
-    ? 'red'
-    : Number(fixture.playerYellowCards || 0) > 0
-      ? 'yellow'
-      : 'none');
+  fixture.playerCard || 'none';
 
 const playerCardDisplay =
   playerCard === 'yellow'
