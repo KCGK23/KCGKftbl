@@ -61,10 +61,10 @@ export async function loadFixtures() {
       )
     );
 
-    fixtures = snapshot.docs.map(item => ({
-      id: item.id,
-      ...item.data()
-    }));
+   fixtures = snapshot.docs.map(doc => ({
+  id: doc.id,
+  ...doc.data()
+}));
 
   } catch (error) {
     console.warn(
