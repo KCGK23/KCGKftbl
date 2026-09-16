@@ -825,6 +825,4 @@ export async function editMatchReport(
 }
 
 
-```js
-  }
-}
+
