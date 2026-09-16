@@ -431,12 +431,16 @@ function clearMatchEditor() {
   ).value = 0;
 
   document.getElementById(
-    'editPlayerYellow'
-  ).value = 0;
+  'editPlayerNoCard'
+).checked = true;
 
-  document.getElementById(
-    'editPlayerRed'
-  ).value = 0;
+document.getElementById(
+  'editPlayerYellow'
+).checked = false;
+
+document.getElementById(
+  'editPlayerRed'
+).checked = false;
 
   document.getElementById(
     'editManOfTheMatch'
