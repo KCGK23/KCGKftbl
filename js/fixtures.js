@@ -172,11 +172,13 @@ export function createFixtureItem(fixture) {
     'fixture-item';
 
 
-  const homeLogo =
-    fixture.homeLogoUrl ||
-    fixture.homeLogo ||
-    '../assets/images/team-logo.png';
+  const DEFAULT_HOME_LOGO =
+  new URL('../assets/images/team-logo.png', import.meta.url).href;
 
+const homeLogo =
+  fixture.homeLogoUrl ||
+  fixture.homeLogo ||
+  DEFAULT_HOME_LOGO;
 
   const opponentLogo =
     fixture.opponentLogoUrl ||
