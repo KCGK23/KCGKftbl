@@ -50,3 +50,13 @@ export async function loadPlayerStats() {
   }
 }
 export function enableStatsToggle() { const button = document.getElementById('statsButton'); const section = document.getElementById('statsSection'); if (button && section) button.addEventListener('click', () => { const hidden = section.style.display === 'none' || !section.style.display; section.style.display = hidden ? 'block' : 'none'; button.textContent = hidden ? 'Hide Stats' : 'Show Stats'; }); }
+
+export async function savePlayerStats(values) {
+  if (!auth.currentUser) {
+    throw new Error('You must be logged in to save player stats.');
+  }
+
+  await setDoc(statsDocRef, values, { merge: true });
+
+  return loadPlayerStats();
+}
