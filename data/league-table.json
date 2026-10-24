@@ -1,7 +1,7 @@
 {
   "source": "https://www.pjdyfl.co.uk/leaguetablefeed/1058",
   "league": "2026/2027 - PJDYFL 2011 Division 3",
-  "updatedAt": "2026-10-24T12:07:53.601060+00:00",
+  "updatedAt": "2026-10-24T16:06:57.342593+00:00",
   "myTeam": "Renfrew Football Club Blue (2011)",
   "teams": [
     {
@@ -30,6 +30,18 @@
     },
     {
       "position": 3,
+      "club": "Ardgowan Thistle FC (2011)",
+      "played": 6,
+      "won": 4,
+      "drawn": 1,
+      "lost": 1,
+      "goalsFor": null,
+      "goalsAgainst": null,
+      "goalDifference": null,
+      "points": 13
+    },
+    {
+      "position": 4,
       "club": "Harmony Row YC Athletic (2011)",
       "played": 7,
       "won": 4,
@@ -41,7 +53,7 @@
       "points": 13
     },
     {
-      "position": 4,
+      "position": 5,
       "club": "Erskine Youth F C (Utd) (2011)",
       "played": 6,
       "won": 4,
@@ -53,28 +65,16 @@
       "points": 12
     },
     {
-      "position": 5,
-      "club": "Ardgowan Thistle FC (2011)",
-      "played": 5,
-      "won": 4,
-      "drawn": 0,
-      "lost": 1,
-      "goalsFor": null,
-      "goalsAgainst": null,
-      "goalDifference": null,
-      "points": 12
-    },
-    {
       "position": 6,
       "club": "Irvine Meadow (2011)",
-      "played": 5,
+      "played": 6,
       "won": 2,
-      "drawn": 2,
+      "drawn": 3,
       "lost": 1,
       "goalsFor": null,
       "goalsAgainst": null,
       "goalDifference": null,
-      "points": 8
+      "points": 9
     },
     {
       "position": 7,
