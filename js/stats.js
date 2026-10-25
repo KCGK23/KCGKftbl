@@ -1,5 +1,9 @@
 import { auth, statsDocRef, getDoc, setDoc } from './firebase.js';
-import { loadFixtures } from './fixtures.js';
+import {
+  getGoalsConcededWhilePlaying,
+  isGoalkeeperAppearance,
+  loadFixtures
+} from './fixtures.js';
 
 function getPlayerCard(fixture) {
   return fixture.playerCard || 'none';
@@ -15,41 +19,6 @@ export function calculateCardTotals(fixtures = []) {
       fixture => getPlayerCard(fixture) === 'red'
     ).length
   };
-}
-
-export function isGoalkeeperAppearance(fixture) {
-  // Legacy fixtures predate appearance tracking and retain their old full-match meaning.
-  return fixture.goalkeeperParticipation !== 'none';
-}
-
-export function getGoalsConcededWhilePlaying(fixture) {
-  const conceded = Math.max(0, Number(fixture.awayScore) || 0);
-  if (!conceded || fixture.goalkeeperParticipation === 'none') return 0;
-
-  const participation = fixture.goalkeeperParticipation || 'full';
-  const scoreAtSubstitution = fixture.opponentScoreAtSubstitution;
-  if (Number.isFinite(Number(scoreAtSubstitution)) && scoreAtSubstitution !== null && scoreAtSubstitution !== '') {
-    return participation === 'subbed-on'
-      ? Math.max(0, conceded - Number(scoreAtSubstitution))
-      : participation === 'subbed-off'
-        ? Math.min(conceded, Number(scoreAtSubstitution))
-        : conceded;
-  }
-
-  // Support fixtures saved with the earlier goal-minute version of this editor.
-  const start = participation === 'subbed-on'
-    ? Number(fixture.goalkeeperEntryMinute ?? 0)
-    : 0;
-  const end = participation === 'subbed-off'
-    ? Number(fixture.goalkeeperExitMinute ?? 90)
-    : 150;
-  const minutes = Array.isArray(fixture.opponentGoalMinutes)
-    ? fixture.opponentGoalMinutes.map(Number).filter(Number.isFinite)
-    : null;
-
-  // Without event data, preserve the historic score-based total.
-  if (minutes === null || minutes.length !== conceded) return conceded;
-  return minutes.filter(minute => minute >= start && minute <= end).length;
 }
 
 export function updateSeasonStats(fixtures) {

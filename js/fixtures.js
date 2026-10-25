@@ -19,6 +19,41 @@ const DEFAULT_OPPONENT_LOGO =
 
 let currentFixtures = [];
 
+export function isGoalkeeperAppearance(fixture) {
+  // Legacy fixtures predate appearance tracking and retain their old full-match meaning.
+  return fixture.goalkeeperParticipation !== 'none';
+}
+
+export function getGoalsConcededWhilePlaying(fixture) {
+  const conceded = Math.max(0, Number(fixture.awayScore) || 0);
+  if (!conceded || fixture.goalkeeperParticipation === 'none') return 0;
+
+  const participation = fixture.goalkeeperParticipation || 'full';
+  const scoreAtSubstitution = fixture.opponentScoreAtSubstitution;
+  if (Number.isFinite(Number(scoreAtSubstitution)) && scoreAtSubstitution !== null && scoreAtSubstitution !== '') {
+    return participation === 'subbed-on'
+      ? Math.max(0, conceded - Number(scoreAtSubstitution))
+      : participation === 'subbed-off'
+        ? Math.min(conceded, Number(scoreAtSubstitution))
+        : conceded;
+  }
+
+  // Support fixtures saved with the earlier goal-minute version of this editor.
+  const start = participation === 'subbed-on'
+    ? Number(fixture.goalkeeperEntryMinute ?? 0)
+    : 0;
+  const end = participation === 'subbed-off'
+    ? Number(fixture.goalkeeperExitMinute ?? 90)
+    : 150;
+  const minutes = Array.isArray(fixture.opponentGoalMinutes)
+    ? fixture.opponentGoalMinutes.map(Number).filter(Number.isFinite)
+    : null;
+
+  // Without event data, preserve the historic score-based total.
+  if (minutes === null || minutes.length !== conceded) return conceded;
+  return minutes.filter(minute => minute >= start && minute <= end).length;
+}
+
 
 /* =========================================================
    LOCAL FIXTURES
@@ -164,6 +199,21 @@ export function createFixtureItem(fixture) {
     abandoned: 'ABANDONED'
   };
   const statusLabel = statusLabels[fixtureStatus] || statusLabels.upcoming;
+  const goalkeeperAppearance = scoreText && fixtureStatus === 'completed'
+    ? (() => {
+        const participation = fixture.goalkeeperParticipation || 'full';
+        const labels = {
+          full: 'Played full game',
+          'subbed-on': 'Subbed on',
+          'subbed-off': 'Subbed off',
+          none: 'Did not play'
+        };
+        const played = isGoalkeeperAppearance(fixture);
+        const conceded = getGoalsConcededWhilePlaying(fixture);
+        const concededText = conceded === 1 ? '1 goal conceded' : `${conceded} goals conceded`;
+        return `<div class="goalkeeper-appearance-badge"><strong>🧤 Kyle: ${labels[participation] || labels.full}</strong>${played ? `<span>${concededText} while playing</span>` : ''}</div>`;
+      })()
+    : '';
 
   let scoreClass = '';
 
@@ -389,6 +439,7 @@ ${playerCardDisplay}
 
     </div>
 
+    ${goalkeeperAppearance}
 
     ${
       fixture.manOfTheMatch === true
