@@ -127,6 +127,26 @@ export async function loadFixtures() {
    FILTERS
 ========================================================= */
 
+function getFixtureTimestamp(fixture) {
+  const date = String(fixture.date || '').trim();
+  const isoDate = date.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  const ukDate = date.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  let timestamp = 0;
+
+  if (isoDate) {
+    timestamp = Date.UTC(Number(isoDate[1]), Number(isoDate[2]) - 1, Number(isoDate[3]));
+  } else if (ukDate) {
+    timestamp = Date.UTC(Number(ukDate[3]), Number(ukDate[2]) - 1, Number(ukDate[1]));
+  } else {
+    const parsed = Date.parse(date);
+    if (Number.isFinite(parsed)) timestamp = parsed;
+  }
+
+  const time = String(fixture.time || '').match(/^(\d{1,2}):(\d{2})/);
+  if (time) timestamp += (Number(time[1]) * 60 + Number(time[2])) * 60_000;
+  return timestamp;
+}
+
 export function filterFixtures(
   fixtures,
   filter
@@ -154,7 +174,7 @@ export function filterFixtures(
           : 'upcoming'
       );
       return status === 'completed';
-    });
+    }).sort((a, b) => getFixtureTimestamp(b) - getFixtureTimestamp(a));
   }
 
   if (filter === 'league') {
