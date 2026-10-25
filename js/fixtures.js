@@ -98,17 +98,27 @@ export function filterFixtures(
 ) {
 
   if (filter === 'upcoming') {
-    return fixtures.filter(fixture =>
-      typeof fixture.homeScore !== 'number' ||
-      typeof fixture.awayScore !== 'number'
-    );
+    return fixtures.filter(fixture => {
+      const status = fixture.status || (
+        typeof fixture.homeScore === 'number' &&
+        typeof fixture.awayScore === 'number'
+          ? 'completed'
+          : 'upcoming'
+      );
+      return status === 'upcoming';
+    });
   }
 
   if (filter === 'results') {
-    return fixtures.filter(fixture =>
-      typeof fixture.homeScore === 'number' &&
-      typeof fixture.awayScore === 'number'
-    );
+    return fixtures.filter(fixture => {
+      const status = fixture.status || (
+        typeof fixture.homeScore === 'number' &&
+        typeof fixture.awayScore === 'number'
+          ? 'completed'
+          : 'upcoming'
+      );
+      return status === 'completed';
+    });
   }
 
   if (filter === 'league') {
@@ -142,6 +152,17 @@ export function createFixtureItem(fixture) {
   const scoreText =
     typeof fixture.homeScore === 'number' &&
     typeof fixture.awayScore === 'number';
+
+  const fixtureStatus = fixture.status || (
+    scoreText ? 'completed' : 'upcoming'
+  );
+  const statusLabels = {
+    upcoming: 'UPCOMING FIXTURE',
+    completed: 'COMPLETED',
+    postponed: 'POSTPONED',
+    abandoned: 'ABANDONED'
+  };
+  const statusLabel = statusLabels[fixtureStatus] || statusLabels.upcoming;
 
   let scoreClass = '';
 
@@ -268,12 +289,8 @@ const playerCardDisplay =
 
     <div class="fixture-card-header">
 
-      <span class="fixture-status">
-        ${
-          scoreText
-            ? 'FULL TIME'
-            : 'UPCOMING FIXTURE'
-        }
+      <span class="fixture-status fixture-status--${fixtureStatus}">
+        ${statusLabel}
       </span>
 
       <span class="fixture-competition">
@@ -622,6 +639,8 @@ export async function addFixture({
     location:
       location || 'TBC',
 
+    status: 'upcoming',
+
     manOfTheMatch:
       false,
 
@@ -869,6 +888,9 @@ export async function updateMatch(fixtureId, values) {
 
     location:
       values.location || 'TBC',
+
+    status:
+      values.status || 'upcoming',
 
     homeScore:
       values.homeScore === ''
