@@ -20,7 +20,9 @@ import {
   loadPlayerStats,
   savePlayerStats,
   loadSeasonSettings,
-  saveSeasonSettings
+  saveSeasonSettings,
+  deleteSeason,
+  getSeasonNames
 } from './stats.js';
 
 import {
@@ -29,6 +31,26 @@ import {
   addMatchRow,
   saveTournament
 } from './tournaments.js';
+
+let currentSeasonSettings = {};
+
+function populateSeasonManager(fixtures, settings) {
+  currentSeasonSettings = settings;
+  const selector = document.getElementById('editSeasonSelector');
+  if (!selector) return;
+  selector.innerHTML = '<option value="">+ New season</option>';
+  getSeasonNames(fixtures, settings).forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    const status = settings.seasonStatuses?.[name] ||
+      (name === settings.seasonName ? settings.seasonStatus : 'ended');
+    option.textContent = `${name} · ${status === 'active' ? 'In progress' : 'Ended'}`;
+    selector.append(option);
+  });
+  selector.value = settings.seasonName || '';
+  document.getElementById('editSeasonName').value = settings.seasonName || '';
+  document.getElementById('editSeasonStatus').value = settings.seasonStatus || 'active';
+}
 
 
 /* =========================================================
@@ -150,6 +172,12 @@ async function refresh() {
     fixtures
   );
 
+  try {
+    const seasonSettings = await loadSeasonSettings();
+    populateSeasonManager(fixtures, seasonSettings);
+  } catch (error) {
+    console.warn('Unable to load season settings:', error);
+  }
 
   await loadTournaments();
 
@@ -1077,6 +1105,7 @@ export function initAdmin() {
   document.getElementById('saveSeasonSettingsButton')
     ?.addEventListener('click', async () => {
       const message = document.getElementById('seasonSettingsMessage');
+      const targetSeasonName = document.getElementById('editSeasonSelector').value;
       const seasonName = document.getElementById('editSeasonName').value.trim();
       const seasonStatus = document.getElementById('editSeasonStatus').value;
       if (!auth.currentUser) return;
@@ -1085,10 +1114,41 @@ export function initAdmin() {
         return;
       }
       try {
-        await saveSeasonSettings({ seasonName, seasonStatus });
+        await saveSeasonSettings({ targetSeasonName, seasonName, seasonStatus });
         message.textContent = 'Season settings saved.';
+        await refresh();
       } catch (error) {
         message.textContent = error.message || 'Unable to save season settings.';
+      }
+    });
+
+  document.getElementById('editSeasonSelector')
+    ?.addEventListener('change', event => {
+      const name = event.target.value;
+      document.getElementById('editSeasonName').value = name;
+      document.getElementById('editSeasonStatus').value = name
+        ? currentSeasonSettings.seasonStatuses?.[name] ||
+          (name === currentSeasonSettings.seasonName ? currentSeasonSettings.seasonStatus : 'ended')
+        : 'active';
+    });
+
+  document.getElementById('deleteSeasonButton')
+    ?.addEventListener('click', async () => {
+      const selector = document.getElementById('editSeasonSelector');
+      const seasonName = selector.value;
+      const message = document.getElementById('seasonSettingsMessage');
+      if (!auth.currentUser) return;
+      if (!seasonName) {
+        message.textContent = 'Select a season to remove.';
+        return;
+      }
+      if (!confirm(`Remove ${seasonName} from the season list? Match results will be kept.`)) return;
+      try {
+        await deleteSeason(seasonName);
+        message.textContent = 'Season removed. Match results were kept.';
+        await refresh();
+      } catch (error) {
+        message.textContent = error.message || 'Unable to remove season.';
       }
     });
 
@@ -1162,10 +1222,6 @@ export function initAdmin() {
   /* INITIAL LOAD */
 
   loadPlayerStats();
-  loadSeasonSettings().then(settings => {
-    document.getElementById('editSeasonName').value = settings.seasonName;
-    document.getElementById('editSeasonStatus').value = settings.seasonStatus;
-  }).catch(() => {});
 
   syncUi();
 

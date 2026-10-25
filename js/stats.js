@@ -32,41 +32,128 @@ export function calculateCardTotals(fixtures = []) {
 export async function loadSeasonSettings() {
   const snapshot = await getDoc(statsDocRef);
   const data = snapshot.exists() ? snapshot.data() : {};
+  const seasonStatuses = Object.fromEntries(
+    (Array.isArray(data.seasonStatusRecords) ? data.seasonStatusRecords : [])
+      .map(record => [record.name, record.status])
+  );
+  if (data.currentSeasonName && !seasonStatuses[data.currentSeasonName]) {
+    seasonStatuses[data.currentSeasonName] = data.seasonStatus || 'active';
+  }
   return {
     seasonName: data.currentSeasonName || '',
-    seasonStatus: data.seasonStatus || 'active'
+    seasonStatus: data.seasonStatus || 'active',
+    seasonStatuses
   };
 }
 
-export async function saveSeasonSettings({ seasonName, seasonStatus }) {
+export async function saveSeasonSettings({ targetSeasonName = '', seasonName, seasonStatus }) {
   if (!auth.currentUser) {
     throw new Error('You must be logged in to save season settings.');
   }
+  seasonName = String(seasonName || '').trim();
+  if (!seasonName) throw new Error('Enter a season name.');
+
   const current = await getDoc(statsDocRef);
   const currentData = current.exists() ? current.data() : {};
-  if (!currentData.currentSeasonName && seasonName.trim()) {
-    const fixtures = await getDocs(fixturesCollection);
+  const oldName = targetSeasonName;
+  const fixtures = await getDocs(fixturesCollection);
+  const fixtureNames = new Set(fixtures.docs.map(fixture => fixture.data().season).filter(Boolean));
+  if (oldName && seasonName !== oldName && fixtureNames.has(seasonName)) {
+    throw new Error('A season with that name already exists.');
+  }
+
+  if (!currentData.currentSeasonName && !oldName) {
     await Promise.all(fixtures.docs
       .filter(fixture => !fixture.data().season)
-      .map(fixture => updateDoc(fixture.ref, { season: seasonName.trim() })));
+      .map(fixture => updateDoc(fixture.ref, { season: seasonName })));
+  } else if (oldName && seasonName !== oldName) {
+    await Promise.all(fixtures.docs
+      .filter(fixture => fixture.data().season === oldName)
+      .map(fixture => updateDoc(fixture.ref, { season: seasonName })));
   }
+
+  const seasonStatuses = Object.fromEntries(
+    (Array.isArray(currentData.seasonStatusRecords) ? currentData.seasonStatusRecords : [])
+      .map(record => [record.name, record.status])
+  );
+  if (oldName && seasonName !== oldName) delete seasonStatuses[oldName];
+  seasonStatuses[seasonName] = seasonStatus;
+
+  let currentSeasonName = currentData.currentSeasonName || '';
+  if (oldName && currentSeasonName === oldName) currentSeasonName = seasonName;
+  if (seasonStatus === 'active') {
+    if (currentSeasonName && currentSeasonName !== seasonName) {
+      seasonStatuses[currentSeasonName] = 'ended';
+    }
+    currentSeasonName = seasonName;
+  }
+  if (!currentSeasonName) currentSeasonName = seasonName;
+
   await setDoc(statsDocRef, {
-    currentSeasonName: seasonName.trim(),
-    seasonStatus
+    currentSeasonName,
+    seasonStatus: seasonStatuses[currentSeasonName] || 'active',
+    seasonStatusRecords: Object.entries(seasonStatuses)
+      .map(([name, status]) => ({ name, status }))
   }, { merge: true });
   return loadSeasonSettings();
+}
+
+export async function deleteSeason(seasonName) {
+  if (!auth.currentUser) {
+    throw new Error('You must be logged in to manage seasons.');
+  }
+  if (!seasonName) throw new Error('Select a season to remove.');
+
+  const [settingsSnapshot, fixtureSnapshot] = await Promise.all([
+    getDoc(statsDocRef),
+    getDocs(fixturesCollection)
+  ]);
+  const currentData = settingsSnapshot.exists() ? settingsSnapshot.data() : {};
+  await Promise.all(fixtureSnapshot.docs
+    .filter(fixture => fixture.data().season === seasonName)
+    .map(fixture => updateDoc(fixture.ref, { season: null })));
+
+  const seasonStatuses = Object.fromEntries(
+    (Array.isArray(currentData.seasonStatusRecords) ? currentData.seasonStatusRecords : [])
+      .filter(record => record.name !== seasonName)
+      .map(record => [record.name, record.status])
+  );
+  const remainingNames = new Set(fixtureSnapshot.docs
+    .filter(fixture => fixture.data().season && fixture.data().season !== seasonName)
+    .map(fixture => fixture.data().season));
+  const previousCurrentSeason = currentData.currentSeasonName;
+  if (previousCurrentSeason && previousCurrentSeason !== seasonName) remainingNames.add(previousCurrentSeason);
+  const nextCurrentSeasonName = previousCurrentSeason === seasonName
+    ? [...remainingNames].sort((a, b) => b.localeCompare(a))[0] || ''
+    : previousCurrentSeason || '';
+  if (nextCurrentSeasonName && !seasonStatuses[nextCurrentSeasonName]) {
+    seasonStatuses[nextCurrentSeasonName] = 'ended';
+  }
+
+  await setDoc(statsDocRef, {
+    currentSeasonName: nextCurrentSeasonName,
+    seasonStatus: nextCurrentSeasonName
+      ? seasonStatuses[nextCurrentSeasonName]
+      : 'active',
+    seasonStatusRecords: Object.entries(seasonStatuses)
+      .map(([name, status]) => ({ name, status }))
+  }, { merge: true });
+  return loadSeasonSettings();
+}
+
+export function getSeasonNames(fixtures, settings = {}) {
+  const names = [...new Set(fixtures.map(fixture => fixture.season).filter(Boolean))];
+  if (settings.seasonName && !names.includes(settings.seasonName)) {
+    names.push(settings.seasonName);
+  }
+  return names.sort((a, b) => b.localeCompare(a));
 }
 
 export function populateSeasonSelector(fixtures, settings = {}) {
   const selector = document.getElementById('seasonSelector');
   if (!selector) return;
 
-  const seasonNames = [...new Set(
-    fixtures.map(fixture => fixture.season).filter(Boolean)
-  )].sort((a, b) => b.localeCompare(a));
-  if (settings.seasonName && !seasonNames.includes(settings.seasonName)) {
-    seasonNames.unshift(settings.seasonName);
-  }
+  const seasonNames = getSeasonNames(fixtures, settings);
 
   selector.innerHTML = '';
   const currentOption = document.createElement('option');
@@ -81,7 +168,8 @@ export function populateSeasonSelector(fixtures, settings = {}) {
     .forEach(name => {
       const option = document.createElement('option');
       option.value = name;
-      option.textContent = `${name} · Ended`;
+      const status = settings.seasonStatuses?.[name] || 'ended';
+      option.textContent = `${name} · ${status === 'active' ? 'In progress' : 'Ended'}`;
       selector.append(option);
     });
   selector.value = settings.seasonName || '';
@@ -101,9 +189,8 @@ export function updateSeasonStats(fixtures, settings = {}) {
   const heading = document.getElementById('seasonStatsHeading');
   if (heading) heading.textContent = selectedSeasonName ? `Season Stats · ${selectedSeasonName}` : 'Season Stats';
   const seasonState = document.getElementById('seasonState');
-  const selectedSeasonStatus = selectedSeasonName === settings.seasonName
-    ? settings.seasonStatus
-    : 'ended';
+  const selectedSeasonStatus = settings.seasonStatuses?.[selectedSeasonName] ||
+    (selectedSeasonName === settings.seasonName ? settings.seasonStatus : 'ended');
   if (seasonState) {
     seasonState.textContent = selectedSeasonStatus === 'ended'
       ? 'Season ended'

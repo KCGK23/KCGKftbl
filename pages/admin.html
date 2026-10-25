@@ -440,8 +440,14 @@
 
 
         <h4>Season Settings</h4>
-        <p>When this season ends, enter its name and choose Season ended. The first season name you save will keep the existing fixtures with that season. When the next season begins, change the name and choose In progress; new fixtures will then count toward the new season only.</p>
+        <p>Select a season to edit or remove it. You can rename seasons or change their status for testing. Removing a season only removes its label from fixtures; match results remain saved.</p>
         <div class="fixture-row">
+          <label>
+            Season to edit
+            <select id="editSeasonSelector">
+              <option value="">+ New season</option>
+            </select>
+          </label>
           <label>
             Season name
             <input id="editSeasonName" placeholder="e.g. 2027/28">
@@ -454,7 +460,10 @@
             </select>
           </label>
         </div>
-        <button id="saveSeasonSettingsButton" class="secondary-button" type="button">Save Season Settings</button>
+        <div class="fixture-access-buttons">
+          <button id="saveSeasonSettingsButton" class="secondary-button" type="button">Save Season Settings</button>
+          <button id="deleteSeasonButton" class="delete-fixture-button" type="button">Remove Selected Season</button>
+        </div>
         <p id="seasonSettingsMessage" class="fixture-message"></p>
 
         <button
