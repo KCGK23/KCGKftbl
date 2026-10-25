@@ -22,7 +22,8 @@ import {
   loadSeasonSettings,
   saveSeasonSettings,
   deleteSeason,
-  getSeasonNames
+  getSeasonNames,
+  UNASSIGNED_SEASON_KEY
 } from './stats.js';
 
 import {
@@ -47,7 +48,14 @@ function populateSeasonManager(fixtures, settings) {
     option.textContent = `${name} · ${status === 'active' ? 'In progress' : 'Ended'}`;
     selector.append(option);
   });
+  if (fixtures.some(fixture => !fixture.season)) {
+    const option = document.createElement('option');
+    option.value = UNASSIGNED_SEASON_KEY;
+    option.textContent = 'Unassigned / legacy matches';
+    selector.append(option);
+  }
   selector.value = settings.seasonName || '';
+  document.getElementById('deleteSeasonButton').disabled = !selector.value;
   document.getElementById('editSeasonName').value = settings.seasonName || '';
   document.getElementById('editSeasonStatus').value = settings.seasonStatus || 'active';
 }
@@ -1125,11 +1133,13 @@ export function initAdmin() {
   document.getElementById('editSeasonSelector')
     ?.addEventListener('change', event => {
       const name = event.target.value;
-      document.getElementById('editSeasonName').value = name;
-      document.getElementById('editSeasonStatus').value = name
+      const isUnassigned = name === UNASSIGNED_SEASON_KEY;
+      document.getElementById('editSeasonName').value = isUnassigned ? '' : name;
+      document.getElementById('editSeasonStatus').value = isUnassigned ? 'active' : name
         ? currentSeasonSettings.seasonStatuses?.[name] ||
           (name === currentSeasonSettings.seasonName ? currentSeasonSettings.seasonStatus : 'ended')
         : 'active';
+      document.getElementById('deleteSeasonButton').disabled = !name || isUnassigned;
     });
 
   document.getElementById('deleteSeasonButton')
@@ -1138,7 +1148,7 @@ export function initAdmin() {
       const seasonName = selector.value;
       const message = document.getElementById('seasonSettingsMessage');
       if (!auth.currentUser) return;
-      if (!seasonName) {
+      if (!seasonName || seasonName === UNASSIGNED_SEASON_KEY) {
         message.textContent = 'Select a season to remove.';
         return;
       }

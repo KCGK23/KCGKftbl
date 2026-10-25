@@ -13,6 +13,8 @@ import {
   loadFixtures
 } from './fixtures.js';
 
+export const UNASSIGNED_SEASON_KEY = '__unassigned__';
+
 function getPlayerCard(fixture) {
   return fixture.playerCard || 'none';
 }
@@ -55,14 +57,15 @@ export async function saveSeasonSettings({ targetSeasonName = '', seasonName, se
 
   const current = await getDoc(statsDocRef);
   const currentData = current.exists() ? current.data() : {};
-  const oldName = targetSeasonName;
+  const isUnassigned = targetSeasonName === UNASSIGNED_SEASON_KEY;
+  const oldName = isUnassigned ? '' : targetSeasonName;
   const fixtures = await getDocs(fixturesCollection);
   const fixtureNames = new Set(fixtures.docs.map(fixture => fixture.data().season).filter(Boolean));
   if (oldName && seasonName !== oldName && fixtureNames.has(seasonName)) {
     throw new Error('A season with that name already exists.');
   }
 
-  if (!currentData.currentSeasonName && !oldName) {
+  if (isUnassigned || (!currentData.currentSeasonName && !oldName)) {
     await Promise.all(fixtures.docs
       .filter(fixture => !fixture.data().season)
       .map(fixture => updateDoc(fixture.ref, { season: seasonName })));
@@ -172,6 +175,12 @@ export function populateSeasonSelector(fixtures, settings = {}) {
       option.textContent = `${name} · ${status === 'active' ? 'In progress' : 'Ended'}`;
       selector.append(option);
     });
+  if (fixtures.some(fixture => !fixture.season)) {
+    const option = document.createElement('option');
+    option.value = UNASSIGNED_SEASON_KEY;
+    option.textContent = 'Unassigned / legacy matches';
+    selector.append(option);
+  }
   selector.value = settings.seasonName || '';
 }
 
@@ -179,26 +188,37 @@ export function updateSeasonStats(fixtures, settings = {}) {
   const selectedSeasonName = Object.hasOwn(settings, 'selectedSeasonName')
     ? settings.selectedSeasonName
     : settings.seasonName;
-  const seasonFixtures = selectedSeasonName
-    ? fixtures.filter(item => item.season === selectedSeasonName)
-    : fixtures;
+  const showingUnassigned = selectedSeasonName === UNASSIGNED_SEASON_KEY;
+  const seasonFixtures = showingUnassigned
+    ? fixtures.filter(item => !item.season)
+    : selectedSeasonName
+      ? fixtures.filter(item => item.season === selectedSeasonName)
+      : fixtures;
   const completed = seasonFixtures.filter(item => typeof item.homeScore === 'number' && typeof item.awayScore === 'number' && item.competition?.toLowerCase().includes('league'));
   const appearances = completed.filter(isGoalkeeperAppearance);
   const values = [appearances.length, appearances.filter(item => item.homeScore > item.awayScore).length, appearances.filter(item => item.homeScore === item.awayScore).length, appearances.filter(item => item.homeScore < item.awayScore).length, appearances.filter(item => getGoalsConcededWhilePlaying(item) === 0).length, appearances.reduce((total, item) => total + getGoalsConcededWhilePlaying(item), 0)];
   ['statPlayed', 'statWins', 'statDraws', 'statLosses', 'statCleanSheets', 'statConceded'].forEach((id, index) => { const element = document.getElementById(id); if (element) element.textContent = values[index]; });
   const heading = document.getElementById('seasonStatsHeading');
-  if (heading) heading.textContent = selectedSeasonName ? `Season Stats · ${selectedSeasonName}` : 'Season Stats';
+  if (heading) heading.textContent = showingUnassigned
+    ? 'Season Stats · Unassigned matches'
+    : selectedSeasonName
+      ? `Season Stats · ${selectedSeasonName}`
+      : 'Season Stats';
   const seasonState = document.getElementById('seasonState');
-  const selectedSeasonStatus = settings.seasonStatuses?.[selectedSeasonName] ||
-    (selectedSeasonName === settings.seasonName ? settings.seasonStatus : 'ended');
+  const selectedSeasonStatus = showingUnassigned
+    ? 'unassigned'
+    : settings.seasonStatuses?.[selectedSeasonName] ||
+      (selectedSeasonName === settings.seasonName ? settings.seasonStatus : 'ended');
   if (seasonState) {
-    seasonState.textContent = selectedSeasonStatus === 'ended'
-      ? 'Season ended'
-      : selectedSeasonName && appearances.length === 0
-        ? 'Season in progress · no appearances yet, 0 goals conceded'
-        : selectedSeasonName
-          ? 'Season in progress'
-          : 'Current season';
+    seasonState.textContent = selectedSeasonStatus === 'unassigned'
+      ? 'These fixtures are not assigned to a season'
+      : selectedSeasonStatus === 'ended'
+        ? 'Season ended'
+        : selectedSeasonName && appearances.length === 0
+          ? 'Season in progress · no appearances yet, 0 goals conceded'
+          : selectedSeasonName
+            ? 'Season in progress'
+            : 'Current season';
   }
   const form = document.getElementById('formMessage'); if (!form) return;
   const games = [...appearances].sort((a, b) => String(b.date).localeCompare(String(a.date)));
