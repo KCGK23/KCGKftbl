@@ -1326,6 +1326,26 @@ body{
   color:rgba(238,247,255,0.72);
   font-size:0.9rem;
 }
+.season-selector-label{
+  display:grid;
+  gap:7px;
+  max-width:320px;
+  margin-bottom:16px;
+  color:rgba(238,247,255,0.9);
+  font-size:0.88rem;
+  font-weight:700;
+}
+.season-selector-label select{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:10px;
+  background:rgba(255,255,255,0.08);
+  color:#fff;
+}
+.season-selector-label option{
+  color:#12233d;
+}
 
 .season-stats-grid{
   display:grid;

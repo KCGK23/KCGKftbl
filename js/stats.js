@@ -57,23 +57,59 @@ export async function saveSeasonSettings({ seasonName, seasonStatus }) {
   return loadSeasonSettings();
 }
 
+export function populateSeasonSelector(fixtures, settings = {}) {
+  const selector = document.getElementById('seasonSelector');
+  if (!selector) return;
+
+  const seasonNames = [...new Set(
+    fixtures.map(fixture => fixture.season).filter(Boolean)
+  )].sort((a, b) => b.localeCompare(a));
+  if (settings.seasonName && !seasonNames.includes(settings.seasonName)) {
+    seasonNames.unshift(settings.seasonName);
+  }
+
+  selector.innerHTML = '';
+  const currentOption = document.createElement('option');
+  currentOption.value = settings.seasonName || '';
+  currentOption.textContent = settings.seasonName
+    ? `${settings.seasonName} · ${settings.seasonStatus === 'ended' ? 'Ended' : 'In progress'}`
+    : 'Current season';
+  selector.append(currentOption);
+
+  seasonNames
+    .filter(name => name !== settings.seasonName)
+    .forEach(name => {
+      const option = document.createElement('option');
+      option.value = name;
+      option.textContent = `${name} · Ended`;
+      selector.append(option);
+    });
+  selector.value = settings.seasonName || '';
+}
+
 export function updateSeasonStats(fixtures, settings = {}) {
-  const seasonFixtures = settings.seasonName
-    ? fixtures.filter(item => item.season === settings.seasonName)
+  const selectedSeasonName = Object.hasOwn(settings, 'selectedSeasonName')
+    ? settings.selectedSeasonName
+    : settings.seasonName;
+  const seasonFixtures = selectedSeasonName
+    ? fixtures.filter(item => item.season === selectedSeasonName)
     : fixtures;
   const completed = seasonFixtures.filter(item => typeof item.homeScore === 'number' && typeof item.awayScore === 'number' && item.competition?.toLowerCase().includes('league'));
   const appearances = completed.filter(isGoalkeeperAppearance);
   const values = [appearances.length, appearances.filter(item => item.homeScore > item.awayScore).length, appearances.filter(item => item.homeScore === item.awayScore).length, appearances.filter(item => item.homeScore < item.awayScore).length, appearances.filter(item => getGoalsConcededWhilePlaying(item) === 0).length, appearances.reduce((total, item) => total + getGoalsConcededWhilePlaying(item), 0)];
   ['statPlayed', 'statWins', 'statDraws', 'statLosses', 'statCleanSheets', 'statConceded'].forEach((id, index) => { const element = document.getElementById(id); if (element) element.textContent = values[index]; });
   const heading = document.getElementById('seasonStatsHeading');
-  if (heading) heading.textContent = settings.seasonName ? `Season Stats · ${settings.seasonName}` : 'Season Stats';
+  if (heading) heading.textContent = selectedSeasonName ? `Season Stats · ${selectedSeasonName}` : 'Season Stats';
   const seasonState = document.getElementById('seasonState');
+  const selectedSeasonStatus = selectedSeasonName === settings.seasonName
+    ? settings.seasonStatus
+    : 'ended';
   if (seasonState) {
-    seasonState.textContent = settings.seasonStatus === 'ended'
+    seasonState.textContent = selectedSeasonStatus === 'ended'
       ? 'Season ended'
-      : settings.seasonName && appearances.length === 0
+      : selectedSeasonName && appearances.length === 0
         ? 'Season in progress · no appearances yet, 0 goals conceded'
-        : settings.seasonName
+        : selectedSeasonName
           ? 'Season in progress'
           : 'Current season';
   }
