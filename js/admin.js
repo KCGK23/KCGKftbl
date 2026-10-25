@@ -18,7 +18,9 @@ import {
 
 import {
   loadPlayerStats,
-  savePlayerStats
+  savePlayerStats,
+  loadSeasonSettings,
+  saveSeasonSettings
 } from './stats.js';
 
 import {
@@ -1072,6 +1074,24 @@ export function initAdmin() {
       }
     );
 
+  document.getElementById('saveSeasonSettingsButton')
+    ?.addEventListener('click', async () => {
+      const message = document.getElementById('seasonSettingsMessage');
+      const seasonName = document.getElementById('editSeasonName').value.trim();
+      const seasonStatus = document.getElementById('editSeasonStatus').value;
+      if (!auth.currentUser) return;
+      if (!seasonName) {
+        message.textContent = 'Enter a season name first.';
+        return;
+      }
+      try {
+        await saveSeasonSettings({ seasonName, seasonStatus });
+        message.textContent = 'Season settings saved.';
+      } catch (error) {
+        message.textContent = error.message || 'Unable to save season settings.';
+      }
+    });
+
 
   /* =======================================================
      TOURNAMENTS
@@ -1142,6 +1162,10 @@ export function initAdmin() {
   /* INITIAL LOAD */
 
   loadPlayerStats();
+  loadSeasonSettings().then(settings => {
+    document.getElementById('editSeasonName').value = settings.seasonName;
+    document.getElementById('editSeasonStatus').value = settings.seasonStatus;
+  }).catch(() => {});
 
   syncUi();
 

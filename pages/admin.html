@@ -439,6 +439,24 @@
         </div>
 
 
+        <h4>Season Settings</h4>
+        <p>When this season ends, enter its name and choose Season ended. The first season name you save will keep the existing fixtures with that season. When the next season begins, change the name and choose In progress; new fixtures will then count toward the new season only.</p>
+        <div class="fixture-row">
+          <label>
+            Season name
+            <input id="editSeasonName" placeholder="e.g. 2027/28">
+          </label>
+          <label>
+            Season status
+            <select id="editSeasonStatus">
+              <option value="active">In progress</option>
+              <option value="ended">Season ended</option>
+            </select>
+          </label>
+        </div>
+        <button id="saveSeasonSettingsButton" class="secondary-button" type="button">Save Season Settings</button>
+        <p id="seasonSettingsMessage" class="fixture-message"></p>
+
         <button
           id="saveStatsButton"
           class="primary-button"

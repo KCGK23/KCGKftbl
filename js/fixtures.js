@@ -1,7 +1,9 @@
 import {
   auth,
   fixturesCollection,
+  statsDocRef,
   getDocs,
+  getDoc,
   query,
   orderBy,
   addDoc,
@@ -725,6 +727,11 @@ export async function addFixture({
 
 
   try {
+    const seasonSnapshot = await getDoc(statsDocRef);
+    const currentSeasonName = seasonSnapshot.exists()
+      ? seasonSnapshot.data().currentSeasonName
+      : '';
+    if (currentSeasonName) payload.season = currentSeasonName;
 
     const docRef =
       await addDoc(

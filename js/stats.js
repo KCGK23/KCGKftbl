@@ -1,4 +1,12 @@
-import { auth, statsDocRef, getDoc, setDoc } from './firebase.js';
+import {
+  auth,
+  fixturesCollection,
+  statsDocRef,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc
+} from './firebase.js';
 import {
   getGoalsConcededWhilePlaying,
   isGoalkeeperAppearance,
@@ -21,11 +29,54 @@ export function calculateCardTotals(fixtures = []) {
   };
 }
 
-export function updateSeasonStats(fixtures) {
-  const completed = fixtures.filter(item => typeof item.homeScore === 'number' && typeof item.awayScore === 'number' && item.competition?.toLowerCase().includes('league'));
+export async function loadSeasonSettings() {
+  const snapshot = await getDoc(statsDocRef);
+  const data = snapshot.exists() ? snapshot.data() : {};
+  return {
+    seasonName: data.currentSeasonName || '',
+    seasonStatus: data.seasonStatus || 'active'
+  };
+}
+
+export async function saveSeasonSettings({ seasonName, seasonStatus }) {
+  if (!auth.currentUser) {
+    throw new Error('You must be logged in to save season settings.');
+  }
+  const current = await getDoc(statsDocRef);
+  const currentData = current.exists() ? current.data() : {};
+  if (!currentData.currentSeasonName && seasonName.trim()) {
+    const fixtures = await getDocs(fixturesCollection);
+    await Promise.all(fixtures.docs
+      .filter(fixture => !fixture.data().season)
+      .map(fixture => updateDoc(fixture.ref, { season: seasonName.trim() })));
+  }
+  await setDoc(statsDocRef, {
+    currentSeasonName: seasonName.trim(),
+    seasonStatus
+  }, { merge: true });
+  return loadSeasonSettings();
+}
+
+export function updateSeasonStats(fixtures, settings = {}) {
+  const seasonFixtures = settings.seasonName
+    ? fixtures.filter(item => item.season === settings.seasonName)
+    : fixtures;
+  const completed = seasonFixtures.filter(item => typeof item.homeScore === 'number' && typeof item.awayScore === 'number' && item.competition?.toLowerCase().includes('league'));
   const appearances = completed.filter(isGoalkeeperAppearance);
   const values = [appearances.length, appearances.filter(item => item.homeScore > item.awayScore).length, appearances.filter(item => item.homeScore === item.awayScore).length, appearances.filter(item => item.homeScore < item.awayScore).length, appearances.filter(item => getGoalsConcededWhilePlaying(item) === 0).length, appearances.reduce((total, item) => total + getGoalsConcededWhilePlaying(item), 0)];
   ['statPlayed', 'statWins', 'statDraws', 'statLosses', 'statCleanSheets', 'statConceded'].forEach((id, index) => { const element = document.getElementById(id); if (element) element.textContent = values[index]; });
+  const heading = document.getElementById('seasonStatsHeading');
+  if (heading) heading.textContent = settings.seasonName ? `Season Stats · ${settings.seasonName}` : 'Season Stats';
+  const seasonState = document.getElementById('seasonState');
+  if (seasonState) {
+    seasonState.textContent = settings.seasonStatus === 'ended'
+      ? 'Season ended'
+      : settings.seasonName && appearances.length === 0
+        ? 'Season in progress · no appearances yet, 0 goals conceded'
+        : settings.seasonName
+          ? 'Season in progress'
+          : 'Current season';
+  }
   const form = document.getElementById('formMessage'); if (!form) return;
   const games = [...appearances].sort((a, b) => String(b.date).localeCompare(String(a.date)));
   if (!games.length) { form.textContent = 'No league form yet.'; return; }
