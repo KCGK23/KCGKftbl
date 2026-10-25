@@ -314,7 +314,6 @@ function loadSelectedMatch() {
     fixture.goalkeeperParticipation || 'full';
   document.getElementById('editOpponentScoreAtSubstitution').value =
     fixture.opponentScoreAtSubstitution ?? '';
-  updateGoalkeeperMinuteFields();
 
   document.getElementById(
     'editHomeScore'
@@ -431,7 +430,6 @@ function clearMatchEditor() {
   if (statusSelect) statusSelect.value = 'upcoming';
   document.getElementById('editGoalkeeperParticipation').value = 'full';
   document.getElementById('editOpponentScoreAtSubstitution').value = '';
-  updateGoalkeeperMinuteFields();
 
   document.getElementById(
     'editHomeYellow'
@@ -466,19 +464,6 @@ document.getElementById(
   ).checked = false;
 
 }
-
-function updateGoalkeeperMinuteFields() {
-  const participation = document.getElementById('editGoalkeeperParticipation')?.value;
-  const label = document.getElementById('goalkeeperSubstitutionScoreLabel');
-  const prompt = document.getElementById('goalkeeperSubstitutionScorePrompt');
-  if (label) {
-    label.classList.toggle('hidden', !['subbed-on', 'subbed-off'].includes(participation));
-    prompt.textContent = participation === 'subbed-on'
-      ? 'Opponent score just before Kyle came on'
-      : 'Opponent score when Kyle came off';
-  }
-}
-
 
 /* =========================================================
    SAVE MATCH
@@ -1018,10 +1003,6 @@ export function initAdmin() {
       'change',
       loadSelectedMatch
     );
-
-  document.getElementById('editGoalkeeperParticipation')
-    ?.addEventListener('change', updateGoalkeeperMinuteFields);
-
 
   document
     .getElementById(
