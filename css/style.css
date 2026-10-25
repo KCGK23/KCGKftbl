@@ -789,7 +789,27 @@ body{
 }
 
 .fixture-status{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:58%;
+  padding:5px 9px;
+  border-radius:999px;
   color:#9ecbff;
+  background:rgba(79,157,255,0.12);
+  letter-spacing:0.06em;
+}
+.fixture-status--completed{
+  color:#9df2b4;
+  background:rgba(34,197,94,0.14);
+}
+.fixture-status--postponed{
+  color:#ffd18a;
+  background:rgba(245,158,11,0.16);
+}
+.fixture-status--abandoned{
+  color:#ffaaaa;
+  background:rgba(239,68,68,0.16);
 }
 
 .fixture-competition{
