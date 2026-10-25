@@ -224,7 +224,7 @@
         </div>
 
         <h4>Kyle's Goalkeeper Appearance</h4>
-        <p>Enter opponent goal minutes in order, separated by commas (for example: 12, 44, 78). This lets the stats count only goals scored while Kyle was playing. Older matches without goal minutes keep their existing full-game totals.</p>
+        <p>For a substitution, enter the opponent's score at that moment. If Kyle came on, enter the score just before he came on; if he came off, enter the score when he left. The final score and this score determine how many goals he conceded.</p>
         <div class="fixture-row">
           <label>
             Appearance
@@ -235,19 +235,9 @@
               <option value="none">Did not play</option>
             </select>
           </label>
-          <label>
-            Opponent goal minutes
-            <input id="editOpponentGoalMinutes" inputmode="numeric" placeholder="e.g. 12, 44, 78">
-          </label>
-        </div>
-        <div class="fixture-row" id="goalkeeperMinutesRow">
-          <label id="goalkeeperEntryMinuteLabel" class="hidden">
-            Minute Kyle came on
-            <input id="editGoalkeeperEntryMinute" type="number" min="0" max="150">
-          </label>
-          <label id="goalkeeperExitMinuteLabel" class="hidden">
-            Minute Kyle came off
-            <input id="editGoalkeeperExitMinute" type="number" min="0" max="150">
+          <label id="goalkeeperSubstitutionScoreLabel" class="hidden">
+            <span id="goalkeeperSubstitutionScorePrompt">Opponent score at substitution</span>
+            <input id="editOpponentScoreAtSubstitution" type="number" min="0" max="150">
           </label>
         </div>
 

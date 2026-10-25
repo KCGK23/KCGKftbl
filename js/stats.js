@@ -27,6 +27,16 @@ export function getGoalsConcededWhilePlaying(fixture) {
   if (!conceded || fixture.goalkeeperParticipation === 'none') return 0;
 
   const participation = fixture.goalkeeperParticipation || 'full';
+  const scoreAtSubstitution = fixture.opponentScoreAtSubstitution;
+  if (Number.isFinite(Number(scoreAtSubstitution)) && scoreAtSubstitution !== null && scoreAtSubstitution !== '') {
+    return participation === 'subbed-on'
+      ? Math.max(0, conceded - Number(scoreAtSubstitution))
+      : participation === 'subbed-off'
+        ? Math.min(conceded, Number(scoreAtSubstitution))
+        : conceded;
+  }
+
+  // Support fixtures saved with the earlier goal-minute version of this editor.
   const start = participation === 'subbed-on'
     ? Number(fixture.goalkeeperEntryMinute ?? 0)
     : 0;

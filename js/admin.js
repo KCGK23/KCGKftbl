@@ -312,10 +312,8 @@ function loadSelectedMatch() {
 
   document.getElementById('editGoalkeeperParticipation').value =
     fixture.goalkeeperParticipation || 'full';
-  document.getElementById('editOpponentGoalMinutes').value =
-    Array.isArray(fixture.opponentGoalMinutes) ? fixture.opponentGoalMinutes.join(', ') : '';
-  document.getElementById('editGoalkeeperEntryMinute').value = fixture.goalkeeperEntryMinute ?? '';
-  document.getElementById('editGoalkeeperExitMinute').value = fixture.goalkeeperExitMinute ?? '';
+  document.getElementById('editOpponentScoreAtSubstitution').value =
+    fixture.opponentScoreAtSubstitution ?? '';
   updateGoalkeeperMinuteFields();
 
   document.getElementById(
@@ -432,9 +430,7 @@ function clearMatchEditor() {
   const statusSelect = document.getElementById('editFixtureStatus');
   if (statusSelect) statusSelect.value = 'upcoming';
   document.getElementById('editGoalkeeperParticipation').value = 'full';
-  document.getElementById('editOpponentGoalMinutes').value = '';
-  document.getElementById('editGoalkeeperEntryMinute').value = '';
-  document.getElementById('editGoalkeeperExitMinute').value = '';
+  document.getElementById('editOpponentScoreAtSubstitution').value = '';
   updateGoalkeeperMinuteFields();
 
   document.getElementById(
@@ -473,8 +469,14 @@ document.getElementById(
 
 function updateGoalkeeperMinuteFields() {
   const participation = document.getElementById('editGoalkeeperParticipation')?.value;
-  document.getElementById('goalkeeperEntryMinuteLabel')?.classList.toggle('hidden', participation !== 'subbed-on');
-  document.getElementById('goalkeeperExitMinuteLabel')?.classList.toggle('hidden', participation !== 'subbed-off');
+  const label = document.getElementById('goalkeeperSubstitutionScoreLabel');
+  const prompt = document.getElementById('goalkeeperSubstitutionScorePrompt');
+  if (label) {
+    label.classList.toggle('hidden', !['subbed-on', 'subbed-off'].includes(participation));
+    prompt.textContent = participation === 'subbed-on'
+      ? 'Opponent score just before Kyle came on'
+      : 'Opponent score when Kyle came off';
+  }
 }
 
 
@@ -556,18 +558,8 @@ async function saveCompleteMatch() {
     goalkeeperParticipation:
       document.getElementById('editGoalkeeperParticipation').value,
 
-    goalkeeperEntryMinute:
-      document.getElementById('editGoalkeeperEntryMinute').value,
-
-    goalkeeperExitMinute:
-      document.getElementById('editGoalkeeperExitMinute').value,
-
-    opponentGoalMinutes:
-      document.getElementById('editOpponentGoalMinutes').value
-        .split(',')
-        .map(value => value.trim())
-        .filter(Boolean)
-        .map(Number),
+    opponentScoreAtSubstitution:
+      document.getElementById('editOpponentScoreAtSubstitution').value,
 
     homeYellowCards:
       document.getElementById(
@@ -616,21 +608,16 @@ async function saveCompleteMatch() {
 
   }
 
-  const scoredAgainst = Number(values.awayScore);
-  if (values.opponentGoalMinutes.length &&
-      (values.opponentGoalMinutes.length !== scoredAgainst ||
-       values.opponentGoalMinutes.some(minute => !Number.isInteger(minute) || minute < 0 || minute > 150) ||
-       values.opponentGoalMinutes.some((minute, index, minutes) => index > 0 && minute < minutes[index - 1]))) {
-    messageBox.textContent = 'Enter one whole minute in match order for each opponent goal, or leave goal minutes blank.';
-    return;
-  }
-  const subMinute = values.goalkeeperParticipation === 'subbed-on'
-    ? Number(values.goalkeeperEntryMinute)
-    : Number(values.goalkeeperExitMinute);
   if (['subbed-on', 'subbed-off'].includes(values.goalkeeperParticipation) &&
-      (!Number.isInteger(subMinute) || subMinute < 0 || subMinute > 150)) {
-    messageBox.textContent = 'Enter the substitution minute (0–150).';
-    return;
+      values.awayScore !== '') {
+    const scoreAtSubstitution = Number(values.opponentScoreAtSubstitution);
+    if (values.opponentScoreAtSubstitution === '' ||
+        !Number.isInteger(scoreAtSubstitution) ||
+        scoreAtSubstitution < 0 ||
+        scoreAtSubstitution > Number(values.awayScore)) {
+      messageBox.textContent = 'Enter the opponent’s score at substitution, from 0 up to the final score.';
+      return;
+    }
   }
 
 

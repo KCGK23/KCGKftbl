@@ -876,10 +876,12 @@ export async function updateMatch(fixtureId, values) {
   }
 
   if (['subbed-on', 'subbed-off'].includes(values.goalkeeperParticipation) &&
-      Number(values.awayScore) > 0 &&
-      (!Array.isArray(values.opponentGoalMinutes) ||
-       values.opponentGoalMinutes.length !== Number(values.awayScore))) {
-    throw new Error('Add the minute of each opponent goal to calculate Kyle’s conceded total accurately.');
+      values.awayScore !== '' && values.awayScore !== null &&
+      (values.opponentScoreAtSubstitution === '' ||
+       !Number.isInteger(Number(values.opponentScoreAtSubstitution)) ||
+       Number(values.opponentScoreAtSubstitution) < 0 ||
+       Number(values.opponentScoreAtSubstitution) > Number(values.awayScore))) {
+    throw new Error('Enter the opponent’s score at substitution, from 0 up to the final score.');
   }
 
   const fixtureRef = doc(
@@ -915,20 +917,10 @@ export async function updateMatch(fixtureId, values) {
     goalkeeperParticipation:
       values.goalkeeperParticipation || 'full',
 
-    goalkeeperEntryMinute:
-      values.goalkeeperParticipation === 'subbed-on'
-        ? Number(values.goalkeeperEntryMinute)
-        : null,
-
-    goalkeeperExitMinute:
-      values.goalkeeperParticipation === 'subbed-off'
-        ? Number(values.goalkeeperExitMinute)
-        : null,
-
-    opponentGoalMinutes:
-      Array.isArray(values.opponentGoalMinutes)
-        ? values.opponentGoalMinutes
-        : [],
+    opponentScoreAtSubstitution:
+      values.opponentScoreAtSubstitution === ''
+        ? null
+        : Number(values.opponentScoreAtSubstitution),
 
     /* TEAM CARDS */
 
