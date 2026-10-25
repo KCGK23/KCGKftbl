@@ -105,7 +105,8 @@ export function filterFixtures(
           ? 'completed'
           : 'upcoming'
       );
-      return status === 'upcoming';
+      // Keep postponed and abandoned fixtures visible in the default Upcoming tab.
+      return status !== 'completed';
     });
   }
 
