@@ -17,14 +17,40 @@ export function calculateCardTotals(fixtures = []) {
   };
 }
 
+export function isGoalkeeperAppearance(fixture) {
+  // Legacy fixtures predate appearance tracking and retain their old full-match meaning.
+  return fixture.goalkeeperParticipation !== 'none';
+}
+
+export function getGoalsConcededWhilePlaying(fixture) {
+  const conceded = Math.max(0, Number(fixture.awayScore) || 0);
+  if (!conceded || fixture.goalkeeperParticipation === 'none') return 0;
+
+  const participation = fixture.goalkeeperParticipation || 'full';
+  const start = participation === 'subbed-on'
+    ? Number(fixture.goalkeeperEntryMinute ?? 0)
+    : 0;
+  const end = participation === 'subbed-off'
+    ? Number(fixture.goalkeeperExitMinute ?? 90)
+    : 150;
+  const minutes = Array.isArray(fixture.opponentGoalMinutes)
+    ? fixture.opponentGoalMinutes.map(Number).filter(Number.isFinite)
+    : null;
+
+  // Without event data, preserve the historic score-based total.
+  if (minutes === null || minutes.length !== conceded) return conceded;
+  return minutes.filter(minute => minute >= start && minute <= end).length;
+}
+
 export function updateSeasonStats(fixtures) {
   const completed = fixtures.filter(item => typeof item.homeScore === 'number' && typeof item.awayScore === 'number' && item.competition?.toLowerCase().includes('league'));
-  const values = [completed.length, completed.filter(item => item.homeScore > item.awayScore).length, completed.filter(item => item.homeScore === item.awayScore).length, completed.filter(item => item.homeScore < item.awayScore).length, completed.filter(item => item.awayScore === 0).length, completed.reduce((total, item) => total + item.awayScore, 0)];
+  const appearances = completed.filter(isGoalkeeperAppearance);
+  const values = [appearances.length, appearances.filter(item => item.homeScore > item.awayScore).length, appearances.filter(item => item.homeScore === item.awayScore).length, appearances.filter(item => item.homeScore < item.awayScore).length, appearances.filter(item => getGoalsConcededWhilePlaying(item) === 0).length, appearances.reduce((total, item) => total + getGoalsConcededWhilePlaying(item), 0)];
   ['statPlayed', 'statWins', 'statDraws', 'statLosses', 'statCleanSheets', 'statConceded'].forEach((id, index) => { const element = document.getElementById(id); if (element) element.textContent = values[index]; });
   const form = document.getElementById('formMessage'); if (!form) return;
-  const games = [...completed].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  const games = [...appearances].sort((a, b) => String(b.date).localeCompare(String(a.date)));
   if (!games.length) { form.textContent = 'No league form yet.'; return; }
-  let unbeaten = 0, clean = 0; for (const item of games) { if (item.homeScore >= item.awayScore) unbeaten++; else break; } for (const item of games) { if (item.awayScore === 0) clean++; else break; }
+  let unbeaten = 0, clean = 0; for (const item of games) { if (item.homeScore >= item.awayScore) unbeaten++; else break; } for (const item of games) { if (getGoalsConcededWhilePlaying(item) === 0) clean++; else break; }
   form.textContent = clean >= 2 ? `🧤 ${clean} clean sheets in a row` : unbeaten >= 2 ? `🔥 Unbeaten in ${unbeaten} league games` : games[0].homeScore > games[0].awayScore ? '✅ Won the latest league match' : games[0].homeScore === games[0].awayScore ? '➖ Drew the latest league match' : '🔴 Looking to bounce back next game';
 }
 function applyStats(stats = {}) { const values = { kitNumber: stats.kitNumber || '23', yellowCards: stats.yellowCards || '0', redCards: stats.redCards || '0', injuries: stats.injuries || 'None' }; const map = { kitNumber: 'kitNumberStat', yellowCards: 'yellowCardStat', redCards: 'redCardStat' }; Object.entries(map).forEach(([key, id]) => { const node = document.getElementById(id); if (node) node.textContent = values[key]; }); const injury = document.getElementById('injuryStat'); if (injury) { injury.querySelector('strong').textContent = values.injuries; injury.classList.toggle('injury-active', values.injuries.toLowerCase() !== 'none'); } return values; }

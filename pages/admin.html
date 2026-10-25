@@ -223,6 +223,33 @@
 
         </div>
 
+        <h4>Kyle's Goalkeeper Appearance</h4>
+        <p>Enter opponent goal minutes in order, separated by commas (for example: 12, 44, 78). This lets the stats count only goals scored while Kyle was playing. Older matches without goal minutes keep their existing full-game totals.</p>
+        <div class="fixture-row">
+          <label>
+            Appearance
+            <select id="editGoalkeeperParticipation">
+              <option value="full">Full game</option>
+              <option value="subbed-on">Subbed on</option>
+              <option value="subbed-off">Subbed off</option>
+              <option value="none">Did not play</option>
+            </select>
+          </label>
+          <label>
+            Opponent goal minutes
+            <input id="editOpponentGoalMinutes" inputmode="numeric" placeholder="e.g. 12, 44, 78">
+          </label>
+        </div>
+        <div class="fixture-row" id="goalkeeperMinutesRow">
+          <label id="goalkeeperEntryMinuteLabel" class="hidden">
+            Minute Kyle came on
+            <input id="editGoalkeeperEntryMinute" type="number" min="0" max="150">
+          </label>
+          <label id="goalkeeperExitMinuteLabel" class="hidden">
+            Minute Kyle came off
+            <input id="editGoalkeeperExitMinute" type="number" min="0" max="150">
+          </label>
+        </div>
 
         <h4>Team Cards</h4>
 

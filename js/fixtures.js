@@ -642,6 +642,8 @@ export async function addFixture({
 
     status: 'upcoming',
 
+    goalkeeperParticipation: 'none',
+
     manOfTheMatch:
       false,
 
@@ -873,6 +875,13 @@ export async function updateMatch(fixtureId, values) {
     throw new Error('No fixture selected.');
   }
 
+  if (['subbed-on', 'subbed-off'].includes(values.goalkeeperParticipation) &&
+      Number(values.awayScore) > 0 &&
+      (!Array.isArray(values.opponentGoalMinutes) ||
+       values.opponentGoalMinutes.length !== Number(values.awayScore))) {
+    throw new Error('Add the minute of each opponent goal to calculate Kyle’s conceded total accurately.');
+  }
+
   const fixtureRef = doc(
     fixturesCollection,
     fixtureId
@@ -902,6 +911,24 @@ export async function updateMatch(fixtureId, values) {
       values.awayScore === ''
         ? null
         : Number(values.awayScore),
+
+    goalkeeperParticipation:
+      values.goalkeeperParticipation || 'full',
+
+    goalkeeperEntryMinute:
+      values.goalkeeperParticipation === 'subbed-on'
+        ? Number(values.goalkeeperEntryMinute)
+        : null,
+
+    goalkeeperExitMinute:
+      values.goalkeeperParticipation === 'subbed-off'
+        ? Number(values.goalkeeperExitMinute)
+        : null,
+
+    opponentGoalMinutes:
+      Array.isArray(values.opponentGoalMinutes)
+        ? values.opponentGoalMinutes
+        : [],
 
     /* TEAM CARDS */
 
