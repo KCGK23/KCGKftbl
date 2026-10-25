@@ -61,8 +61,16 @@ export async function saveSeasonSettings({ targetSeasonName = '', seasonName, se
   const oldName = isUnassigned ? '' : targetSeasonName;
   const fixtures = await getDocs(fixturesCollection);
   const fixtureNames = new Set(fixtures.docs.map(fixture => fixture.data().season).filter(Boolean));
-  if (oldName && seasonName !== oldName && fixtureNames.has(seasonName)) {
-    throw new Error('A season with that name already exists.');
+  const settingsNames = new Set([
+    currentData.currentSeasonName,
+    ...(Array.isArray(currentData.seasonStatusRecords)
+      ? currentData.seasonStatusRecords.map(record => record.name)
+      : [])
+  ].filter(Boolean));
+  if (!isUnassigned &&
+      ((oldName && seasonName !== oldName) || !oldName) &&
+      (fixtureNames.has(seasonName) || settingsNames.has(seasonName))) {
+    throw new Error('That season already exists. Select it from the list to edit or restart it.');
   }
 
   if (isUnassigned || (!currentData.currentSeasonName && !oldName)) {

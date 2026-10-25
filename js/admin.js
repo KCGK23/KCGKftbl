@@ -1142,6 +1142,18 @@ export function initAdmin() {
       document.getElementById('deleteSeasonButton').disabled = !name || isUnassigned;
     });
 
+  document.getElementById('startNewSeasonButton')
+    ?.addEventListener('click', () => {
+      const selector = document.getElementById('editSeasonSelector');
+      selector.value = '';
+      document.getElementById('editSeasonName').value = '';
+      document.getElementById('editSeasonStatus').value = 'active';
+      document.getElementById('deleteSeasonButton').disabled = true;
+      document.getElementById('seasonSettingsMessage').textContent =
+        'Enter the new season name, then save season settings.';
+      document.getElementById('editSeasonName').focus();
+    });
+
   document.getElementById('deleteSeasonButton')
     ?.addEventListener('click', async () => {
       const selector = document.getElementById('editSeasonSelector');
