@@ -302,6 +302,13 @@ function loadSelectedMatch() {
   ).value =
     fixture.location || '';
 
+  document.getElementById('editFixtureStatus').value =
+    fixture.status || (
+      typeof fixture.homeScore === 'number' &&
+      typeof fixture.awayScore === 'number'
+        ? 'completed'
+        : 'upcoming'
+    );
 
   document.getElementById(
     'editHomeScore'
@@ -414,6 +421,9 @@ function clearMatchEditor() {
   });
 
 
+  const statusSelect = document.getElementById('editFixtureStatus');
+  if (statusSelect) statusSelect.value = 'upcoming';
+
   document.getElementById(
     'editHomeYellow'
   ).value = 0;
@@ -510,6 +520,9 @@ async function saveCompleteMatch() {
       document.getElementById(
         'editFixtureLocation'
       ).value.trim(),
+
+    status:
+      document.getElementById('editFixtureStatus').value,
 
     homeScore:
       document.getElementById(
