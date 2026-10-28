@@ -459,7 +459,7 @@ ${playerCardDisplay}
         📅 ${fixture.date || 'Date TBC'}
       </span>
 
-      ${fixture.time ? `<span>🕐 ${fixture.time}</span>` : ''}
+      ${fixture.time ? `<span>🕐 Kick-off ${fixture.time}</span>` : ''}
 
     </div>
 

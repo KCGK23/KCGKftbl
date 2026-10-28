@@ -17,7 +17,7 @@ function getMatchDay(fixture) {
   }
 
   const time = String(fixture.time || '').match(/^(\d{1,2}):(\d{2})/);
-  // Fixtures currently store dates without a kick-off time, so count down to noon on match day.
+  // Older fixtures may have no kick-off time; use midday for those until a time is added.
   return new Date(year, month - 1, day, time ? Number(time[1]) : 12, time ? Number(time[2]) : 0);
 }
 
@@ -53,7 +53,8 @@ export async function showNextMatch() {
     const dateLabel = new Intl.DateTimeFormat('en-GB', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
     }).format(next.matchDay);
-    const details = [dateLabel, next.fixture.time, next.fixture.competition, next.fixture.location]
+    const kickoffLabel = next.fixture.time ? `Kick-off ${next.fixture.time}` : '';
+    const details = [dateLabel, kickoffLabel, next.fixture.competition, next.fixture.location]
       .filter(Boolean);
     document.querySelector('#nextMatchMeta').textContent = details.join(' · ');
 
