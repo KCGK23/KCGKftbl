@@ -36,7 +36,7 @@ import {
   loadCustomTeamLogos,
   saveCustomTeamLogo
 } from './team-logos.js';
-import { initPlayerTimelineEditor } from './player-timeline.js?v=horizontal-timeline-editor-fix';
+import { initPlayerTimelineEditor } from './player-timeline.js?v=timeline-auto-emojis';
 
 let currentSeasonSettings = {};
 

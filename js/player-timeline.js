@@ -18,7 +18,20 @@ const starterTimeline = [
   }
 ];
 
-const icons = ['⚽', '🧤', '🏆', '⭐', '🥇', '📍'];
+function getTimelineEmoji(entry = {}) {
+  const text = `${entry.date || ''} ${entry.title || ''} ${entry.description || ''}`.toLowerCase();
+  if (/semi[\s-]?final/.test(text)) return '🥈';
+  if (/final|trophy|champion|cup|won|win|victory/.test(text)) return '🏆';
+  if (/transfer|moved|switch(?:ed)? team/.test(text)) return '🔄';
+  if (/folded|folding|closed|left the team/.test(text)) return '💔';
+  if (/join(?:ed|ing)?|signed/.test(text)) return '🤝';
+  if (/present|current|still at|home club/.test(text)) return '🏠';
+  if (/save|goalkeeper|clean sheet|shutout/.test(text)) return '🧤';
+  if (/medal|award|player of the match|motm/.test(text)) return '🥇';
+  if (/first|debut|milestone/.test(text)) return '⭐';
+  if (/venue|ground|stadium|location/.test(text)) return '📍';
+  return '⚽';
+}
 
 export async function loadPlayerTimeline() {
   const snapshot = await getDoc(statsDocRef);
@@ -43,13 +56,13 @@ export async function savePlayerTimeline(entries) {
   return cleanEntries;
 }
 
-function makeTimelineItem(entry, index) {
+function makeTimelineItem(entry) {
   const item = document.createElement('li');
-  item.className = `timeline-item${entry.date.toLowerCase() === 'current chapter' ? ' timeline-item--current' : ''}`;
+  item.className = `timeline-item${/current|present|still at/i.test(entry.date || '') ? ' timeline-item--current' : ''}`;
   const marker = document.createElement('span');
   marker.className = 'timeline-marker';
   marker.setAttribute('aria-hidden', 'true');
-  marker.textContent = icons[index % icons.length];
+  marker.textContent = getTimelineEmoji(entry);
   const content = document.createElement('div');
   content.className = 'timeline-content';
   const date = document.createElement('span');
@@ -89,6 +102,7 @@ function createEditorRow(entry = {}) {
   const row = document.createElement('div');
   row.className = 'timeline-editor-row';
   row.innerHTML = `
+    <div class="timeline-editor-row-heading"><span class="timeline-edit-emoji" aria-hidden="true"></span><span>Emoji chosen automatically</span></div>
     <div class="fixture-row">
       <label>Season or date<input class="timeline-edit-date" maxlength="40" placeholder="e.g. 2024/25"></label>
       <label>Milestone heading<input class="timeline-edit-title" maxlength="70" placeholder="e.g. First clean sheet"></label>
@@ -102,6 +116,16 @@ function createEditorRow(entry = {}) {
   row.querySelector('.timeline-edit-date').value = entry.date || '';
   row.querySelector('.timeline-edit-title').value = entry.title || '';
   row.querySelector('.timeline-edit-description').value = entry.description || '';
+  const refreshEmojiPreview = () => {
+    row.querySelector('.timeline-edit-emoji').textContent = getTimelineEmoji({
+      date: row.querySelector('.timeline-edit-date').value,
+      title: row.querySelector('.timeline-edit-title').value,
+      description: row.querySelector('.timeline-edit-description').value
+    });
+  };
+  row.querySelectorAll('.timeline-edit-date, .timeline-edit-title, .timeline-edit-description')
+    .forEach(input => input.addEventListener('input', refreshEmojiPreview));
+  refreshEmojiPreview();
   row.querySelector('.timeline-move-up').addEventListener('click', () => {
     const previous = row.previousElementSibling;
     if (previous) row.parentElement.insertBefore(row, previous);

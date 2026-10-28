@@ -156,6 +156,8 @@ header.goalkeeper p{
 .timeline-editor-heading p:not(.timeline-kicker){max-width:620px;margin:0;color:rgba(226,239,255,.68);font-size:.9rem}
 .timeline-editor-rows{display:grid;gap:14px}
 .timeline-editor-row{display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid rgba(170,214,255,.13);border-radius:14px;background:linear-gradient(145deg,rgba(12,34,61,.72),rgba(8,18,34,.68))}
+.timeline-editor-row-heading{display:flex;align-items:center;gap:9px;color:rgba(226,239,255,.62);font-size:.78rem;font-weight:700;letter-spacing:.03em}
+.timeline-edit-emoji{display:grid;width:34px;height:34px;place-items:center;border:1px solid rgba(185,218,255,.18);border-radius:50%;background:#102b49;font-size:1.1rem}
 .timeline-editor-row label{display:flex;flex-direction:column;gap:7px;color:rgba(248,235,235,.92);font-size:.9rem;font-weight:700;min-width:0}
 .timeline-editor-row input,.timeline-editor-row textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.16);border-radius:11px;padding:12px 14px;background:rgba(255,255,255,.07);color:#fff;font:inherit;font-weight:450;resize:vertical}
 .timeline-editor-row input{min-height:46px}
