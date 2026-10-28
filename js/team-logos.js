@@ -1,3 +1,5 @@
+import { auth, getDoc, setDoc, statsDocRef } from './firebase.js';
+
 const teamLogos = [
   { file: '03289c33-0736-42cb-9439-fad0e5b471d4.jpeg', names: ['Castlemilk Community', 'Castlemilk Community FC'] },
   { file: '100291.png', names: ['Drumsagard', 'Drumsagard FC'] },
@@ -83,6 +85,85 @@ const searchableNames = teamLogos.flatMap(entry =>
   entry.names.map(name => ({ entry, normalized: normalizeTeamName(name) }))
 );
 
+let customTeamLogos = [];
+let customTeamLogosLoaded = false;
+let customTeamLogosRequest;
+
+export async function loadCustomTeamLogos() {
+  if (customTeamLogosLoaded) return customTeamLogos;
+  if (customTeamLogosRequest) return customTeamLogosRequest;
+
+  customTeamLogosRequest = getDoc(statsDocRef)
+    .then(snapshot => {
+      const records = snapshot.exists() ? snapshot.data().customTeamLogos : [];
+      customTeamLogos = Array.isArray(records) ? records : [];
+      customTeamLogosLoaded = true;
+      return customTeamLogos;
+    })
+    .catch(error => {
+      console.warn('Custom team badges could not be loaded:', error);
+      customTeamLogosRequest = null;
+      return customTeamLogos;
+    });
+
+  return customTeamLogosRequest;
+}
+
+export async function saveCustomTeamLogo({ name, aliases, imageDataUrl }) {
+  if (!auth.currentUser) throw new Error('Log in as an admin to update the badge gallery.');
+
+  name = String(name || '').trim();
+  if (!name) throw new Error('Enter the team name.');
+  if (!String(imageDataUrl || '').startsWith('data:image/')) {
+    throw new Error('Choose a valid image file for the badge.');
+  }
+
+  const names = [...new Set([name, ...aliases]
+    .map(value => String(value || '').trim())
+    .filter(Boolean))];
+  const key = normalizeTeamName(name);
+  const snapshot = await getDoc(statsDocRef);
+  const documentData = snapshot.exists() ? snapshot.data() : {};
+  const current = Array.isArray(documentData.customTeamLogos)
+    ? documentData.customTeamLogos
+    : [];
+  const record = {
+    key,
+    name,
+    names,
+    imageDataUrl,
+    updatedAt: new Date().toISOString()
+  };
+  const next = current.filter(item => item.key !== key).concat(record);
+  const estimatedSize = new TextEncoder().encode(JSON.stringify({
+    ...documentData,
+    customTeamLogos: next
+  })).length;
+
+  if (estimatedSize > 850_000) {
+    throw new Error('The badge gallery is nearly full. Use a smaller image or remove an old badge first.');
+  }
+
+  await setDoc(statsDocRef, { customTeamLogos: next }, { merge: true });
+  customTeamLogos = next;
+  customTeamLogosLoaded = true;
+  customTeamLogosRequest = Promise.resolve(customTeamLogos);
+  return record;
+}
+
+export async function removeCustomTeamLogo(key) {
+  if (!auth.currentUser) throw new Error('Log in as an admin to update the badge gallery.');
+
+  const snapshot = await getDoc(statsDocRef);
+  const documentData = snapshot.exists() ? snapshot.data() : {};
+  const next = (Array.isArray(documentData.customTeamLogos) ? documentData.customTeamLogos : [])
+    .filter(item => item.key !== key);
+  await setDoc(statsDocRef, { customTeamLogos: next }, { merge: true });
+  customTeamLogos = next;
+  customTeamLogosLoaded = true;
+  customTeamLogosRequest = Promise.resolve(customTeamLogos);
+}
+
 export function getTeamLogoUrl(teamName) {
   const normalized = normalizeTeamName(teamName);
   if (!normalized) return '';
@@ -92,6 +173,13 @@ export function getTeamLogoUrl(teamName) {
   }
 
   const paddedName = ` ${normalized} `;
+  const customMatch = customTeamLogos
+    .flatMap(entry => (entry.names || [entry.name]).map(name => ({ entry, normalized: normalizeTeamName(name) })))
+    .filter(item => item.normalized && paddedName.includes(` ${item.normalized} `))
+    .sort((a, b) => b.normalized.length - a.normalized.length)[0];
+
+  if (customMatch?.entry.imageDataUrl) return customMatch.entry.imageDataUrl;
+
   const match = searchableNames
     .filter(item => paddedName.includes(` ${item.normalized} `))
     .sort((a, b) => b.normalized.length - a.normalized.length)[0];

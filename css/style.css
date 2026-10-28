@@ -651,6 +651,34 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
   width:100%;
   min-width:0;
 }
+.custom-logo-admin{
+  margin-top:24px;
+  padding:22px;
+  border:1px solid rgba(164,205,255,.17);
+  border-radius:20px;
+  background:linear-gradient(145deg,rgba(13,34,61,.8),rgba(255,255,255,.035));
+}
+.custom-logo-admin-heading{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.custom-logo-admin-heading h3{margin:2px 0 5px;font-size:1.25rem}
+.custom-logo-admin-heading p:not(.custom-logo-kicker){max-width:620px;margin:0;color:rgba(239,246,255,.72);font-size:.9rem}
+.custom-logo-kicker{margin:0;color:#91f2bb;font-size:.68rem;font-weight:800;letter-spacing:.15em}
+.custom-logo-admin-form{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.custom-logo-admin-form label{display:flex;flex-direction:column;gap:8px;color:rgba(248,235,235,.92);font-size:.92rem;font-weight:700}
+.custom-logo-admin-form input{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px 14px;background:rgba(255,255,255,.08);color:#fff;min-height:46px}
+.custom-logo-admin-form input[type=file]{padding:9px}
+.custom-logo-upload-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end}
+.custom-logo-preview{width:78px;height:78px;padding:6px;object-fit:contain;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.08)}
+.custom-logo-preview[hidden]{display:none}
+.custom-logo-admin-form .primary-button{align-self:flex-start}
+.custom-logo-gallery-heading{display:flex;align-items:baseline;gap:10px;margin-top:24px}
+.custom-logo-gallery-heading h4{margin:0}
+.custom-logo-gallery-heading span,.custom-logo-gallery-empty{color:rgba(239,246,255,.6);font-size:.82rem}
+.custom-logo-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:10px}
+.custom-logo-gallery-item{display:flex;align-items:center;gap:12px;min-width:0;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.045)}
+.custom-logo-gallery-item img{flex:none;width:54px;height:54px;object-fit:contain;border-radius:10px;background:#fff}
+.custom-logo-gallery-item div{display:flex;flex-direction:column;min-width:0;gap:3px}
+.custom-logo-gallery-item strong,.custom-logo-gallery-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.custom-logo-gallery-item span{color:rgba(239,246,255,.58);font-size:.73rem}
 .primary-button{
   align-self:flex-end;
   border:none;
@@ -684,6 +712,9 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
   .fixture-row{
     grid-template-columns:1fr;
   }
+  .custom-logo-admin-heading{align-items:flex-start;flex-direction:column}
+  .custom-logo-admin-heading button{width:100%}
+  .custom-logo-upload-row{grid-template-columns:1fr auto}
 }
 .fixture-list-card{
   padding:18px 0 0;

@@ -12,7 +12,7 @@ import {
   deleteDoc,
   serverTimestamp
 } from './firebase.js';
-import { getTeamLogoUrl } from './team-logos.js';
+import { getTeamLogoUrl, loadCustomTeamLogos } from './team-logos.js';
 
 export const LOCAL_FIXTURE_KEY = 'localFixtures';
 export const HOME_TEAM_NAME = 'Renfrew Juniors';
@@ -88,6 +88,8 @@ export function getFixtures() {
 ========================================================= */
 
 export async function loadFixtures() {
+  await loadCustomTeamLogos();
+
   let fixtures = [];
   let remoteFailed = false;
 

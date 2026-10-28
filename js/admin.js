@@ -32,8 +32,82 @@ import {
   addMatchRow,
   saveTournament
 } from './tournaments.js';
+import {
+  loadCustomTeamLogos,
+  saveCustomTeamLogo
+} from './team-logos.js';
 
 let currentSeasonSettings = {};
+
+function prepareBadgeImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!file || !['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      reject(new Error('Choose a PNG, JPG, or WebP image.'));
+      return;
+    }
+
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const scale = Math.min(1, 360 / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      let dataUrl = canvas.toDataURL('image/webp', 0.82);
+      if (dataUrl.length > 320_000) dataUrl = canvas.toDataURL('image/webp', 0.62);
+      if (dataUrl.length > 320_000) {
+        canvas.width = Math.max(1, Math.round(canvas.width * 0.7));
+        canvas.height = Math.max(1, Math.round(canvas.height * 0.7));
+        canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+        dataUrl = canvas.toDataURL('image/webp', 0.52);
+      }
+      if (dataUrl.length > 320_000) {
+        reject(new Error('That image is too large after compression. Choose a smaller badge image.'));
+        return;
+      }
+      resolve(dataUrl);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('That image could not be opened.'));
+    };
+    image.src = objectUrl;
+  });
+}
+
+async function renderCustomTeamLogoGallery() {
+  const gallery = document.getElementById('customTeamLogoGallery');
+  if (!gallery) return;
+
+  gallery.replaceChildren();
+  const logos = await loadCustomTeamLogos();
+  if (!logos.length) {
+    const empty = document.createElement('p');
+    empty.className = 'custom-logo-gallery-empty';
+    empty.textContent = 'No custom team badges added yet.';
+    gallery.append(empty);
+    return;
+  }
+
+  logos.forEach(logo => {
+    const card = document.createElement('article');
+    card.className = 'custom-logo-gallery-item';
+    const image = document.createElement('img');
+    image.src = logo.imageDataUrl;
+    image.alt = `${logo.name} badge`;
+    const details = document.createElement('div');
+    const name = document.createElement('strong');
+    name.textContent = logo.name;
+    const aliases = document.createElement('span');
+    aliases.textContent = (logo.names || []).join(' · ');
+    details.append(name, aliases);
+    card.append(image, details);
+    gallery.append(card);
+  });
+}
 
 function populateSeasonManager(fixtures, settings) {
   currentSeasonSettings = settings;
@@ -787,6 +861,11 @@ export function initAdmin() {
       syncUi();
 
       await refresh();
+      if (auth.currentUser) {
+        await renderCustomTeamLogoGallery();
+      } else {
+        document.getElementById('customTeamLogoGallery')?.replaceChildren();
+      }
 
     }
   );
@@ -928,6 +1007,81 @@ export function initAdmin() {
 
       }
     );
+
+
+  /* CUSTOM TEAM BADGES */
+
+  const logoForm = document.getElementById('teamLogoForm');
+  const logoStatus = document.getElementById('customLogoStatus');
+  const logoFileInput = document.getElementById('customLogoImage');
+  const logoPreview = document.getElementById('customLogoPreview');
+  let selectedLogoDataUrl = '';
+
+  const setLogoStatus = (text, type = '') => {
+    logoStatus.textContent = text;
+    logoStatus.className = `fixture-message ${type}`;
+  };
+
+  logoFileInput.addEventListener('change', async () => {
+    selectedLogoDataUrl = '';
+    logoPreview.hidden = true;
+    const file = logoFileInput.files?.[0];
+    if (!file) return;
+
+    try {
+      selectedLogoDataUrl = await prepareBadgeImage(file);
+      logoPreview.src = selectedLogoDataUrl;
+      logoPreview.hidden = false;
+      setLogoStatus('Badge ready to add to the gallery.', 'success');
+    } catch (error) {
+      setLogoStatus(error.message, 'error');
+    }
+  });
+
+  document.getElementById('searchLogoButton').addEventListener('click', () => {
+    const name = document.getElementById('customLogoTeamName').value.trim();
+    if (!name) {
+      setLogoStatus('Enter the team name first, then search for its badge.');
+      return;
+    }
+    const query = encodeURIComponent(`${name} football club badge official`);
+    window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank', 'noopener,noreferrer');
+  });
+
+  logoForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!auth.currentUser) {
+      setLogoStatus('Log in as an admin to update the badge gallery.', 'error');
+      return;
+    }
+    if (!selectedLogoDataUrl) {
+      setLogoStatus('Choose a badge image before saving.', 'error');
+      return;
+    }
+
+    const saveButton = document.getElementById('saveCustomLogoButton');
+    saveButton.disabled = true;
+    setLogoStatus('Adding badge to the gallery…');
+    try {
+      await saveCustomTeamLogo({
+        name: document.getElementById('customLogoTeamName').value.trim(),
+        aliases: document.getElementById('customLogoAliases').value.split(/[,;\n]+/),
+        imageDataUrl: selectedLogoDataUrl
+      });
+      setLogoStatus('Badge added. Matching fixtures will use it automatically.', 'success');
+      await renderCustomTeamLogoGallery();
+      await refresh();
+      logoForm.reset();
+      selectedLogoDataUrl = '';
+      logoPreview.removeAttribute('src');
+      logoPreview.hidden = true;
+    } catch (error) {
+      console.error('Unable to save custom team badge:', error);
+      setLogoStatus(error.message || 'Unable to save the badge. Try again.', 'error');
+    } finally {
+      saveButton.disabled = false;
+    }
+  });
 
 
   /* OLD SCORE EDITOR */

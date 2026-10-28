@@ -130,6 +130,50 @@
       </form>
 
 
+      <section
+        id="customLogoAdminPanel"
+        data-admin-only
+        class="custom-logo-admin hidden"
+      >
+        <div class="custom-logo-admin-heading">
+          <div>
+            <p class="custom-logo-kicker">SITE-WIDE GALLERY</p>
+            <h3>Unmatched team badges</h3>
+            <p>Search for the club’s official badge, download the image, and add it here once. Include common name variations so future fixtures can recognise the team automatically.</p>
+          </div>
+          <button id="searchLogoButton" class="secondary-button" type="button">Search for badge</button>
+        </div>
+
+        <form id="teamLogoForm" class="custom-logo-admin-form">
+          <div class="fixture-row">
+            <label>
+              Team name
+              <input id="customLogoTeamName" type="text" placeholder="e.g. Lochnell FC" required>
+            </label>
+            <label>
+              Other names or spellings
+              <input id="customLogoAliases" type="text" placeholder="Comma separated, optional">
+            </label>
+          </div>
+          <div class="custom-logo-upload-row">
+            <label>
+              Badge image
+              <input id="customLogoImage" type="file" accept="image/png,image/jpeg,image/webp" required>
+            </label>
+            <img id="customLogoPreview" class="custom-logo-preview" alt="Selected team badge preview" hidden>
+          </div>
+          <button id="saveCustomLogoButton" class="primary-button" type="submit">Add to logo gallery</button>
+          <p id="customLogoStatus" class="fixture-message" aria-live="polite"></p>
+        </form>
+
+        <div class="custom-logo-gallery-heading">
+          <h4>Added badges</h4>
+          <span>These are saved online for future fixtures.</span>
+        </div>
+        <div id="customTeamLogoGallery" class="custom-logo-gallery" aria-live="polite"></div>
+      </section>
+
+
       <div
         data-admin-only
         id="matchEditor"
