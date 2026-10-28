@@ -322,6 +322,9 @@ function loadSelectedMatch() {
   ).value =
     fixture.date || '';
 
+  document.getElementById('editFixtureTime').value =
+    fixture.time || '';
+
 
   document.getElementById(
     'editFixtureOpponent'
@@ -442,6 +445,7 @@ function clearMatchEditor() {
   const ids = [
 
     'editFixtureDate',
+    'editFixtureTime',
     'editFixtureOpponent',
     'editFixtureComp',
     'editFixtureLocation',
@@ -549,6 +553,9 @@ async function saveCompleteMatch() {
       document.getElementById(
         'editFixtureDate'
       ).value,
+
+    time:
+      document.getElementById('editFixtureTime').value,
 
     opponent:
       document.getElementById(
@@ -882,6 +889,9 @@ export function initAdmin() {
 
             date:
               fixtureDate.value,
+
+            time:
+              document.getElementById('fixtureTime').value,
 
             opponent:
               fixtureOpponent

@@ -456,8 +456,10 @@ ${playerCardDisplay}
       </span>
 
       <span>
-        🕐 ${fixture.date || 'Date / time TBC'}
+        📅 ${fixture.date || 'Date TBC'}
       </span>
+
+      ${fixture.time ? `<span>🕐 ${fixture.time}</span>` : ''}
 
     </div>
 
@@ -696,6 +698,7 @@ export function renderFixtures(
 
 export async function addFixture({
   date,
+  time,
   opponent,
   competition,
   location
@@ -704,6 +707,8 @@ export async function addFixture({
   const payload = {
 
     date,
+
+    time: time || '',
 
     opponent,
 
@@ -970,6 +975,8 @@ export async function updateMatch(fixtureId, values) {
   await updateDoc(fixtureRef, {
 
     date: values.date,
+
+    time: values.time || '',
 
     opponent: values.opponent,
 

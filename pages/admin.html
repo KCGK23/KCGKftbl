@@ -80,7 +80,7 @@
       >
         <h3>Add Fixture</h3>
 
-        <div class="fixture-row">
+        <div class="fixture-row fixture-row--time">
           <label>
             Date
             <input
@@ -88,6 +88,11 @@
               type="date"
               required
             >
+          </label>
+
+          <label>
+            Kick-off time
+            <input id="fixtureTime" type="time">
           </label>
 
           <label>
@@ -145,7 +150,7 @@
         </label>
 
 
-        <div class="fixture-row">
+        <div class="fixture-row fixture-row--time">
 
           <label>
             Date
@@ -153,6 +158,11 @@
               id="editFixtureDate"
               type="date"
             >
+          </label>
+
+          <label>
+            Kick-off time
+            <input id="editFixtureTime" type="time">
           </label>
 
           <label>

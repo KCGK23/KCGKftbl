@@ -645,6 +645,7 @@ button.secondary-button:hover{transform:translateY(-2px); background:rgba(255,25
   gap:14px;
   align-items:end;
 }
+.fixture-row--time{grid-template-columns:repeat(3,minmax(0,1fr))}
 .fixture-row > label{
   margin:0;
   width:100%;
