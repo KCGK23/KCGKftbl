@@ -36,6 +36,7 @@ import {
   loadCustomTeamLogos,
   saveCustomTeamLogo
 } from './team-logos.js';
+import { initPlayerTimelineEditor } from './player-timeline.js';
 
 let currentSeasonSettings = {};
 
@@ -1407,6 +1408,7 @@ export function initAdmin() {
 
   /* INITIAL LOAD */
 
+  initPlayerTimelineEditor();
   loadPlayerStats();
 
   syncUi();

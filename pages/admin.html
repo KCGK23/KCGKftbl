@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin | KCGK</title>
-  <link rel="stylesheet" href="../css/style.css?v=admin-badge-panel">
+  <link rel="stylesheet" href="../css/style.css?v=player-timeline-editor">
 </head>
 
 <body>
@@ -536,6 +536,22 @@
 
       </div>
 
+
+      <section data-admin-only id="playerTimelineEditor" class="admin-section hidden player-timeline-editor">
+        <div class="timeline-editor-heading">
+          <div>
+            <p class="timeline-kicker">PLAYER PROFILE</p>
+            <h3>Edit Football Journey</h3>
+            <p>Update the milestones shown on the home page. Add them in the order you want visitors to read them.</p>
+          </div>
+          <button id="addTimelineMilestoneButton" class="secondary-button" type="button">+ Add milestone</button>
+        </div>
+        <div id="timelineEditorRows" class="timeline-editor-rows"></div>
+        <div class="fixture-access-buttons">
+          <button id="saveTimelineButton" class="primary-button" type="button">Save timeline</button>
+        </div>
+        <p id="timelineSaveMessage" class="fixture-message" aria-live="polite"></p>
+      </section>
 
       <section
         data-admin-only

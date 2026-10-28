@@ -144,6 +144,20 @@ header.goalkeeper p{
 .timeline-content p{margin:0;color:rgba(226,239,255,.68);font-size:.88rem}
 @media(max-width:480px){.player-timeline{margin-top:20px;padding:22px 18px}.timeline-item{gap:12px}}
 
+.player-timeline-editor{margin-top:16px}
+.timeline-editor-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
+.timeline-editor-heading h3{margin:4px 0;font-size:1.25rem}
+.timeline-editor-heading p:not(.timeline-kicker){max-width:620px;margin:0;color:rgba(226,239,255,.68);font-size:.9rem}
+.timeline-editor-rows{display:grid;gap:14px}
+.timeline-editor-row{display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid rgba(170,214,255,.13);border-radius:14px;background:linear-gradient(145deg,rgba(12,34,61,.72),rgba(8,18,34,.68))}
+.timeline-editor-row label{display:flex;flex-direction:column;gap:7px;color:rgba(248,235,235,.92);font-size:.9rem;font-weight:700;min-width:0}
+.timeline-editor-row input,.timeline-editor-row textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.16);border-radius:11px;padding:12px 14px;background:rgba(255,255,255,.07);color:#fff;font:inherit;font-weight:450;resize:vertical}
+.timeline-editor-row input{min-height:46px}
+.timeline-editor-row input:focus,.timeline-editor-row textarea:focus{outline:2px solid rgba(79,157,255,.38);outline-offset:2px}
+.timeline-remove-button{align-self:flex-start;padding:8px 13px;font-size:.82rem}
+.timeline-remove-button:disabled{opacity:.48;cursor:not-allowed;transform:none}
+@media(max-width:620px){.timeline-editor-heading{flex-direction:column}.timeline-editor-heading button{width:100%}}
+
 /* Image styling */
 .profile-card img{
   width:100%;
