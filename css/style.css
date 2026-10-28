@@ -66,35 +66,44 @@ header.goalkeeper p{
   color:var(--muted);
 }
 
-/* Profile card styling */
 .next-match-card{
   position:relative;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:24px;
+  gap:32px;
   overflow:hidden;
-  margin-top:28px;
-  padding:clamp(24px, 5vw, 42px);
-  border:1px solid rgba(169,211,255,0.26);
-  border-radius:24px;
-  background:linear-gradient(115deg, rgba(10,31,60,0.94), rgba(24,87,153,0.88) 62%, rgba(46,119,199,0.76));
-  box-shadow:0 24px 55px rgba(3,10,20,0.34), inset 0 1px 0 rgba(255,255,255,0.12);
+  isolation:isolate;
+  margin-top:24px;
+  padding:clamp(26px, 5vw, 46px);
+  border:1px solid rgba(170,214,255,0.2);
+  border-radius:28px;
+  background:
+    radial-gradient(ellipse at 88% 8%, rgba(71,156,255,.28), transparent 38%),
+    linear-gradient(120deg, #071a32 0%, #0c2c50 54%, #103d68 100%);
+  box-shadow:0 24px 58px rgba(3,10,20,0.38), inset 0 1px 0 rgba(255,255,255,0.09);
 }
-.next-match-copy{position:relative;z-index:1;min-width:0}
-.next-match-kicker{color:#9ecbff;font-size:.78rem;font-weight:800;letter-spacing:.16em}
-.next-match-card h2{margin:5px 0 4px;font-size:clamp(1.5rem,4vw,2.15rem);line-height:1.2}
-.next-match-meta{margin:0;color:rgba(244,248,255,.82)}
-.countdown{display:flex;gap:10px;margin-top:22px}
-.countdown-unit{display:grid;min-width:76px;padding:10px 12px;text-align:center;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(3,15,34,.34)}
-.countdown-unit strong{font-size:1.55rem;line-height:1.2;font-variant-numeric:tabular-nums}
-.countdown-unit span{color:rgba(244,248,255,.72);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em}
-.countdown-note{margin:7px 0 0;color:rgba(244,248,255,.64);font-size:.8rem}
-.next-match-link{display:inline-flex;gap:8px;align-items:center;margin-top:18px;color:#fff;font-weight:700;text-decoration:none}
-.next-match-link:hover{text-decoration:underline}
-.next-match-ball{flex:none;font-size:clamp(5rem,15vw,9rem);filter:drop-shadow(0 14px 18px rgba(0,0,0,.3));transform:rotate(-12deg)}
+.next-match-card::before,.next-match-card::after{position:absolute;z-index:-1;content:"";pointer-events:none}
+.next-match-card::before{width:390px;height:390px;right:-132px;top:-208px;border:1px solid rgba(184,220,255,.12);border-radius:50%;box-shadow:0 0 0 28px rgba(184,220,255,.025),0 0 0 58px rgba(184,220,255,.025),0 0 0 92px rgba(184,220,255,.02)}
+.next-match-card::after{inset:auto 0 0;height:4px;background:linear-gradient(90deg,#73f0b1,#54b6ff 55%,#9c8bff)}
+.next-match-copy{position:relative;z-index:1;min-width:0;flex:1}
+.next-match-kicker{display:inline-flex;align-items:center;gap:8px;color:#91f2bb;font-size:.73rem;font-weight:850;letter-spacing:.17em}
+.next-match-kicker::before{width:7px;height:7px;border-radius:50%;background:#75efad;box-shadow:0 0 12px rgba(117,239,173,.8);content:""}
+.next-match-card h2{max-width:620px;margin:9px 0 7px;font-size:clamp(1.65rem,4.5vw,2.55rem);line-height:1.12;letter-spacing:-.035em;text-wrap:balance}
+.next-match-meta{margin:0;color:rgba(226,239,255,.76);font-size:.95rem}
+.countdown{display:flex;gap:9px;margin-top:25px}
+.countdown-unit{display:grid;min-width:84px;padding:11px 14px 10px;text-align:left;border:1px solid rgba(193,222,255,.14);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.1),rgba(255,255,255,.035));box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.countdown-unit strong{font-size:1.8rem;line-height:1.1;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.countdown-unit span{margin-top:5px;color:rgba(216,232,250,.64);font-size:.66rem;font-weight:750;text-transform:uppercase;letter-spacing:.12em}
+.countdown-note{margin:8px 0 0;color:rgba(216,232,250,.5);font-size:.75rem}
+.next-match-link{display:inline-flex;gap:10px;align-items:center;margin-top:20px;padding:10px 14px;border:1px solid rgba(183,216,255,.2);border-radius:999px;background:rgba(255,255,255,.055);color:#fff;font-size:.88rem;font-weight:750;text-decoration:none;transition:background .16s ease,transform .16s ease}
+.next-match-link span{color:#91f2bb;font-size:1.1rem;transition:transform .16s ease}
+.next-match-link:hover{transform:translateY(-2px);background:rgba(255,255,255,.12)}
+.next-match-link:hover span{transform:translateX(3px)}
+.next-match-ball{position:relative;z-index:0;display:grid;flex:none;place-items:center;width:clamp(130px,20vw,205px);aspect-ratio:1;border:1px solid rgba(198,226,255,.14);border-radius:50%;background:radial-gradient(circle at 35% 28%,rgba(114,183,255,.22),rgba(45,107,169,.08) 62%,rgba(255,255,255,.025));box-shadow:inset 0 0 38px rgba(93,164,235,.12),0 0 70px rgba(46,128,212,.12);font-size:clamp(4rem,9vw,7rem);filter:drop-shadow(0 16px 18px rgba(0,0,0,.27));transform:rotate(-12deg)}
 .next-match-card [hidden]{display:none}
 
+/* Profile card styling */
 .profile-card{
   display:grid;
   grid-template-columns: minmax(180px, 260px) 1fr;
@@ -167,17 +176,20 @@ button:focus{outline:3px solid rgba(79,157,255,0.18); outline-offset:3px}
 
 /* Small screens */
 @media (max-width:720px){
-  .next-match-ball{font-size:5rem;opacity:.75}
+  .next-match-ball{width:125px;font-size:4.5rem;opacity:.82}
   .profile-card{grid-template-columns:1fr}
   .profile-card ul{grid-template-columns:1fr}
   header.goalkeeper .team-logo{width:64px}
 }
 
 @media (max-width:480px){
-  .next-match-card{gap:8px;padding:22px 18px}
-  .next-match-ball{position:absolute;right:8px;top:12px;font-size:4rem;opacity:.23}
-  .countdown{gap:7px}
-  .countdown-unit{min-width:62px;padding:9px 8px}
+  .next-match-card{gap:8px;padding:24px 18px 22px;border-radius:22px}
+  .next-match-ball{position:absolute;right:-28px;top:-32px;width:136px;font-size:4rem;opacity:.19}
+  .next-match-card h2{max-width:calc(100% - 25px);font-size:1.7rem}
+  .next-match-meta{max-width:calc(100% - 12px);font-size:.85rem}
+  .countdown{gap:7px;margin-top:20px}
+  .countdown-unit{min-width:0;flex:1;padding:10px 10px 9px}
+  .countdown-unit strong{font-size:1.55rem}
   header.goalkeeper{padding-right:88px;}
   header.goalkeeper h1{font-size:1.75rem;}
 }
