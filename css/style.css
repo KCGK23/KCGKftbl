@@ -132,17 +132,20 @@ header.goalkeeper p{
 .timeline-kicker{color:#91f2bb;font-size:.72rem;font-weight:850;letter-spacing:.16em}
 .player-timeline-heading h2{margin:5px 0 3px;font-size:clamp(1.4rem,3vw,1.85rem);letter-spacing:-.025em}
 .player-timeline-heading p{margin:0;color:rgba(226,239,255,.68);font-size:.92rem}
-.timeline-list{position:relative;display:grid;gap:0;margin:0;padding:0;list-style:none}
-.timeline-list::before{position:absolute;top:22px;bottom:25px;left:21px;width:2px;background:linear-gradient(#72ebb0,#54b6ff 65%,rgba(84,182,255,.18));content:""}
-.timeline-item{position:relative;display:grid;grid-template-columns:44px minmax(0,1fr);gap:15px;padding-bottom:22px}
-.timeline-item:last-child{padding-bottom:0}
+.timeline-list{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:300px;gap:16px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-color:rgba(117,239,173,.55) rgba(255,255,255,.08);scrollbar-width:thin;margin:0 -4px;padding:12px 4px 18px;list-style:none}
+.timeline-list:focus-visible{outline:2px solid rgba(117,239,173,.72);outline-offset:3px;border-radius:12px}
+.timeline-item{position:relative;display:grid;grid-template-rows:46px 1fr;gap:14px;min-height:178px;scroll-snap-align:start}
+.timeline-item::after{position:absolute;z-index:0;top:21px;left:44px;right:-16px;height:2px;background:linear-gradient(90deg,#72ebb0,#54b6ff);content:""}
+.timeline-item:last-child::after{display:none}
 .timeline-marker{z-index:1;display:grid;width:44px;height:44px;place-items:center;border:1px solid rgba(185,218,255,.18);border-radius:50%;background:#102b49;box-shadow:0 0 0 5px rgba(9,22,39,.8);font-size:1.15rem}
 .timeline-item--current .timeline-marker{border-color:rgba(117,239,173,.55);background:linear-gradient(145deg,#174c50,#123755);box-shadow:0 0 0 5px rgba(9,22,39,.8),0 0 22px rgba(117,239,173,.15)}
-.timeline-content{padding:2px 0 0}
+.timeline-content{height:100%;box-sizing:border-box;padding:16px;border:1px solid rgba(170,214,255,.13);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));box-shadow:inset 0 1px 0 rgba(255,255,255,.045)}
 .timeline-date{color:#91f2bb;font-size:.71rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
-.timeline-content h3{margin:2px 0 3px;font-size:1.02rem}
+.timeline-content h3{margin:4px 0 6px;font-size:1.02rem}
 .timeline-content p{margin:0;color:rgba(226,239,255,.68);font-size:.88rem}
-@media(max-width:480px){.player-timeline{margin-top:20px;padding:22px 18px}.timeline-item{gap:12px}}
+.timeline-scroll-hint{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0;color:rgba(226,239,255,.55);font-size:.75rem;font-weight:700;letter-spacing:.04em}
+.timeline-scroll-hint span{color:#91f2bb;font-size:1rem}
+@media(max-width:480px){.player-timeline{margin-top:20px;padding:22px 18px}.timeline-list{grid-auto-columns:minmax(0,84%);gap:12px}.timeline-item{min-height:166px}}
 
 .player-timeline-editor{margin-top:16px}
 .timeline-editor-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
@@ -154,8 +157,9 @@ header.goalkeeper p{
 .timeline-editor-row input,.timeline-editor-row textarea{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.16);border-radius:11px;padding:12px 14px;background:rgba(255,255,255,.07);color:#fff;font:inherit;font-weight:450;resize:vertical}
 .timeline-editor-row input{min-height:46px}
 .timeline-editor-row input:focus,.timeline-editor-row textarea:focus{outline:2px solid rgba(79,157,255,.38);outline-offset:2px}
-.timeline-remove-button{align-self:flex-start;padding:8px 13px;font-size:.82rem}
-.timeline-remove-button:disabled{opacity:.48;cursor:not-allowed;transform:none}
+.timeline-editor-actions{display:flex;flex-wrap:wrap;gap:8px}
+.timeline-editor-actions button{padding:8px 13px;font-size:.82rem}
+.timeline-editor-actions button:disabled{opacity:.48;cursor:not-allowed;transform:none}
 @media(max-width:620px){.timeline-editor-heading{flex-direction:column}.timeline-editor-heading button{width:100%}}
 
 /* Image styling */

@@ -85,10 +85,24 @@ function createEditorRow(entry = {}) {
       <label>Milestone heading<input class="timeline-edit-title" maxlength="70" placeholder="e.g. First clean sheet"></label>
     </div>
     <label>Story<textarea class="timeline-edit-description" rows="3" maxlength="240" placeholder="Add a short detail about this milestone"></textarea></label>
-    <button class="secondary-button timeline-remove-button" type="button">Remove milestone</button>`;
+    <div class="timeline-editor-actions">
+      <button class="secondary-button timeline-move-up" type="button" aria-label="Move milestone earlier">↑ Earlier</button>
+      <button class="secondary-button timeline-move-down" type="button" aria-label="Move milestone later">↓ Later</button>
+      <button class="secondary-button timeline-remove-button" type="button">Remove milestone</button>
+    </div>`;
   row.querySelector('.timeline-edit-date').value = entry.date || '';
   row.querySelector('.timeline-edit-title').value = entry.title || '';
   row.querySelector('.timeline-edit-description').value = entry.description || '';
+  row.querySelector('.timeline-move-up').addEventListener('click', () => {
+    const previous = row.previousElementSibling;
+    if (previous) row.parentElement.insertBefore(row, previous);
+    updateTimelineRowButtons();
+  });
+  row.querySelector('.timeline-move-down').addEventListener('click', () => {
+    const next = row.nextElementSibling;
+    if (next) row.parentElement.insertBefore(next, row);
+    updateTimelineRowButtons();
+  });
   row.querySelector('.timeline-remove-button').addEventListener('click', () => {
     row.remove();
     updateTimelineRowButtons();
@@ -99,9 +113,10 @@ function createEditorRow(entry = {}) {
 function updateTimelineRowButtons() {
   const rows = [...document.querySelectorAll('#timelineEditorRows .timeline-editor-row')];
   rows.forEach((row, index) => {
-    const button = row.querySelector('.timeline-remove-button');
-    button.disabled = rows.length === 1;
-    button.textContent = `Remove milestone ${index + 1}`;
+    row.querySelector('.timeline-remove-button').disabled = rows.length === 1;
+    row.querySelector('.timeline-remove-button').textContent = `Remove milestone ${index + 1}`;
+    row.querySelector('.timeline-move-up').disabled = index === 0;
+    row.querySelector('.timeline-move-down').disabled = index === rows.length - 1;
   });
 }
 
