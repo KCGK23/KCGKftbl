@@ -67,6 +67,34 @@ header.goalkeeper p{
 }
 
 /* Profile card styling */
+.next-match-card{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  overflow:hidden;
+  margin-top:28px;
+  padding:clamp(24px, 5vw, 42px);
+  border:1px solid rgba(169,211,255,0.26);
+  border-radius:24px;
+  background:linear-gradient(115deg, rgba(10,31,60,0.94), rgba(24,87,153,0.88) 62%, rgba(46,119,199,0.76));
+  box-shadow:0 24px 55px rgba(3,10,20,0.34), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.next-match-copy{position:relative;z-index:1;min-width:0}
+.next-match-kicker{color:#9ecbff;font-size:.78rem;font-weight:800;letter-spacing:.16em}
+.next-match-card h2{margin:5px 0 4px;font-size:clamp(1.5rem,4vw,2.15rem);line-height:1.2}
+.next-match-meta{margin:0;color:rgba(244,248,255,.82)}
+.countdown{display:flex;gap:10px;margin-top:22px}
+.countdown-unit{display:grid;min-width:76px;padding:10px 12px;text-align:center;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(3,15,34,.34)}
+.countdown-unit strong{font-size:1.55rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.countdown-unit span{color:rgba(244,248,255,.72);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em}
+.countdown-note{margin:7px 0 0;color:rgba(244,248,255,.64);font-size:.8rem}
+.next-match-link{display:inline-flex;gap:8px;align-items:center;margin-top:18px;color:#fff;font-weight:700;text-decoration:none}
+.next-match-link:hover{text-decoration:underline}
+.next-match-ball{flex:none;font-size:clamp(5rem,15vw,9rem);filter:drop-shadow(0 14px 18px rgba(0,0,0,.3));transform:rotate(-12deg)}
+.next-match-card [hidden]{display:none}
+
 .profile-card{
   display:grid;
   grid-template-columns: minmax(180px, 260px) 1fr;
@@ -139,12 +167,17 @@ button:focus{outline:3px solid rgba(79,157,255,0.18); outline-offset:3px}
 
 /* Small screens */
 @media (max-width:720px){
+  .next-match-ball{font-size:5rem;opacity:.75}
   .profile-card{grid-template-columns:1fr}
   .profile-card ul{grid-template-columns:1fr}
   header.goalkeeper .team-logo{width:64px}
 }
 
 @media (max-width:480px){
+  .next-match-card{gap:8px;padding:22px 18px}
+  .next-match-ball{position:absolute;right:8px;top:12px;font-size:4rem;opacity:.23}
+  .countdown{gap:7px}
+  .countdown-unit{min-width:62px;padding:9px 8px}
   header.goalkeeper{padding-right:88px;}
   header.goalkeeper h1{font-size:1.75rem;}
 }
