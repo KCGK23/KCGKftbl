@@ -67,6 +67,15 @@ function makeTimelineItem(entry, index) {
 export async function renderPlayerTimeline() {
   const list = document.getElementById('playerTimelineList');
   if (!list) return;
+  const controls = document.querySelectorAll('[data-timeline-scroll]');
+  controls.forEach(button => {
+    if (button.dataset.initialized === 'true') return;
+    button.dataset.initialized = 'true';
+    button.addEventListener('click', () => {
+      const direction = button.dataset.timelineScroll === 'left' ? -1 : 1;
+      list.scrollBy({ left: direction * Math.max(260, list.clientWidth * 0.8), behavior: 'smooth' });
+    });
+  });
   try {
     const entries = await loadPlayerTimeline();
     list.replaceChildren(...entries.map(makeTimelineItem));
@@ -129,8 +138,12 @@ export async function initPlayerTimelineEditor() {
   } catch (error) {
     console.warn('Unable to load timeline editor:', error);
     rows.replaceChildren(...starterTimeline.map(createEditorRow));
+    const message = document.getElementById('timelineSaveMessage');
+    if (message) message.textContent = 'Could not load the saved timeline. Check your connection and try again.';
   }
   updateTimelineRowButtons();
+  if (rows.dataset.initialized === 'true') return;
+  rows.dataset.initialized = 'true';
   document.getElementById('addTimelineMilestoneButton')?.addEventListener('click', () => {
     rows.append(createEditorRow());
     updateTimelineRowButtons();
@@ -155,6 +168,7 @@ export async function initPlayerTimelineEditor() {
       rows.replaceChildren(...saved.map(createEditorRow));
       updateTimelineRowButtons();
       message.textContent = 'Timeline saved. It will appear on the home page.';
+      window.dispatchEvent(new CustomEvent('player-timeline-updated', { detail: saved }));
     } catch (error) {
       message.textContent = error.message || 'Unable to save the timeline.';
     } finally {

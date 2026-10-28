@@ -36,7 +36,7 @@ import {
   loadCustomTeamLogos,
   saveCustomTeamLogo
 } from './team-logos.js';
-import { initPlayerTimelineEditor } from './player-timeline.js';
+import { initPlayerTimelineEditor } from './player-timeline.js?v=horizontal-timeline-editor-fix';
 
 let currentSeasonSettings = {};
 
@@ -213,7 +213,7 @@ function syncUi() {
   if (!loggedIn) {
 
     message(
-      'Log in to manage fixtures, scores, tournaments, and player stats.'
+      'Log in to manage fixtures, scores, tournaments, player stats, and the player timeline.'
     );
 
   }
@@ -860,6 +860,7 @@ export function initAdmin() {
     async () => {
 
       syncUi();
+      await initPlayerTimelineEditor();
 
       await refresh();
       if (auth.currentUser) {
@@ -1408,7 +1409,6 @@ export function initAdmin() {
 
   /* INITIAL LOAD */
 
-  initPlayerTimelineEditor();
   loadPlayerStats();
 
   syncUi();

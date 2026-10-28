@@ -128,7 +128,7 @@ header.goalkeeper p{
   background:linear-gradient(145deg,rgba(12,34,61,.84),rgba(8,18,34,.78));
   box-shadow:0 20px 50px rgba(3,10,20,.3);
 }
-.player-timeline-heading{margin-bottom:25px}
+.player-timeline-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:18px}
 .timeline-kicker{color:#91f2bb;font-size:.72rem;font-weight:850;letter-spacing:.16em}
 .player-timeline-heading h2{margin:5px 0 3px;font-size:clamp(1.4rem,3vw,1.85rem);letter-spacing:-.025em}
 .player-timeline-heading p{margin:0;color:rgba(226,239,255,.68);font-size:.92rem}
@@ -145,7 +145,10 @@ header.goalkeeper p{
 .timeline-content p{margin:0;color:rgba(226,239,255,.68);font-size:.88rem}
 .timeline-scroll-hint{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:0;color:rgba(226,239,255,.55);font-size:.75rem;font-weight:700;letter-spacing:.04em}
 .timeline-scroll-hint span{color:#91f2bb;font-size:1rem}
-@media(max-width:480px){.player-timeline{margin-top:20px;padding:22px 18px}.timeline-list{grid-auto-columns:minmax(0,84%);gap:12px}.timeline-item{min-height:166px}}
+.timeline-scroll-controls{display:flex;gap:8px;flex:none}
+.timeline-scroll-controls button{display:grid;width:38px;height:38px;place-items:center;padding:0;border:1px solid rgba(183,216,255,.2);background:rgba(255,255,255,.055);font-size:1.15rem}
+.timeline-scroll-controls button:hover{background:rgba(255,255,255,.13)}
+@media(max-width:480px){.player-timeline{margin-top:20px;padding:22px 18px}.player-timeline-heading{align-items:center}.timeline-list{grid-auto-columns:minmax(0,84%);gap:12px}.timeline-item{min-height:166px}.timeline-scroll-controls button{width:34px;height:34px}}
 
 .player-timeline-editor{margin-top:16px}
 .timeline-editor-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
