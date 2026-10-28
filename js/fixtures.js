@@ -12,6 +12,7 @@ import {
   deleteDoc,
   serverTimestamp
 } from './firebase.js';
+import { getTeamLogoUrl } from './team-logos.js';
 
 export const LOCAL_FIXTURE_KEY = 'localFixtures';
 export const HOME_TEAM_NAME = 'Renfrew Juniors';
@@ -279,6 +280,7 @@ const homeLogo =
     fixture.opponentLogo ||
     fixture.awayLogoUrl ||
     fixture.awayLogo ||
+    getTeamLogoUrl(fixture.opponent) ||
     DEFAULT_OPPONENT_LOGO;
 
 
