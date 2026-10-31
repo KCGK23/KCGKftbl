@@ -1,7 +1,7 @@
 {
   "source": "https://www.pjdyfl.co.uk/leaguetablefeed/1058",
   "league": "2026/2027 - PJDYFL 2011 Division 3",
-  "updatedAt": "2026-10-31T16:24:57.358246+00:00",
+  "updatedAt": "2026-10-31T20:08:03.787795+00:00",
   "myTeam": "Renfrew Football Club Blue (2011)",
   "teams": [
     {
@@ -43,14 +43,14 @@
     {
       "position": 4,
       "club": "Ardgowan Thistle FC (2011)",
-      "played": 6,
-      "won": 4,
+      "played": 7,
+      "won": 5,
       "drawn": 1,
       "lost": 1,
       "goalsFor": null,
       "goalsAgainst": null,
       "goalDifference": null,
-      "points": 13
+      "points": 16
     },
     {
       "position": 5,
@@ -139,10 +139,10 @@
     {
       "position": 12,
       "club": "Erskine Youth F C (Thistle) (2011)",
-      "played": 6,
+      "played": 7,
       "won": 0,
       "drawn": 2,
-      "lost": 4,
+      "lost": 5,
       "goalsFor": null,
       "goalsAgainst": null,
       "goalDifference": null,
