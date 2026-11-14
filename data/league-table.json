@@ -1,7 +1,7 @@
 {
   "source": "https://www.pjdyfl.co.uk/leaguetablefeed/1058",
   "league": "2026/2027 - PJDYFL 2011 Division 3",
-  "updatedAt": "2026-11-14T11:01:47.755499+00:00",
+  "updatedAt": "2026-11-14T17:13:37.529495+00:00",
   "myTeam": "Renfrew Football Club Blue (2011)",
   "teams": [
     {
@@ -54,23 +54,23 @@
     },
     {
       "position": 5,
+      "club": "Irvine Meadow (2011)",
+      "played": 8,
+      "won": 4,
+      "drawn": 3,
+      "lost": 1,
+      "goalsFor": null,
+      "goalsAgainst": null,
+      "goalDifference": null,
+      "points": 15
+    },
+    {
+      "position": 6,
       "club": "Erskine Youth F C (Utd) (2011)",
       "played": 6,
       "won": 4,
       "drawn": 0,
       "lost": 2,
-      "goalsFor": null,
-      "goalsAgainst": null,
-      "goalDifference": null,
-      "points": 12
-    },
-    {
-      "position": 6,
-      "club": "Irvine Meadow (2011)",
-      "played": 7,
-      "won": 3,
-      "drawn": 3,
-      "lost": 1,
       "goalsFor": null,
       "goalsAgainst": null,
       "goalDifference": null,
@@ -91,10 +91,10 @@
     {
       "position": 8,
       "club": "St Mirren Youth FC White (2011)",
-      "played": 6,
+      "played": 7,
       "won": 2,
       "drawn": 0,
-      "lost": 4,
+      "lost": 5,
       "goalsFor": null,
       "goalsAgainst": null,
       "goalDifference": null,
