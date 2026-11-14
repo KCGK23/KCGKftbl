@@ -1,11 +1,23 @@
 {
   "source": "https://www.pjdyfl.co.uk/leaguetablefeed/1058",
   "league": "2026/2027 - PJDYFL 2011 Division 3",
-  "updatedAt": "2026-11-14T17:13:37.529495+00:00",
+  "updatedAt": "2026-11-14T21:36:22.463145+00:00",
   "myTeam": "Renfrew Football Club Blue (2011)",
   "teams": [
     {
       "position": 1,
+      "club": "Harmony Row YC Athletic (2011)",
+      "played": 10,
+      "won": 7,
+      "drawn": 1,
+      "lost": 2,
+      "goalsFor": null,
+      "goalsAgainst": null,
+      "goalDifference": null,
+      "points": 22
+    },
+    {
+      "position": 2,
       "club": "Greenock HSFP AFC Black(2011)",
       "played": 7,
       "won": 7,
@@ -17,24 +29,12 @@
       "points": 21
     },
     {
-      "position": 2,
+      "position": 3,
       "club": "Lochnell FC (2011)",
       "played": 8,
       "won": 6,
       "drawn": 1,
       "lost": 1,
-      "goalsFor": null,
-      "goalsAgainst": null,
-      "goalDifference": null,
-      "points": 19
-    },
-    {
-      "position": 3,
-      "club": "Harmony Row YC Athletic (2011)",
-      "played": 9,
-      "won": 6,
-      "drawn": 1,
-      "lost": 2,
       "goalsFor": null,
       "goalsAgainst": null,
       "goalDifference": null,
@@ -79,10 +79,10 @@
     {
       "position": 7,
       "club": "Clydebank FC Red (2011)",
-      "played": 8,
+      "played": 9,
       "won": 2,
       "drawn": 2,
-      "lost": 4,
+      "lost": 5,
       "goalsFor": null,
       "goalsAgainst": null,
       "goalDifference": null,
